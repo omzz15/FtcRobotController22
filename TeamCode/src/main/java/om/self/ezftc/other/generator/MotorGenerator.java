@@ -35,22 +35,4 @@ public class MotorGenerator {
                 .toSupplier(new DeadZoneModifier<T>(deadZoneMin, deadZoneMax)
                         .toSupplier(make(useSecondGamepad, conversion)));
     }
-
-    @Autowired
-    public void construct(OpMode opMode, EventManager eventManager){
-        //set opMode
-        ControlGenerator.opMode = opMode;
-        //load controls on init
-        eventManager.attachToEvent(EventManager.CommonTrigger.INIT, this::load);
-    }
-
-    private void load(){
-        //set all gamepads
-        for (Map.Entry<LinkedSupplier<Gamepad, ?>, Boolean> entry: unlinkedSuppliers) {
-            if(entry.getValue()) entry.getKey().setInput(opMode.gamepad2);
-            else entry.getKey().setInput(opMode.gamepad1);
-        }
-        //clean up in case there is another ControlGenerator
-        unlinkedSuppliers.clear();
-    }
 }
