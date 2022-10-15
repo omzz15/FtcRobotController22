@@ -8,5 +8,5 @@ import java.util.function.Function;
 
 @Bean(alwaysLoad = true)
 public class Drive extends RobotPart<DriveSettings, DriveHardware> {
-    Function<Float, Float> xRamp = new SimpleRampedModifier<>();
+    //Function<Float, Float> xRamp = new SimpleRampedModifier<>();
 }

@@ -32,7 +32,7 @@ public class RobotPart<SETTINGS, HARDWARE>{
 
     /**
      * this sets the name for any descriptors and for the task manager Group
-     * @apiNote YOU MUST call this before starting robot, and it must be unique unless events should be linked
+     * @apiNote YOU MUST call this before starting robot, and it must be unique unless events should be linked and it can override the task manager
      * @param name the name of this part
      */
     public void setName(String name){

@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import om.self.beans.Bean;
 import om.self.beans.core.Autowired;
+import om.self.supplier.Utils;
 import om.self.supplier.modifiers.DeadZoneModifier;
 import om.self.supplier.modifiers.SimpleRampedModifier;
 import om.self.supplier.suppliers.LinkedSupplier;
@@ -31,13 +32,13 @@ public class ControlGenerator{
         return supplier;
     }
 
-    public static<T extends Number & Comparable<T>> Supplier<T> makeEx(boolean useSecondGamepad, Function<Gamepad, T> conversion, T deadZoneMin, T deadZoneMax, T ramp, T currVal){
-        return new SimpleRampedModifier<T>(ramp,currVal)
-                .toSupplier(new DeadZoneModifier<T>(deadZoneMin, deadZoneMax)
-                        .toSupplier(make(useSecondGamepad, conversion)));
+    public static Supplier<Double> makeEx(boolean useSecondGamepad, Function<Gamepad, Double> conversion, double deadZoneMin, double deadZoneMax, double ramp, double currVal){
+        return () -> new DeadZoneModifier<>(deadZoneMin, deadZoneMax)
+                        .toSupplier(new SimpleRampedModifier(ramp,currVal)
+                            .toSupplier(make(useSecondGamepad, conversion))).get();
     }
 
-    public static Supplier<Float> makeEx(boolean useSecondGamepad, Function<Gamepad, Float> conversion, float deadZone, float ramp){
+    public static Supplier<Double> makeEx(boolean useSecondGamepad, Function<Gamepad, Double> conversion, double deadZone, double ramp){
         return makeEx(useSecondGamepad, conversion, -deadZone, deadZone, ramp, 0f);
     }
 
