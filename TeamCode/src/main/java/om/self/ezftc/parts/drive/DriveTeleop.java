@@ -15,9 +15,9 @@ import om.self.task.core.EventManager;
  * <br>
  * USED EVENTS:
  * <ul>
- *     <li>INIT_DRIVE --> INIT_DRIVE_TELEMETRY</li>
- *     <li>START_DRIVE --> START_DRIVE_TELEMETRY</li>
- *     <li>STOP_DRIVE --> STOP_DRIVE_TELEMETRY</li>
+ *     <li>INIT_DRIVE --> INIT_DRIVE_TELEOP</li>
+ *     <li>START_DRIVE --> START_DRIVE_TELEOP</li>
+ *     <li>STOP_DRIVE --> STOP_DRIVE_TELEOP</li>
  * </ul>
  * USED BEANS:
  * <ul>
@@ -37,10 +37,11 @@ public class DriveTeleop extends TeleopPart<Drive> {
             .toSupplier(ControlGenerator.make(useSecondGamepad, gamepad -> gamepad.left_stick_y));
     private Supplier<Float> driveRPower = new DeadZoneModifier<>(input -> 0f, -0.07f,0.07f)
             .toSupplier(ControlGenerator.make(useSecondGamepad, gamepad -> gamepad.right_stick_x));
-
+    private Supplier<Boolean> stopButton = ControlGenerator.make(useSecondGamepad, gamepad -> gamepad.x);
 
     @Override
     public void onRun() {
-
+        if(stopButton.get()) getPart().stopRobot();
+        else getPart().setPower(driveXPower.get(),driveYPower.get(),driveRPower.get());
     }
 }

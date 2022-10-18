@@ -27,7 +27,7 @@ public class MotorContainer {
         this.motor = motor;
     }
 
-    DcMotor getMotor(){
+    public DcMotor getMotor(){
         return motor;
     }
 

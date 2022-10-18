@@ -1,5 +1,7 @@
 package om.self.ezftc.core;
 
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import om.self.beans.Bean;
 import om.self.beans.core.Autowired;
 import om.self.task.core.EventManager;
@@ -21,6 +23,7 @@ public class RobotPart<SETTINGS, HARDWARE>{
 
     @Autowired
     public void setSettings(SETTINGS settings) {
+        onSettingsUpdate(settings);
         this.settings = settings;
     }
 
@@ -30,6 +33,7 @@ public class RobotPart<SETTINGS, HARDWARE>{
 
     @Autowired
     public void setHardware(HARDWARE hardware) {
+        onHardwareUpdate(hardware);
         this.hardware = hardware;
     }
 
@@ -78,6 +82,10 @@ public class RobotPart<SETTINGS, HARDWARE>{
 
     //----------Triggered methods----------//
     public void onInit(){}
+
+    public void onSettingsUpdate(SETTINGS settings){}
+
+    public void onHardwareUpdate(HARDWARE hardware){}
 
     public void onStart(){}
 

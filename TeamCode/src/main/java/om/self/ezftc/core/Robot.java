@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import om.self.beans.PackageBeanManager;
+import om.self.beans.core.Utils;
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;
 
@@ -87,7 +88,10 @@ public class Robot {
 
         //load everything
         beanManager.setFilter(
-                (bean) -> (!bean.getClass().isAnnotationPresent(Part.class)) || parts.contains(bean.getClass().getAnnotation(Part.class).value())
+                bean -> {
+                    Part part = Utils.getAnnotationRecursively(bean.getClass(), Part.class);
+                    return part == null || parts.contains(part.value());
+                }
         );
         beanManager.load();
 
