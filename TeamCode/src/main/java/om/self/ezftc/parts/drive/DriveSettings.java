@@ -2,7 +2,7 @@ package om.self.ezftc.parts.drive;
 
 import om.self.beans.Bean;
 
-@Bean
+@Bean(alwaysLoad = true)
 public class DriveSettings {
     public DriveMode driveMode = DriveMode.MECANUM;
 

@@ -1,4 +1,4 @@
-package om.self.ezftc.other.generator;
+package om.self.ezftc.other;
 
 import om.self.task.core.EventManager;
 
@@ -15,19 +15,19 @@ public class Generator<LINK, E> {
         this.linkFunction = linkFunction;
     }
 
-    void add(E unlinkedObj){
+    public void add(E unlinkedObj){
         unlinked.add(unlinkedObj);
     }
 
-    void init(LINK link, EventManager eventManager){
+    public void init(LINK link, EventManager eventManager){
         //set opMode
         this.link = link;
-        //load controls on init
+        //load on init
         eventManager.attachToEvent(EventManager.CommonTrigger.INIT, this::load);
     }
 
     private void load(){
-        //set all gamepads
+        //set all unliked things
         for (E entry: unlinked) {
             linkFunction.accept(link, entry);
         }

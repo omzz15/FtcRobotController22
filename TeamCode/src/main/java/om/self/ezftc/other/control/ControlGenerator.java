@@ -1,11 +1,12 @@
-package om.self.ezftc.other.generator;
+package om.self.ezftc.other.control;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import om.self.beans.Bean;
 import om.self.beans.core.Autowired;
-import om.self.supplier.Utils;
+import om.self.ezftc.other.Generator;
 import om.self.supplier.modifiers.DeadZoneModifier;
+import om.self.supplier.modifiers.NumberConverter;
 import om.self.supplier.modifiers.SimpleRampedModifier;
 import om.self.supplier.suppliers.LinkedSupplier;
 import om.self.task.core.EventManager;
@@ -32,13 +33,15 @@ public class ControlGenerator{
         return supplier;
     }
 
-    public static Supplier<Double> makeEx(boolean useSecondGamepad, Function<Gamepad, Double> conversion, double deadZoneMin, double deadZoneMax, double ramp, double currVal){
-        return () -> new DeadZoneModifier<>(deadZoneMin, deadZoneMax)
-                        .toSupplier(new SimpleRampedModifier(ramp,currVal)
-                            .toSupplier(make(useSecondGamepad, conversion))).get();
+    public static Supplier<Float> makeEx(boolean useSecondGamepad, Function<Gamepad, Float> conversion, double deadZoneMin, double deadZoneMax, double ramp, double currVal){
+        return new NumberConverter<>(Double.class, Float.class)
+                        .toSupplier(new DeadZoneModifier<>(deadZoneMin, deadZoneMax)
+                            .toSupplier(new SimpleRampedModifier(ramp,currVal)
+                                .toSupplier(new NumberConverter<>(Float.class, Double.class)
+                                    .toSupplier(make(useSecondGamepad, conversion)))));
     }
 
-    public static Supplier<Double> makeEx(boolean useSecondGamepad, Function<Gamepad, Double> conversion, double deadZone, double ramp){
+    public static Supplier<Float> makeEx(boolean useSecondGamepad, Function<Gamepad, Float> conversion, double deadZone, double ramp){
         return makeEx(useSecondGamepad, conversion, -deadZone, deadZone, ramp, 0f);
     }
 

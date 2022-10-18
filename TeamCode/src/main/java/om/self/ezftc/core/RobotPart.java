@@ -1,10 +1,13 @@
 package om.self.ezftc.core;
 
+import om.self.beans.Bean;
 import om.self.beans.core.Autowired;
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;
 import om.self.task.core.Task;
 
+@Bean(alwaysLoad = true)
+@Part("")
 public class RobotPart<SETTINGS, HARDWARE>{
     private String name;
     private final Group taskManager = new Group(null);

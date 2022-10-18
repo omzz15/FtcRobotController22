@@ -5,6 +5,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeServices;
 
+import java.lang.ref.SoftReference;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import om.self.beans.PackageBeanManager;
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;
@@ -18,6 +24,10 @@ import om.self.task.core.Group;
  *     <li>INIT</li>
  *     <li>START</li>
  *     <li>STOP</li>
+ * </ul>
+ * USED BEANS:
+ * <ul>
+ *     <li>NONE</li>
  * </ul>
  * ADDED BEANS:
  * <ul>
@@ -36,11 +46,28 @@ public class Robot {
     public final Group taskManager = new Group("main");
 
     //other things
+    private final Set<String> parts = new HashSet<>();
     public final OpMode opMode;
 
     public Robot(OpMode opMode) {
-
         this.opMode = opMode;
+    }
+
+    public Robot(OpMode opMode, String... parts){
+        this.opMode = opMode;
+        this.parts.addAll(Arrays.stream(parts).collect(Collectors.toList()));
+    }
+
+    public Set<String> getParts() {
+        return parts;
+    }
+
+    public void addPart(String part){
+        parts.add(part);
+    }
+
+    public void removePart(String part){
+        parts.remove(part);
     }
 
     public void init(){
@@ -59,6 +86,9 @@ public class Robot {
         beanManager.addBean(opMode.internalOpModeServices, false, true);
 
         //load everything
+        beanManager.setFilter(
+                (bean) -> (!bean.getClass().isAnnotationPresent(Part.class)) || parts.contains(bean.getClass().getAnnotation(Part.class).value())
+        );
         beanManager.load();
 
         //trigger init
