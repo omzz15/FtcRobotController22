@@ -42,6 +42,19 @@ public class Drive extends RobotPart<DriveSettings, DriveHardware> {
         getHardware().BRMotor.getMotor().setPower(pows[3]);
     }
 
+//    void headlessMoveRobot(double offset)
+//    {
+//        double curAngle = -robot.positionTracker.currentPosition.R + offset;
+//        curAngle = robot.scaleAngle(curAngle);
+//        double gamepadAngle = robot.getAngleFromXY(-gamepad1.left_stick_x, -gamepad1.left_stick_y);
+//        double error = -robot.findAngleError(curAngle,gamepadAngle);
+//        double power = Math.max(Math.abs(gamepad1.left_stick_x), Math.abs(gamepad1.left_stick_y));
+//        double[] XY = robot.getXYFromAngle(error);
+//        XY[0] *= power;
+//        XY[1] *= power;
+//        robot.robotHardware.setMotorsToSeparatePowersArrayList(robot.robotHardware.driveMotors, moveRobotPowers(XY[0],XY[1],gamepad1.right_stick_x, true, true));
+//    }
+
     public void stopRobot(){
         xRamp.setCurrentVal(0);
         yRamp.setCurrentVal(0);

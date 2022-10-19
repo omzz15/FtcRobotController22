@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import om.self.beans.PackageBeanManager;
 import om.self.beans.core.Utils;
+import om.self.ezftc.other.control.ControlGenerator;
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;
 

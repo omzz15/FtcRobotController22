@@ -2,7 +2,7 @@ package om.self.ezftc.parts.drive.settings;
 
 import om.self.beans.core.Profile;
 
-@Profile
+@Profile("fast")
 public class DefaultDriveSettings extends DriveSettings{
     public DefaultDriveSettings() {
         super(
