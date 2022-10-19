@@ -1,11 +1,9 @@
 package om.self.ezftc.other.hardware.motor;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import om.self.beans.core.Autowired;
 import om.self.ezftc.other.Generator;
-import om.self.task.core.EventManager;
+
 
 public class MotorGenerator {
     private static final Generator<HardwareMap, MotorContainer> generator = new Generator<>((hardwareMap, link) -> {
@@ -13,9 +11,9 @@ public class MotorGenerator {
         link.updateMotor(true);
     });
 
-    @Autowired
-    public void construct(HardwareMap hardwareMap, EventManager eventManager){
-        generator.init(hardwareMap,eventManager);
+
+    public static void generate(HardwareMap hardwareMap){
+        generator.load(hardwareMap);
     }
 
 

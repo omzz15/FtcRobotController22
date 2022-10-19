@@ -1,10 +1,6 @@
 package om.self.ezftc.parts.drive.settings;
 
-import om.self.beans.Bean;
-import om.self.ezftc.core.Part;
 
-@Bean(alwaysLoad = true)
-@Part("drive")
 public class DriveSettings {
     public final DriveMode driveMode;
 

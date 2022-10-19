@@ -1,11 +1,7 @@
 package om.self.ezftc.parts.drive.hardware;
 
-import om.self.beans.Bean;
-import om.self.ezftc.core.Part;
 import om.self.ezftc.other.hardware.motor.MotorContainer;
 
-@Bean(alwaysLoad = true)
-@Part("drive")
 public class DriveHardware {
     public final MotorContainer FLMotor;
     public final MotorContainer FRMotor;

@@ -1,15 +1,9 @@
 package om.self.ezftc.core;
 
-import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import om.self.beans.Bean;
-import om.self.beans.core.Autowired;
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;
 import om.self.task.core.Task;
 
-@Bean(alwaysLoad = true)
-@Part("")
 public class RobotPart<SETTINGS, HARDWARE>{
     private String name;
     private final Group taskManager = new Group(null);
@@ -21,7 +15,6 @@ public class RobotPart<SETTINGS, HARDWARE>{
         return settings;
     }
 
-    @Autowired
     public void setSettings(SETTINGS settings) {
         onSettingsUpdate(settings);
         this.settings = settings;
@@ -31,7 +24,6 @@ public class RobotPart<SETTINGS, HARDWARE>{
         return hardware;
     }
 
-    @Autowired
     public void setHardware(HARDWARE hardware) {
         onHardwareUpdate(hardware);
         this.hardware = hardware;
@@ -50,30 +42,28 @@ public class RobotPart<SETTINGS, HARDWARE>{
         return name;
     }
 
-    @Autowired
-    public void construct(Group taskManager, EventManager eventManager){
+    public void init(Robot robot, SETTINGS settings, HARDWARE hardware){
         //-----task manager-----//
         this.taskManager.setName(name);
         taskManager.attachChild(this.taskManager);
         new Task("main loop", this.taskManager).setRunnable(this::onRun);
 
         //-----event manager-----//
-        //make/attach init
-        String initEventName = "INIT_" + name.toUpperCase();
-        eventManager.attachToEvent(initEventName, this::onInit);
-        eventManager.attachToEvent(EventManager.CommonTrigger.INIT, () -> eventManager.triggerEvent(initEventName));
-
         //make/attach start
         String startEventName = "START_" + name.toUpperCase();
-        eventManager.attachToEvent(startEventName, this::onStart);
-        eventManager.attachToEvent(startEventName, () -> taskManager.runCommand(Group.Command.START));
-        eventManager.attachToEvent(EventManager.CommonTrigger.START, () -> eventManager.triggerEvent(startEventName));
+        robot.eventManager.attachToEvent(startEventName, this::onStart);
+        robot.eventManager.attachToEvent(startEventName, () -> taskManager.runCommand(Group.Command.START));
+        robot.eventManager.attachToEvent(EventManager.CommonTrigger.START, () -> robot.eventManager.triggerEvent(startEventName));
 
         //make/attach stop
         String stopEventName = "STOP_" + name.toUpperCase();
-        eventManager.attachToEvent(stopEventName, this::onStop);
-        eventManager.attachToEvent(stopEventName, () -> taskManager.runCommand(Group.Command.PAUSE));
-        eventManager.attachToEvent(EventManager.CommonTrigger.STOP, () -> eventManager.triggerEvent(stopEventName));
+        robot.eventManager.attachToEvent(stopEventName, this::onStop);
+        robot.eventManager.attachToEvent(stopEventName, () -> taskManager.runCommand(Group.Command.PAUSE));
+        robot.eventManager.attachToEvent(EventManager.CommonTrigger.STOP, () -> robot.eventManager.triggerEvent(stopEventName));
+
+        setSettings(settings);
+        setHardware(hardware);
+        onInit();
     }
     public Group getTaskManager(){
         return taskManager;

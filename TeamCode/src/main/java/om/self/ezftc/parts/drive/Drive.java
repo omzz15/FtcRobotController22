@@ -2,13 +2,11 @@ package om.self.ezftc.parts.drive;
 
 import java.util.function.Function;
 
-import om.self.ezftc.core.Part;
 import om.self.ezftc.core.RobotPart;
 import om.self.ezftc.parts.drive.hardware.DriveHardware;
 import om.self.ezftc.parts.drive.settings.DriveSettings;
 import om.self.supplier.modifiers.SimpleRampedModifier;
 
-@Part("drive")
 public class Drive extends RobotPart<DriveSettings, DriveHardware> {
     private double xTarget = 0;
     private double yTarget = 0;

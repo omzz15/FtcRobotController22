@@ -2,11 +2,9 @@ package om.self.ezftc.parts.drive;
 
 import java.util.function.Supplier;
 
-import om.self.ezftc.core.Part;
 import om.self.ezftc.core.TeleopPart;
 import om.self.ezftc.other.control.ControlGenerator;
 import om.self.supplier.modifiers.DeadZoneModifier;
-import om.self.supplier.modifiers.NumberConverter;
 import om.self.task.core.EventManager;
 
 /**
@@ -28,7 +26,6 @@ import om.self.task.core.EventManager;
  * <ul>
  *   <li>{@link DriveTeleop}</li>
  */
-@Part("drive")
 public class DriveTeleop extends TeleopPart<Drive> {
     private boolean useSecondGamepad = false;
     private Supplier<Float> driveXPower = new DeadZoneModifier<>(input -> 0f, -0.07f,0.07f)

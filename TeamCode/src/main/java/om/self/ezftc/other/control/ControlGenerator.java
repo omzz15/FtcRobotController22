@@ -2,8 +2,6 @@ package om.self.ezftc.other.control;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import om.self.beans.Bean;
-import om.self.beans.core.Autowired;
 import om.self.ezftc.other.Generator;
 import om.self.supplier.modifiers.DeadZoneModifier;
 import om.self.supplier.modifiers.NumberConverter;
@@ -16,7 +14,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@Bean(alwaysLoad = true)
 public class ControlGenerator{
     private static final Generator<OpMode, Map.Entry<LinkedSupplier<Gamepad, ?>, Boolean>> generator = new Generator<>((opMode, link) -> {
         if(link.getValue()) link.getKey().setInput(opMode.gamepad2);
@@ -45,8 +42,7 @@ public class ControlGenerator{
         return makeEx(useSecondGamepad, conversion, -deadZone, deadZone, ramp, 0f);
     }
 
-    @Autowired
-    public void construct(OpMode opMode, EventManager eventManager){
-        generator.init(opMode,eventManager);
+    public static void generate(OpMode opMode){
+        generator.load(opMode);
     }
 }

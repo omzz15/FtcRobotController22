@@ -19,14 +19,7 @@ public class Generator<LINK, E> {
         unlinked.add(unlinkedObj);
     }
 
-    public void init(LINK link, EventManager eventManager){
-        //set opMode
-        this.link = link;
-        //load on init
-        eventManager.attachToEvent(EventManager.CommonTrigger.INIT, this::load);
-    }
-
-    private void load(){
+    public void load(LINK link){
         //set all unliked things
         for (E entry: unlinked) {
             linkFunction.accept(link, entry);
