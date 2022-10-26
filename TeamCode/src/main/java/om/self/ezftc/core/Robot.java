@@ -2,6 +2,9 @@ package om.self.ezftc.core;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import om.self.ezftc.other.control.ControlGenerator;
 import om.self.ezftc.other.hardware.motor.MotorGenerator;
 import om.self.task.core.EventManager;
@@ -18,22 +21,40 @@ import om.self.task.core.Group;
  *     <li>STOP</li>
  * </ul>
  */
-public class Robot {
+public class Robot implements PartParent{
     //managers
     public final EventManager eventManager = new EventManager();
     public final Group taskManager = new Group("main");
 
     //other things
+    Set<RobotPart<?,?>> parts = new HashSet<>();
     public final OpMode opMode;
 
     public Robot(OpMode opMode) {
         this.opMode = opMode;
     }
 
-    public void init(){
-        ControlGenerator.generate(opMode);
-        MotorGenerator.generate(opMode.hardwareMap);
+    @Override
+    public String getName() {
+        return "robot";
+    }
 
+    @Override
+    public String getDir() {
+        return "";
+    }
+
+    @Override
+    public Group getTaskManager() {
+        return taskManager;
+    }
+
+    @Override
+    public EventManager getEventManager() {
+        return eventManager;
+    }
+
+    public void init(){
         //add events
         eventManager.attachToEvent(EventManager.CommonTrigger.START, () -> taskManager.runCommand(Group.Command.START));
         eventManager.attachToEvent(EventManager.CommonTrigger.STOP, () -> taskManager.runCommand(Group.Command.PAUSE));

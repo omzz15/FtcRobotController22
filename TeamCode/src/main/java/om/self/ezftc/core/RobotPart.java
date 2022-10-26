@@ -4,12 +4,17 @@ import om.self.task.core.EventManager;
 import om.self.task.core.Group;
 import om.self.task.core.Task;
 
-public class RobotPart<SETTINGS, HARDWARE>{
+public class RobotPart<SETTINGS extends PartConfig, HARDWARE extends PartConfig> extends Part<Robot>{
     private String name;
     private final Group taskManager = new Group(null);
     private SETTINGS settings;
     private HARDWARE hardware;
 
+    public RobotPart(Robot robot, String name, SETTINGS settings, HARDWARE hardware){
+        super(robot, name);
+        setSettings(settings);
+        setHardware(hardware);
+    }
 
     public SETTINGS getSettings() {
         return settings;
