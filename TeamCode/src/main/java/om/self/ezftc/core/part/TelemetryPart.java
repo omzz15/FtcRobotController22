@@ -1,4 +1,4 @@
-package om.self.ezftc.core;
+package om.self.ezftc.core.part;
 
 
 /**
@@ -13,9 +13,9 @@ package om.self.ezftc.core;
  * </ul>
  * @param <PART> the type of the part you want telemetry for
  */
-public abstract class TelemetryPart<PART extends RobotPart<?,?>> extends PartExtension<PART> {
-    public TelemetryPart() {
-        super("telemetry");
+public abstract class TelemetryPart<PART extends RobotPart<?,?>> extends Part<PART> {
+    public TelemetryPart(PART parent) {
+        super(parent, "telemetry");
     }
 
     //for convenience I provided default implementations for non important methods

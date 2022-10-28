@@ -1,4 +1,4 @@
-package om.self.ezftc.core;
+package om.self.ezftc.core.part;
 
 
 /**
@@ -14,9 +14,9 @@ package om.self.ezftc.core;
  * </ul>
  * @param <PART> the type of the part you want teleop for
  */
-public abstract class TeleopPart<PART extends RobotPart<?,?>> extends PartExtension<PART> {
-    public TeleopPart() {
-        super("teleop");
+public abstract class TeleopPart<PART extends RobotPart<?,?>> extends Part<PART> {
+    public TeleopPart(PART parent) {
+        super(parent, "teleop");
     }
 
     //for convenience I provided default implementations for non important methods

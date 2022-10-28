@@ -1,4 +1,4 @@
-package om.self.ezftc.core;
+package om.self.ezftc.core.part;
 
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;

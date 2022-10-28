@@ -1,4 +1,4 @@
-package om.self.ezftc.core;
+package om.self.ezftc.core.part;
 
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;
@@ -19,7 +19,7 @@ import om.self.task.core.Task;
 public abstract class Part<PARENT extends PartParent> implements PartParent {
     private final PARENT parent;
     private final Group taskManager;
-    private final EventManager eventManager;
+    private final EventManager eventManager;//TODO add separate event manager for each part
     private final String name;
 
     public Part(PARENT parent, String name) {
@@ -47,14 +47,34 @@ public abstract class Part<PARENT extends PartParent> implements PartParent {
         eventManager.attachToEvent("STOP" + parent.getDir(), () -> eventManager.triggerEvent("STOP"));
     }
 
+    private String getEventFullName(String eventName, boolean putInFront){
+        if(putInFront) return eventName.toUpperCase() + getDir();
+        else return getPureDir() + "_" + eventName.toUpperCase();
+    }
+
+    public void attachToEvent(String eventName, boolean putInFront, Runnable event){
+        eventManager.attachToEvent(getEventFullName(eventName, putInFront), event);
+    }
+
+    public void triggerEvent(String eventName, boolean isInFront)
+
     @Override
     public String getName() {
         return name;
     }
 
     @Override
+    /**
+     * this will just call all parent getDir() and will have a '_' in the front. Use getPureDir() if you don't want the '_'
+     */
     public String getDir(){
         return parent.getDir() + "_" + name.toUpperCase();
+    }
+
+    public String getPureDir(){
+        String pDir = parent.getDir();
+        if(pDir == null) return name.toUpperCase();
+        return pDir + "_" + name.toUpperCase();
     }
 
     @Override

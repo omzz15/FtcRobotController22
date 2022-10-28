@@ -2,11 +2,11 @@ package om.self.ezftc.core;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
-import om.self.ezftc.other.control.ControlGenerator;
-import om.self.ezftc.other.hardware.motor.MotorGenerator;
+import om.self.ezftc.core.part.PartParent;
+import om.self.ezftc.core.part.RobotPart;
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;
 
@@ -27,11 +27,21 @@ public class Robot implements PartParent{
     public final Group taskManager = new Group("main");
 
     //other things
-    Set<RobotPart<?,?>> parts = new HashSet<>();
+    public final List<RobotPart<?,?>> parts = new LinkedList<>(); //TODO: figure out how to add more isolation by removing this
     public final OpMode opMode;
 
     public Robot(OpMode opMode) {
         this.opMode = opMode;
+        //add events
+        eventManager.attachToEvent(EventManager.CommonTrigger.START, () -> taskManager.runCommand(Group.Command.START));
+        eventManager.attachToEvent(EventManager.CommonTrigger.STOP, () -> taskManager.runCommand(Group.Command.PAUSE));
+    }
+
+    public<T extends RobotPart<?,?>> T getPartByClass(Class<T> cls){//TODO: figure out how to add more isolation by removing this
+        for (RobotPart<?,?> part: parts)
+            if(cls.isInstance(part)) return (T) part;
+
+        throw new RuntimeException("could not find a part of " + cls + " . PLease update code to not be dependent on other parts");
     }
 
     @Override
@@ -41,7 +51,7 @@ public class Robot implements PartParent{
 
     @Override
     public String getDir() {
-        return "";
+        return null;
     }
 
     @Override
@@ -55,10 +65,6 @@ public class Robot implements PartParent{
     }
 
     public void init(){
-        //add events
-        eventManager.attachToEvent(EventManager.CommonTrigger.START, () -> taskManager.runCommand(Group.Command.START));
-        eventManager.attachToEvent(EventManager.CommonTrigger.STOP, () -> taskManager.runCommand(Group.Command.PAUSE));
-
         //trigger init
         eventManager.triggerEvent(EventManager.CommonTrigger.INIT);
     }

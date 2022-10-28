@@ -1,10 +1,11 @@
-package om.self.ezftc.core;
+package om.self.ezftc.core.part;
 
+import om.self.ezftc.core.Robot;
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;
 import om.self.task.core.Task;
 
-public class RobotPart<SETTINGS extends PartConfig, HARDWARE extends PartConfig> extends Part<Robot>{
+public class RobotPart<SETTINGS, HARDWARE> extends Part<Robot>{
     private String name;
     private final Group taskManager = new Group(null);
     private SETTINGS settings;
@@ -12,6 +13,7 @@ public class RobotPart<SETTINGS extends PartConfig, HARDWARE extends PartConfig>
 
     public RobotPart(Robot robot, String name, SETTINGS settings, HARDWARE hardware){
         super(robot, name);
+        robot.parts.add(this);//TODO: figure out how to add more isolation by removing this
         setSettings(settings);
         setHardware(hardware);
     }
@@ -70,6 +72,11 @@ public class RobotPart<SETTINGS extends PartConfig, HARDWARE extends PartConfig>
         setHardware(hardware);
         onInit();
     }
+
+    public void init(Robot robot){
+        init(robot, settings, hardware);
+    }
+
     public Group getTaskManager(){
         return taskManager;
     }
