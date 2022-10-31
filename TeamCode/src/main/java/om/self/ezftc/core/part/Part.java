@@ -47,16 +47,17 @@ public abstract class Part<PARENT extends PartParent> implements PartParent {
         eventManager.attachToEvent("STOP" + parent.getDir(), () -> eventManager.triggerEvent("STOP"));
     }
 
-    private String getEventFullName(String eventName, boolean putInFront){
-        if(putInFront) return eventName.toUpperCase() + getDir();
-        else return getPureDir() + "_" + eventName.toUpperCase();
+    private String getEventFullName(String eventName){
+        return eventName.toUpperCase() + getDir();
     }
 
-    public void attachToEvent(String eventName, boolean putInFront, Runnable event){
-        eventManager.attachToEvent(getEventFullName(eventName, putInFront), event);
+    public void attachToEvent(String eventName, Runnable event){
+        eventManager.attachToEvent(getEventFullName(eventName), event);
     }
 
-    public void triggerEvent(String eventName, boolean isInFront)
+    public void triggerEvent(String eventName){
+        eventManager.triggerEvent(getEventFullName(eventName));
+    }
 
     @Override
     public String getName() {
@@ -69,12 +70,6 @@ public abstract class Part<PARENT extends PartParent> implements PartParent {
      */
     public String getDir(){
         return parent.getDir() + "_" + name.toUpperCase();
-    }
-
-    public String getPureDir(){
-        String pDir = parent.getDir();
-        if(pDir == null) return name.toUpperCase();
-        return pDir + "_" + name.toUpperCase();
     }
 
     @Override

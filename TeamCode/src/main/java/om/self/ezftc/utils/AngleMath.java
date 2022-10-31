@@ -1,6 +1,6 @@
 package om.self.ezftc.utils;
 
-public class Math {
+public class AngleMath {
     public static double findAngleError(double currentAngle, double targetAngle)
     {
         targetAngle = scaleAngle(targetAngle);

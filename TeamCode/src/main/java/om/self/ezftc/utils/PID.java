@@ -54,7 +54,7 @@ public class PID
 
 	public double returnValue()
 	{
-		return Math.min(Math.max(value, minClamp), maxClamp);
+		return AngleMath.min(AngleMath.max(value, minClamp), maxClamp);
 	}
 
 	public double returnUncappedValue()
