@@ -4,17 +4,18 @@ import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 public class PID
 {
-	PIDCoefficients PIDs;
-	double maxClamp;
-	double minClamp;
-	double value;
+	public PIDCoefficients PIDs;
+	public double maxClamp;
+	public double minClamp;
 
-	double totalError;
-	double lastError;
-	double currentError;
-	long lastTime;
+	private double value = 0;
+
+	private double totalError = 0;
+	private double lastError = 0;
+	private long lastTime = System.nanoTime();
 
 	public PID(){}
+
 	public PID(PIDCoefficients PIDs, double minClamp, double maxClamp)
 	{
 		this.PIDs = PIDs;
@@ -24,26 +25,33 @@ public class PID
 
 	public void updatePID(double error)
 	{
-		lastError = currentError;
-		currentError = error;
+		if(Math.signum(error) != Math.signum(totalError)) totalError = 0;
+
 		totalError += error;
 
 		double calculatedI = (totalError * PIDs.i);
-		if(calculatedI > maxClamp) totalError = maxClamp/PIDs.i;
-		else if(calculatedI < minClamp) totalError = minClamp/ PIDs.i;
+		if(calculatedI > maxClamp){
+			totalError = maxClamp/PIDs.i;
+			calculatedI = maxClamp;
+		}
+		else if(calculatedI < minClamp){
+			totalError = minClamp/ PIDs.i;
+			calculatedI = minClamp;
+		}
 
-		double calculatedD = (((currentError - lastError) * PIDs.d) / ((double)(System.nanoTime() - lastTime) / (double) 1000000000));
+		double calculatedD = (((error - lastError) * PIDs.d) / ((double) (System.nanoTime() - lastTime) / 1000000000.0));
 
 		value = (error * PIDs.p) + calculatedI - calculatedD;
 
 		lastTime = System.nanoTime();
+		lastError = error;
 	}
 
 	public void resetErrors()
 	{
 		totalError = 0;
 		lastError = 0;
-		currentError = 0;
+		lastTime = System.nanoTime();
 	}
 
 	public double updatePIDAndReturnValue(double error)
@@ -54,7 +62,7 @@ public class PID
 
 	public double returnValue()
 	{
-		return AngleMath.min(AngleMath.max(value, minClamp), maxClamp);
+		return Math.min(Math.max(value, minClamp), maxClamp);
 	}
 
 	public double returnUncappedValue()

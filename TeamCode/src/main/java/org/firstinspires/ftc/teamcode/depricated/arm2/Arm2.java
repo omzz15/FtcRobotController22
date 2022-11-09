@@ -5,13 +5,13 @@
 //import org.firstinspires.ftc.teamcode.depricated.led.Led;
 //
 //import om.self.ezftc.core.Robot;
-//import om.self.ezftc.core.part.RobotPart;
+//import om.self.ezftc.core.part.LoopedRobotPart;
 //import om.self.ezftc.utils.Utils;
 //import om.self.task.core.Group;
 //import om.self.task.core.Task;
 //import om.self.task.core.TaskEx;
 //
-//public class Arm2 extends RobotPart<Arm2Settings, Arm2Hardware> {
+//public class Arm2 extends LoopedRobotPart<Arm2Settings, Arm2Hardware> {
 //	double bucketServoPos;
 //	double armServoPos;
 //	public int armMotorPos;

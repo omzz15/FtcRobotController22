@@ -1,9 +1,9 @@
 //package org.firstinspires.ftc.teamcode.depricated.duckspinner;
 //
 //import org.firstinspires.ftc.teamcode.base.Robot;
-//import org.firstinspires.ftc.teamcode.base.part.RobotPart;
+//import org.firstinspires.ftc.teamcode.base.part.LoopedRobotPart;
 //
-//public class DuckSpinner extends RobotPart<DuckSpinnerHardware, DuckSpinnerSettings> {
+//public class DuckSpinner extends LoopedRobotPart<DuckSpinnerHardware, DuckSpinnerSettings> {
 //
 //	public DuckSpinner(Robot robot, DuckSpinnerHardware hardware, DuckSpinnerSettings settings) {
 //		super(robot, hardware, settings);
@@ -14,7 +14,7 @@
 //	}
 //
 //	/////////////////////
-//	//RobotPart Methods//
+//	//LoopedRobotPart Methods//
 //	/////////////////////
 //	@Override
 //	public void onConstruct() {
@@ -44,10 +44,10 @@
 //	@Override
 //	public void onRunLoop(short runMode) {
 //		if(runMode == 1){
-//			hardware.duckSpinnerMotor.setPower(settings.duckSpinnerPowerSupplier.getRampedFloat());
+//			hardware.duckSpinnerMotor.setTargetPower(settings.duckSpinnerPowerSupplier.getRampedFloat());
 //		}
 //		else if(runMode == 2){
-//			hardware.duckSpinnerMotor.setPower(robot.autoBlue ? 0.5 : -0.5);
+//			hardware.duckSpinnerMotor.setTargetPower(robot.autoBlue ? 0.5 : -0.5);
 //		}
 //	}
 //

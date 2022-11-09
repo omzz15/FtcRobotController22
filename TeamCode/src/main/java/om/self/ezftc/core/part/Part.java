@@ -19,57 +19,33 @@ import om.self.task.core.Task;
 public abstract class Part<PARENT extends PartParent> implements PartParent {
     private final PARENT parent;
     private final Group taskManager;
-    private final EventManager eventManager;//TODO add separate event manager for each part
+    private final EventManager eventManager;
     private final String name;
 
     public Part(PARENT parent, String name) {
         this.parent = parent;
         this.name = name;
         taskManager = new Group(name,  parent.getTaskManager());
-        eventManager = parent.getEventManager();
+        eventManager = new EventManager(name, parent.getEventManager());
 
-        //-----part-----//
-        Task task = new Task(name, getTaskManager());
+        //-----task-----//
+        Task task = new Task("main loop", getTaskManager());
         task.setRunnable(this::onRun);
 
         //-----event manager-----//
         //make/attach start
-        eventManager.attachToEvent("INIT" + getDir(), this::onInit);
-        eventManager.attachToEvent("INIT" + parent.getDir(), () -> eventManager.triggerEvent("INIT" + getDir()));
+        eventManager.attachToEvent(EventManager.CommonTrigger.INIT, "onInit", this::onInit);
         //make/attach start
-        eventManager.attachToEvent("START" + getDir(), this::onStart);
-        eventManager.attachToEvent("START" + getDir(), () -> task.runCommand(Group.Command.START));
-        eventManager.attachToEvent("START" + parent.getDir(), () -> eventManager.triggerEvent("START" + getDir()));
-
+        eventManager.attachToEvent(EventManager.CommonTrigger.START, "onStart", this::onStart);
+        eventManager.attachToEvent(EventManager.CommonTrigger.START, "start taskManager", () -> task.runCommand(Group.Command.START));
         //make/attach stop
-        eventManager.attachToEvent("STOP" + getDir(), this::onStop);
-        eventManager.attachToEvent("STOP" + getDir(), () -> task.runCommand(Group.Command.PAUSE));
-        eventManager.attachToEvent("STOP" + parent.getDir(), () -> eventManager.triggerEvent("STOP"));
-    }
-
-    private String getEventFullName(String eventName){
-        return eventName.toUpperCase() + getDir();
-    }
-
-    public void attachToEvent(String eventName, Runnable event){
-        eventManager.attachToEvent(getEventFullName(eventName), event);
-    }
-
-    public void triggerEvent(String eventName){
-        eventManager.triggerEvent(getEventFullName(eventName));
+        eventManager.attachToEvent(EventManager.CommonTrigger.STOP, "onStop", this::onStop);
+        eventManager.attachToEvent(EventManager.CommonTrigger.STOP, "stop taskManager", () -> task.runCommand(Group.Command.PAUSE));
     }
 
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    /**
-     * this will just call all parent getDir() and will have a '_' in the front. Use getPureDir() if you don't want the '_'
-     */
-    public String getDir(){
-        return parent.getDir() + "_" + name.toUpperCase();
     }
 
     @Override

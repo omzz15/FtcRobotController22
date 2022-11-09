@@ -3,8 +3,6 @@ package om.self.ezftc.utils;
 
 import androidx.annotation.Nullable;
 
-import java.util.Vector;
-
 public class Vector3 {
 	public final double X,Y,Z;
 
@@ -67,12 +65,18 @@ public class Vector3 {
 		return new Vector3(X, Y, -Z);
 	}
 
+	public Vector3 withX(double X){return new Vector3(X,Y,Z);}
+
+	public Vector3 withY(double Y){return new Vector3(X,Y,Z);}
+
+	public Vector3 withZ(double Z){return new Vector3(X,Y,Z);}
+
 	public boolean inTolerance(Vector3 targetPos, Vector3 tol){
-		return Vector3Math.inTolerance(this, targetPos, tol);
+		return VectorMath.inTolerance(this, targetPos, tol);
 	}
 
 	public boolean inTolerance(double[] targetPos, double[] tol){
-		return Vector3Math.inTolerance(toArray(), targetPos, tol);
+		return VectorMath.inTolerance(toArray(), targetPos, tol);
 	}
 
 	@Override

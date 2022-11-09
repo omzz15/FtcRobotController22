@@ -3,9 +3,9 @@
 //import com.qualcomm.robotcore.hardware.DcMotor;
 //
 //import org.firstinspires.ftc.teamcode.base.Robot;
-//import org.firstinspires.ftc.teamcode.base.part.RobotPart;
+//import org.firstinspires.ftc.teamcode.base.part.LoopedRobotPart;
 //
-//public class ArmTest extends RobotPart<ArmTestHardware, ArmTestSettings> {
+//public class ArmTest extends LoopedRobotPart<ArmTestHardware, ArmTestSettings> {
 //	private boolean wasArmActive = false;
 //	private int armPosition;
 //
@@ -19,7 +19,7 @@
 //
 //
 //	/////////////////////
-//	//RobotPart Methods//
+//	//LoopedRobotPart Methods//
 //	/////////////////////
 //	@Override
 //	public void onConstruct() {
@@ -54,8 +54,8 @@
 //	public void onRunLoop(short runMode) {
 //		moveArm(settings.armMovementSupplier.get() * settings.armMovementSpeed);
 //		//hardware.ejectServo.setPosition(settings.ejectServoSupplier.get());
-//		hardware.wheelServo.setPower(settings.ejectWheelSupplier.get());
-//		hardware.wheelServo2.setPower(-settings.ejectWheelSupplier.get());
+//		hardware.wheelServo.setTargetPower(settings.ejectWheelSupplier.get());
+//		hardware.wheelServo2.setTargetPower(-settings.ejectWheelSupplier.get());
 //	}
 //
 //	@Override
@@ -70,9 +70,9 @@
 //
 //	private void moveArm(float power){
 //		if(Math.abs(power) > settings.minInputRegisterVal){
-//			hardware.armMotor.setPower(power * settings.armMovementSpeed);
+//			hardware.armMotor.setTargetPower(power * settings.armMovementSpeed);
 //		}else {
-//			hardware.armMotor.setPower(0);
+//			hardware.armMotor.setTargetPower(0);
 //		}
 //
 ////		if(Math.abs(power) > settings.minInputRegisterVal){
@@ -87,7 +87,7 @@
 //
 ////		if(Math.abs(power) >= settings.minInputRegisterVal) {
 ////			hardware.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-////			hardware.armMotor.setPower(power);
+////			hardware.armMotor.setTargetPower(power);
 ////
 ////			armPosition = hardware.armMotor.getCurrentPosition();
 ////
@@ -103,7 +103,7 @@
 ////					return;
 ////		}
 //
-////		hardware.armMotor.setPower(1);
+////		hardware.armMotor.setTargetPower(1);
 ////		hardware.armMotor.setTargetPosition(armPosition);
 ////		hardware.armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //

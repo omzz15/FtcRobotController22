@@ -1,12 +1,12 @@
 //package org.firstinspires.ftc.teamcode.depricated.teamcapper;
 //
 //import org.firstinspires.ftc.teamcode.base.Robot;
-//import org.firstinspires.ftc.teamcode.base.part.RobotPart;
+//import org.firstinspires.ftc.teamcode.base.part.LoopedRobotPart;
 //import org.firstinspires.ftc.teamcode.base.part.RobotPartHardware;
 //import org.firstinspires.ftc.teamcode.base.part.RobotPartSettings;
 //import org.firstinspires.ftc.teamcode.other.Utils;
 //
-//public class TeamCapper extends RobotPart<TeamCapperHardware, TeamCapperSettings> {
+//public class TeamCapper extends LoopedRobotPart<TeamCapperHardware, TeamCapperSettings> {
 //    double capServoPos;
 //
 //    public TeamCapper(Robot robot, TeamCapperHardware hardware, TeamCapperSettings settings) {

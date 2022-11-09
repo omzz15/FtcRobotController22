@@ -1,12 +1,12 @@
 //package org.firstinspires.ftc.teamcode.depricated.intake;
 //
 //import org.firstinspires.ftc.teamcode.base.Robot;
-//import org.firstinspires.ftc.teamcode.base.part.RobotPart;
+//import org.firstinspires.ftc.teamcode.base.part.LoopedRobotPart;
 //import org.firstinspires.ftc.teamcode.other.Utils;
 //import org.firstinspires.ftc.teamcode.deprecated.arm.Arm;
 //import org.firstinspires.ftc.teamcode.depricated.arm2.Arm2;
 //
-//public class Intake extends RobotPart {
+//public class Intake extends LoopedRobotPart {
 //    public boolean intaking = false;
 //
 //    private IntakePosition presetPosition;
@@ -44,7 +44,7 @@
 //                    setIntakeToPreset(IntakePosition.DOWN);
 //            }
 //
-//            ((IntakeHardware) hardware).intakeMotor.setPower(power);
+//            ((IntakeHardware) hardware).intakeMotor.setTargetPower(power);
 //            intakePower = power;
 //            intaking = true;
 //        } else {
@@ -54,10 +54,10 @@
 //
 //    public void stopIntake(){
 //        intaking = false;
-//        ((IntakeHardware) hardware).intakeMotor.setPower(0);
+//        ((IntakeHardware) hardware).intakeMotor.setTargetPower(0);
 //    }
 //    public void startIntake(float power){
-//        ((IntakeHardware) hardware).intakeMotor.setPower(power);
+//        ((IntakeHardware) hardware).intakeMotor.setTargetPower(power);
 //    }
 //
 //
@@ -113,7 +113,7 @@
 //
 //
 //    /////////////////////
-//    //RobotPart Methods//
+//    //LoopedRobotPart Methods//
 //    /////////////////////
 //    @Override
 //    public void onConstruct() {
@@ -132,7 +132,7 @@
 //
 //    @Override
 //    public void onPause() {
-//        ((IntakeHardware) hardware).intakeMotor.setPower(0);
+//        ((IntakeHardware) hardware).intakeMotor.setTargetPower(0);
 //        intaking = false;
 //    }
 //

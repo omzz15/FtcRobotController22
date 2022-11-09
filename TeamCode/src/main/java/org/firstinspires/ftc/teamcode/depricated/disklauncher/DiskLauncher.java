@@ -3,9 +3,9 @@
 //import com.qualcomm.robotcore.hardware.DcMotorEx;
 //
 //import org.firstinspires.ftc.teamcode.base.Robot;
-//import org.firstinspires.ftc.teamcode.base.part.RobotPart;
+//import org.firstinspires.ftc.teamcode.base.part.LoopedRobotPart;
 //
-//public class DiskLauncher extends RobotPart<DiskLauncherHardware, DiskLauncherSettings> {
+//public class DiskLauncher extends LoopedRobotPart<DiskLauncherHardware, DiskLauncherSettings> {
 //    boolean conveyerRunning;
 //    boolean launcherRunning;
 //    boolean conveyerWasPressed;
@@ -75,9 +75,9 @@
 //        }
 //
 //        if (conveyerRunning) {
-//            hardware.intakeMotor.setPower(1);
+//            hardware.intakeMotor.setTargetPower(1);
 //        } else {
-//            hardware.intakeMotor.setPower(0);
+//            hardware.intakeMotor.setTargetPower(0);
 //        }
 //    }
 //

@@ -3,9 +3,9 @@
 //import android.graphics.Color;
 //
 //import om.self.ezftc.core.Robot;
-//import om.self.ezftc.core.part.RobotPart;
+//import om.self.ezftc.core.part.LoopedRobotPart;
 //
-//public class Led extends RobotPart<LedSettings, LedHardware> {
+//public class Led extends LoopedRobotPart<LedSettings, LedHardware> {
 //
 //    public Led(Robot robot, LedHardware hardware, LedSettings settings) {
 //        super(robot,"led", settings, hardware);

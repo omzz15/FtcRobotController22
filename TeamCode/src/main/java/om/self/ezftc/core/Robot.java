@@ -2,11 +2,10 @@ package om.self.ezftc.core;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Hashtable;
+import java.util.Optional;
 
 import om.self.ezftc.core.part.PartParent;
-import om.self.ezftc.core.part.RobotPart;
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;
 
@@ -23,35 +22,34 @@ import om.self.task.core.Group;
  */
 public class Robot implements PartParent{
     //managers
-    public final EventManager eventManager = new EventManager();
+    public final EventManager eventManager = new EventManager("main");
     public final Group taskManager = new Group("main");
 
     //other things
-    public final List<RobotPart<?,?>> parts = new LinkedList<>(); //TODO: figure out how to add more isolation by removing this
+    public final Hashtable<Class<?>, Object> parts = new Hashtable<>();
     public final OpMode opMode;
 
     public Robot(OpMode opMode) {
         this.opMode = opMode;
         //add events
-        eventManager.attachToEvent(EventManager.CommonTrigger.START, () -> taskManager.runCommand(Group.Command.START));
-        eventManager.attachToEvent(EventManager.CommonTrigger.STOP, () -> taskManager.runCommand(Group.Command.PAUSE));
+        eventManager.attachToEvent(EventManager.CommonTrigger.START, "start taskManager",() -> taskManager.runCommand(Group.Command.START));
+        eventManager.attachToEvent(EventManager.CommonTrigger.STOP, "stop taskManager", () -> taskManager.runCommand(Group.Command.PAUSE));
     }
 
-    public<T extends RobotPart<?,?>> T getPartByClass(Class<T> cls){//TODO: figure out how to add more isolation by removing this
-        for (RobotPart<?,?> part: parts)
-            if(cls.isInstance(part)) return (T) part;
-
-        throw new RuntimeException("could not find a part of " + cls + " . PLease update code to not be dependent on other parts");
+    /**
+     * used to get a part that is stored in the robot
+     * @param cls the class of the part
+     * @param <T> the type of the part
+     * @return the part or an error if not found
+     */
+    public<T> Optional<T> getPartByClass(Class<T> cls){
+        if(parts.containsKey(cls)) return Optional.of((T)parts.get(cls));
+        return Optional.empty();
     }
 
     @Override
     public String getName() {
         return "robot";
-    }
-
-    @Override
-    public String getDir() {
-        return null;
     }
 
     @Override
@@ -64,13 +62,10 @@ public class Robot implements PartParent{
         return eventManager;
     }
 
-    public void init(){
-        //trigger init
-        eventManager.triggerEvent(EventManager.CommonTrigger.INIT);
-    }
+    public void init(){eventManager.triggerEventRecursively(EventManager.CommonTrigger.INIT);}
 
     public void start(){
-        eventManager.triggerEvent(EventManager.CommonTrigger.START);
+        eventManager.triggerEventRecursively(EventManager.CommonTrigger.START);
     }
 
     public void run(){
@@ -78,6 +73,6 @@ public class Robot implements PartParent{
     }
 
     public void stop(){
-        eventManager.triggerEvent(EventManager.CommonTrigger.STOP);
+        eventManager.triggerEventRecursively(EventManager.CommonTrigger.STOP);
     }
 }
