@@ -7,23 +7,24 @@ import org.firstinspires.ftc.teamcode.parts.positiontracker.hardware.PositionTra
 import org.firstinspires.ftc.teamcode.parts.positiontracker.settings.PositionTrackerSettings;
 
 import om.self.ezftc.core.Robot;
-import om.self.ezftc.core.part.RobotPart;
+import om.self.ezftc.core.part.ConfigurablePart;
 import om.self.ezftc.utils.AngleMath;
 import om.self.ezftc.utils.Vector3;
 
 
-public class PositionTracker extends RobotPart<PositionTrackerSettings, PositionTrackerHardware> {
-
+public class PositionTracker extends ConfigurablePart<Robot, PositionTrackerSettings, PositionTrackerHardware> {
     private Vector3 currentPosition = new Vector3();
     private double offset;
     private long lastUpdateTime = System.currentTimeMillis();
 
     public PositionTracker(Robot robot) {
-        super(robot, "position tracker", PositionTrackerSettings.makeDefault(), PositionTrackerHardware.makeDefault(robot));
+        super(robot, "position tracker");
+        setConfig(PositionTrackerSettings.makeDefault(), PositionTrackerHardware.makeDefault(robot));
     }
 
     public PositionTracker(Robot robot, PositionTrackerSettings positionTrackerSettings, PositionTrackerHardware positionTrackerHardware) {
-        super(robot, "position tracker", positionTrackerSettings, positionTrackerHardware);
+        super(robot, "position tracker");
+        setConfig(positionTrackerSettings, positionTrackerHardware);
     }
 
     public void setAngle(double angle){
@@ -53,15 +54,19 @@ public class PositionTracker extends RobotPart<PositionTrackerSettings, Position
         setCurrentPosition(currentPosition.withZ(AngleMath.scaleAngle(angle)));
     }
 
+
+    @Override
+    public void onBeanLoad() {
+
+    }
+
     @Override
     public void onInit() {
         setAngle(getSettings().startAngle);
     }
 
     @Override
-    public void onStart() {
-
-    }
+    public void onStart() {}
 
     @Override
     public void onHardwareUpdate(PositionTrackerHardware hardware) {
@@ -69,12 +74,12 @@ public class PositionTracker extends RobotPart<PositionTrackerSettings, Position
 
         while (!hardware.imu.isGyroCalibrated())
         {
-            getParent().opMode.telemetry.addData("gyro status", "calibrating");
-            getParent().opMode.telemetry.update();
+            parent.opMode.telemetry.addData("gyro status", "calibrating");
+            parent.opMode.telemetry.update();
         }
 
-        getParent().opMode.telemetry.addData("gyro status", "calibrated :)");
-        getParent().opMode.telemetry.update();
+        parent.opMode.telemetry.addData("gyro status", "calibrated :)");
+        parent.opMode.telemetry.update();
     }
 
     @Override

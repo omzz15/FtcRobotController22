@@ -6,11 +6,11 @@ import org.firstinspires.ftc.teamcode.parts.drive.settings.DriveSettings;
 import java.util.function.Function;
 
 import om.self.ezftc.core.Robot;
-import om.self.ezftc.core.part.ControllableRobotPart;
+import om.self.ezftc.core.part.ControllablePart;
 import om.self.ezftc.utils.Vector3;
 import om.self.supplier.modifiers.SimpleRampedModifier;
 
-public class Drive extends ControllableRobotPart<DriveSettings, DriveHardware, DriveControl> {
+public class Drive extends ControllablePart<Robot, DriveSettings, DriveHardware, DriveControl> {
     private double xTarget = 0;
     private double yTarget = 0;
     private double rTarget = 0;
@@ -28,11 +28,16 @@ public class Drive extends ControllableRobotPart<DriveSettings, DriveHardware, D
     private boolean smoothing = false;
 
     public Drive(Robot robot){
-        super(robot, "drive", DriveSettings.makeDefault(), DriveHardware.makeDefault(robot));
+        super(robot, "drive");
+        setConfig(
+                DriveSettings.makeDefault(),
+                DriveHardware.makeDefault(robot.opMode.hardwareMap)
+        );
     }
 
     public Drive(Robot robot, DriveSettings driveSettings, DriveHardware driveHardware) {
-        super(robot, "drive", driveSettings, driveHardware);
+        super(robot, "drive");
+        setConfig(driveSettings, driveHardware);
     }
 
     public boolean isSmoothing() {
@@ -162,6 +167,10 @@ public class Drive extends ControllableRobotPart<DriveSettings, DriveHardware, D
         double[] convert(double x, double y, double r);
     }
 
+    @Override
+    public void onBeanLoad() {
+
+    }
 
     @Override
     public void onInit() {

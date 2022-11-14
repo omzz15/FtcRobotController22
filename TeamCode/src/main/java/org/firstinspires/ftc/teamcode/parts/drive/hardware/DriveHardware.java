@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.parts.drive.hardware;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.hardware.motor.MotorSettings;
@@ -16,11 +17,11 @@ public class DriveHardware {
     public final DcMotor bottomLeftMotor;
     public final DcMotor bottomRightMotor;
 
-    public DriveHardware(Robot robot, MotorSettings topLeftMotorSettings, MotorSettings topRightMotorSettings, MotorSettings bottomLeftMotorSettings, MotorSettings bottomRightMotorSettings) {
-        topLeftMotor = topLeftMotorSettings.makeMotor(robot.opMode.hardwareMap);
-        topRightMotor = topRightMotorSettings.makeMotor(robot.opMode.hardwareMap);
-        bottomLeftMotor = bottomLeftMotorSettings.makeMotor(robot.opMode.hardwareMap);
-        bottomRightMotor = bottomRightMotorSettings.makeMotor(robot.opMode.hardwareMap);
+    public DriveHardware(HardwareMap hardwareMap, MotorSettings topLeftMotorSettings, MotorSettings topRightMotorSettings, MotorSettings bottomLeftMotorSettings, MotorSettings bottomRightMotorSettings) {
+        topLeftMotor = topLeftMotorSettings.makeMotor(hardwareMap);
+        topRightMotor = topRightMotorSettings.makeMotor(hardwareMap);
+        bottomLeftMotor = bottomLeftMotorSettings.makeMotor(hardwareMap);
+        bottomRightMotor = bottomRightMotorSettings.makeMotor(hardwareMap);
     }
 
     public DriveHardware(DcMotor topLeftMotor, DcMotor topRightMotor, DcMotor bottomLeftMotor, DcMotor bottomRightMotor){
@@ -30,9 +31,7 @@ public class DriveHardware {
         this.bottomRightMotor = bottomRightMotor;
     }
 
-
-
-    public static DriveHardware makeDefault(Robot robot){
+    public static DriveHardware makeDefault(HardwareMap hardwareMap){
         ////////////
         //settings//
         ////////////
@@ -41,6 +40,6 @@ public class DriveHardware {
         MotorSettings bottomLeftMotorSettings = new MotorSettings(MotorSettings.Number.THREE, DcMotorSimple.Direction.REVERSE, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.RunMode.RUN_USING_ENCODER, 0);
         MotorSettings bottomRightMotorSettings = new MotorSettings(MotorSettings.Number.FOUR, DcMotorSimple.Direction.FORWARD, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.RunMode.RUN_USING_ENCODER, 0);
 
-        return new DriveHardware(robot, topLeftMotorSettings, topRightMotorSettings, bottomLeftMotorSettings, bottomRightMotorSettings);
+        return new DriveHardware(hardwareMap, topLeftMotorSettings, topRightMotorSettings, bottomLeftMotorSettings, bottomRightMotorSettings);
     }
 }

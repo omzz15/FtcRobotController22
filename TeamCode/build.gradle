@@ -42,6 +42,7 @@ dependencies {
 //    implementation 'org.openftc:i2cdrivers:1.0.0'
 
 //    custom stuff
-    implementation 'io.github.omzz15:supplier:1.2.3-RELEASE'
-    implementation 'io.github.omzz15:task:3.1.1-FTCRELEASE'
+    implementation 'io.github.omzz15:supplier:1.0.0-FTCRELEASE'
+    implementation 'io.github.omzz15:task:3.3.2-FTCRELEASE'
+    implementation 'io.github.omzz15:beans:2.1.1-FTCRELEASE'
 }

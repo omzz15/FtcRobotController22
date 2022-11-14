@@ -3,24 +3,23 @@ package org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
-import om.self.ezftc.core.part.Part;
+import om.self.ezftc.core.part.LoopedPart;
 import om.self.ezftc.utils.Vector3;
 import om.self.ezftc.utils.VectorMath;
 
-public class EncoderTracker extends Part<PositionTracker> {
+public class EncoderTracker extends LoopedPart<PositionTracker> {
+    private Drive drive;
 
     private int[] lastMotorPos = new int[4];
     private EncoderTrackerSettings settings;
 
     public EncoderTracker(PositionTracker parent, EncoderTrackerSettings settings) {
         super(parent, "encoder tracker");
-        parent.addDependency(Drive.class);
         setSettings(settings);
     }
 
     public EncoderTracker(PositionTracker parent) {
         super(parent, "encoder tracker");
-        parent.addDependency(Drive.class);
         setSettings(EncoderTrackerSettings.makeDefault());
     }
 
@@ -28,21 +27,26 @@ public class EncoderTracker extends Part<PositionTracker> {
         this.settings = settings;
     }
 
+
     @Override
-    public void onInit() {
+    public void onInit() {}
+
+    @Override
+    public void onBeanLoad() {
+        drive = getBeanManager().getBestMatch(Drive.class, false, false);
     }
 
     @Override
     public void onStart() {
-        lastMotorPos = getParent().getDependency(Drive.class).getMotorPositions();
+        lastMotorPos = drive.getMotorPositions();
     }
 
     @Override
     public void onRun() {
-         Vector3 currentPos = getParent().getCurrentPosition();
+         Vector3 currentPos = parent.getCurrentPosition();
          double currentAngle = currentPos.Z;
 
-         int[] currMotorPos = getParent().getDependency(Drive.class).getMotorPositions();
+         int[] currMotorPos = drive.getMotorPositions();
          int[] diff = new int[]{
                  currMotorPos[0] - lastMotorPos[0],
                  currMotorPos[1] - lastMotorPos[1],
@@ -50,10 +54,6 @@ public class EncoderTracker extends Part<PositionTracker> {
                  currMotorPos[3] - lastMotorPos[3],
          };
          lastMotorPos = currMotorPos;
-
-         getParent().getParent().opMode.telemetry.addData("last", lastMotorPos[0]);
-         getParent().getParent().opMode.telemetry.addData("curr", currMotorPos[0]);
-         getParent().getParent().opMode.telemetry.addData("diff", diff[0]);
 
         //get the X and Y movement of the robot
         double XMove = (.25 * (-diff[0] + diff[2] + diff[1] - diff[3])) / settings.ticksPerInchSideways;
@@ -66,7 +66,7 @@ public class EncoderTracker extends Part<PositionTracker> {
             0
         );
 
-        getParent().setCurrentPosition(VectorMath.add(currentPos, movement));
+        parent.setCurrentPosition(VectorMath.add(currentPos, movement));
     }
 
     @Override

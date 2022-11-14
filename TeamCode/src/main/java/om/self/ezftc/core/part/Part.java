@@ -1,5 +1,7 @@
 package om.self.ezftc.core.part;
 
+import om.self.beans.core.BeanManager;
+import om.self.ezftc.core.Robot;
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;
 import om.self.task.core.Task;
@@ -17,7 +19,7 @@ import om.self.task.core.Task;
  * @param <PARENT> the type of the part you want to extend
  */
 public abstract class Part<PARENT extends PartParent> implements PartParent {
-    private final PARENT parent;
+    public final PARENT parent;
     private final Group taskManager;
     private final EventManager eventManager;
     private final String name;
@@ -27,20 +29,28 @@ public abstract class Part<PARENT extends PartParent> implements PartParent {
         this.name = name;
         taskManager = new Group(name,  parent.getTaskManager());
         eventManager = new EventManager(name, parent.getEventManager());
+        construct();
+    }
 
-        //-----task-----//
-        Task task = new Task("main loop", getTaskManager());
-        task.setRunnable(this::onRun);
+    public Part(PARENT parent, String name, Group taskManager){
+        this.parent = parent;
+        this.name = name;
+        this.taskManager = taskManager;
+        eventManager = new EventManager(name, parent.getEventManager());
+        construct();
+    }
 
+    private void construct(){
         //-----event manager-----//
         //make/attach start
-        eventManager.attachToEvent(EventManager.CommonTrigger.INIT, "onInit", this::onInit);
+        eventManager.attachToEvent(EventManager.CommonEvent.INIT, "onInit", this::onInit);
         //make/attach start
-        eventManager.attachToEvent(EventManager.CommonTrigger.START, "onStart", this::onStart);
-        eventManager.attachToEvent(EventManager.CommonTrigger.START, "start taskManager", () -> task.runCommand(Group.Command.START));
+        eventManager.attachToEvent(EventManager.CommonEvent.START, "onStart", this::onStart);
         //make/attach stop
-        eventManager.attachToEvent(EventManager.CommonTrigger.STOP, "onStop", this::onStop);
-        eventManager.attachToEvent(EventManager.CommonTrigger.STOP, "stop taskManager", () -> task.runCommand(Group.Command.PAUSE));
+        eventManager.attachToEvent(EventManager.CommonEvent.STOP, "onStop", this::onStop);
+        eventManager.attachToEvent(EventManager.CommonEvent.STOP, "stop taskManager", () -> taskManager.runCommand(Group.Command.PAUSE));
+        //add bean!!
+        getBeanManager().addBean(this, this::onBeanLoad, true, false);
     }
 
     @Override
@@ -58,15 +68,16 @@ public abstract class Part<PARENT extends PartParent> implements PartParent {
         return eventManager;
     }
 
-    public PARENT getParent(){
-        return parent;
+    @Override
+    public BeanManager getBeanManager(){
+        return parent.getBeanManager();
     }
+
+    public abstract void onBeanLoad();
 
     public abstract void onInit();
 
     public abstract void onStart();
-
-    public abstract void onRun();
 
     public abstract void onStop();
 }

@@ -25,7 +25,7 @@ import om.self.ezftc.core.Robot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
+@TeleOp(name="Robot Test", group="Linear Opmode")
 public class Test extends LinearOpMode {
     @Override
     public void runOpMode() {
@@ -46,6 +46,8 @@ public class Test extends LinearOpMode {
             r.run();
             if(gamepad1.y) pt.setAngle(0);
             telemetry.addData("position", pt.getCurrentPosition());
+            if(gamepad1.dpad_down) telemetry.addData("tasks", r.getTaskManager());
+            if(gamepad1.dpad_down) telemetry.addData("events", r.getEventManager());
             telemetry.update();
         }
 

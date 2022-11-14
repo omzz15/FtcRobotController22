@@ -2,21 +2,49 @@ package org.firstinspires.ftc.teamcode.parts.drive;
 
 import org.firstinspires.ftc.teamcode.parts.drive.settings.DriveTeleopSettings;
 
+import om.self.ezftc.core.part.Part;
 import om.self.ezftc.utils.VectorMath;
 
-public class DriveTeleop {
-    public DriveTeleop(Drive drive, DriveTeleopSettings settings){
-        construct(drive, settings);
+public class DriveTeleop extends Part<Drive> {
+    private DriveTeleopSettings settings;
+
+    public DriveTeleop(Drive parent) {
+        super(parent, "drive teleop");
+        settings = DriveTeleopSettings.makeDefault(parent.parent);
     }
 
-    public DriveTeleop(Drive drive){
-        construct(drive, DriveTeleopSettings.makeDefault(drive.getParent()));
+    public DriveTeleop(Drive parent, DriveTeleopSettings settings) {
+        super(parent, "drive teleop");
+        this.settings = settings;
     }
 
-    private void construct(Drive drive, DriveTeleopSettings settings){
-        drive.setBaseController(() -> new DriveControl(
+    public DriveTeleopSettings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(DriveTeleopSettings settings) {
+        this.settings = settings;
+    }
+
+    @Override
+    public void onBeanLoad() {
+
+    }
+
+    @Override
+    public void onInit() {
+
+    }
+
+    @Override
+    public void onStart() {
+        parent.setBaseController(() -> new DriveControl(
                 settings.slowModeSupplier.get() ? VectorMath.multiply(settings.powerSupplier.get(), settings.slowModeSpeed) : settings.powerSupplier.get(),
                 settings.stopSupplier.get()
         ), true);
+    }
+
+    @Override
+    public void onStop() {
     }
 }
