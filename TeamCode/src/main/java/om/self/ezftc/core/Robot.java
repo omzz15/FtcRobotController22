@@ -88,8 +88,12 @@ public class Robot implements PartParent{
 
 
     public void addDebugSource(Supplier<String> source){
-        if(enableTelemetryDebug){}
-        if(enableDashboardDebug){}
+        if(enableTelemetryDebug){
+
+        }
+        if(enableDashboardDebug){
+
+        }
     }
 
 

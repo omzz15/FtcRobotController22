@@ -16,25 +16,15 @@ import om.self.task.core.Task;
  * </ul>
  * @param <PARENT> the type of the part you want to extend
  */
-public abstract class LoopedPart<PARENT extends PartParent> extends Part<PARENT> {
+public interface LoopedPart<PARENT extends PartParent> extends Part<PARENT>{
     //----------Names----------//
-    public static class TaskNames {
+    class TaskNames {
         public static final String mainLoop = "main loop";
     }
 
-    public LoopedPart(PARENT parent, String name, Group taskManager) {
-        super(parent, name, taskManager);
-        construct();
-    }
-
-    public LoopedPart(PARENT parent, String name) {
-        super(parent, name);
-        construct();
-    }
-
-    private void construct(){
+    default void constructLooped(){
         new Task(TaskNames.mainLoop, getTaskManager()).setRunnable(this::onRun);
     }
 
-    public abstract void onRun();
+    void onRun();
 }

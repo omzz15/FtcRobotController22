@@ -24,7 +24,7 @@ public class HeaderKeeperSettings {
                         -0.02,0,0
                 ),
                 0.3,
-                300
+                700
         );
     }
 }

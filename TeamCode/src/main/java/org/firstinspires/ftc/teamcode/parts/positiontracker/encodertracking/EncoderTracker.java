@@ -4,10 +4,11 @@ import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
 import om.self.ezftc.core.part.LoopedPart;
+import om.self.ezftc.core.part.implementations.PartImpl;
 import om.self.ezftc.utils.Vector3;
 import om.self.ezftc.utils.VectorMath;
 
-public class EncoderTracker extends LoopedPart<PositionTracker> {
+public class EncoderTracker extends PartImpl<PositionTracker> implements LoopedPart<PositionTracker> {
     private Drive drive;
 
     private int[] lastMotorPos = new int[4];
@@ -15,12 +16,18 @@ public class EncoderTracker extends LoopedPart<PositionTracker> {
 
     public EncoderTracker(PositionTracker parent, EncoderTrackerSettings settings) {
         super(parent, "encoder tracker");
+        make();
         setSettings(settings);
     }
 
     public EncoderTracker(PositionTracker parent) {
         super(parent, "encoder tracker");
+        make();
         setSettings(EncoderTrackerSettings.makeDefault());
+    }
+
+    private void make(){
+        constructLooped();
     }
 
     public void setSettings(EncoderTrackerSettings settings) {

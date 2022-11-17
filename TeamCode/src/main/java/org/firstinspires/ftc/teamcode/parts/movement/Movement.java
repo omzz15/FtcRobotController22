@@ -4,22 +4,14 @@
 //
 //import com.qualcomm.robotcore.hardware.PIDCoefficients;
 //
-//import org.firstinspires.ftc.teamcode.base.Robot;
-//import org.firstinspires.ftc.teamcode.base.part.LoopedRobotPart;
-//import org.firstinspires.ftc.teamcode.other.PID;
-//import org.firstinspires.ftc.teamcode.other.Position;
-//import org.firstinspires.ftc.teamcode.other.Utils;
-//import org.firstinspires.ftc.teamcode.other.task.Task;
-//import org.firstinspires.ftc.teamcode.other.task.TaskManager;
-//import org.firstinspires.ftc.teamcode.other.task.TaskRunner;
 //import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 //import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 //import org.firstinspires.ftc.teamcode.parts.positiontracker.settings.PositionTrackerSettings;
 //
-//public class Movement extends LoopedRobotPart {
-//	TaskRunner movementTasks = new TaskRunner();
+//import om.self.ezftc.core.part.implementations.PartImpl;
+//import om.self.ezftc.utils.PID;
 //
-//	Position currentPos;
+//public class Movement extends PartImpl<Drive> {
 //	double[] targetPos = new double[3];
 //	double[] tol = new double[3];
 //	long startTime;

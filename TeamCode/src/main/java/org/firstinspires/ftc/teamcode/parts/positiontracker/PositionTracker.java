@@ -8,23 +8,31 @@ import org.firstinspires.ftc.teamcode.parts.positiontracker.settings.PositionTra
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.ConfigurablePart;
+import om.self.ezftc.core.part.LoopedPart;
+import om.self.ezftc.core.part.RobotPart;
 import om.self.ezftc.utils.AngleMath;
 import om.self.ezftc.utils.Vector3;
 
 
-public class PositionTracker extends ConfigurablePart<Robot, PositionTrackerSettings, PositionTrackerHardware> {
+public class PositionTracker extends RobotPart implements ConfigurablePart<Robot, PositionTrackerSettings, PositionTrackerHardware>, LoopedPart<Robot> {
     private Vector3 currentPosition = new Vector3();
     private double offset;
     private long lastUpdateTime = System.currentTimeMillis();
 
     public PositionTracker(Robot robot) {
         super(robot, "position tracker");
+        make();
         setConfig(PositionTrackerSettings.makeDefault(), PositionTrackerHardware.makeDefault(robot));
     }
 
     public PositionTracker(Robot robot, PositionTrackerSettings positionTrackerSettings, PositionTrackerHardware positionTrackerHardware) {
         super(robot, "position tracker");
+        make();
         setConfig(positionTrackerSettings, positionTrackerHardware);
+    }
+
+    private void make(){
+        constructLooped();
     }
 
     public void setAngle(double angle){
@@ -67,6 +75,11 @@ public class PositionTracker extends ConfigurablePart<Robot, PositionTrackerSett
 
     @Override
     public void onStart() {}
+
+    @Override
+    public void onSettingsUpdate(PositionTrackerSettings positionTrackerSettings) {
+
+    }
 
     @Override
     public void onHardwareUpdate(PositionTrackerHardware hardware) {
