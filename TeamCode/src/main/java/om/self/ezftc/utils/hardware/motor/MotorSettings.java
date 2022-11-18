@@ -67,14 +67,14 @@ public class MotorSettings {
     }
 
     public enum Number {
-        ONE("motor0"),
-        TWO("motor1"),
-        THREE("motor2"),
-        FOUR("motor3"),
-        ONE_B("motor0B"),
-        TWO_B("motor1B"),
-        THREE_B("motor2B"),
-        FOUR_B("motor3B");
+        ZERO("motor0"),
+        ONE("motor1"),
+        TWO("motor2"),
+        THREE("motor3"),
+        ZERO_B("motor0B"),
+        ONE_B("motor1B"),
+        TWO_B("motor2B"),
+        THREE_B("motor3B");
 
         public String value;
 
