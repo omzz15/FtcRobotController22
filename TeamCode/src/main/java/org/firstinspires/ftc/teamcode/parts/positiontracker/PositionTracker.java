@@ -7,8 +7,6 @@ import org.firstinspires.ftc.teamcode.parts.positiontracker.hardware.PositionTra
 import org.firstinspires.ftc.teamcode.parts.positiontracker.settings.PositionTrackerSettings;
 
 import om.self.ezftc.core.Robot;
-import om.self.ezftc.core.part.ConfigurablePart;
-import om.self.ezftc.core.part.LoopedPart;
 import om.self.ezftc.core.part.RobotPart;
 import om.self.ezftc.utils.AngleMath;
 import om.self.ezftc.utils.Vector3;

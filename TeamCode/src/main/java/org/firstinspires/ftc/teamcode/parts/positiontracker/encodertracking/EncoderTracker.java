@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
-import om.self.ezftc.core.part.LoopedPart;
-import om.self.ezftc.core.part.implementations.PartImpl;
 import om.self.ezftc.utils.Vector3;
 import om.self.ezftc.utils.VectorMath;
 

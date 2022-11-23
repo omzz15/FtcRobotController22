@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.parts.drive;
 
 import org.firstinspires.ftc.teamcode.parts.drive.settings.DriveTeleopSettings;
 
-import om.self.ezftc.core.part.Part;
-import om.self.ezftc.core.part.implementations.PartImpl;
 import om.self.ezftc.utils.VectorMath;
 
 public class DriveTeleop extends PartImpl<Drive> {

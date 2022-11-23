@@ -6,11 +6,8 @@ import org.firstinspires.ftc.teamcode.parts.drive.settings.DriveSettings;
 import java.util.function.Function;
 
 import om.self.ezftc.core.Robot;
-import om.self.ezftc.core.part.ConfigurablePart;
 import om.self.ezftc.core.part.ControllablePart;
-import om.self.ezftc.core.part.LoopedPart;
 import om.self.ezftc.core.part.RobotPart;
-import om.self.ezftc.core.part.implementations.PartImpl;
 import om.self.ezftc.utils.Vector3;
 import om.self.supplier.modifiers.SimpleRampedModifier;
 
