@@ -12,6 +12,7 @@ import om.self.ezftc.core.part.RobotPart;
 
 public class Lifter extends RobotPart implements ControllablePart<Robot, LifterControl>, ConfigurablePart<Robot, LifterSettings, LifterHardware> {
     //private EdgeExModifier powerEdgeDetector = new EdgeExModifier();
+    private boolean closed = false;
 
     public Lifter(Robot parent) {
         super(parent, "lifter");
@@ -19,11 +20,17 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
                 LifterSettings.makeDefault(),
                 LifterHardware.makeDefault(parent.opMode.hardwareMap)
         );
+        constructThings();
     }
 
     public Lifter(Robot parent, LifterSettings settings, LifterHardware hardware){
         super(parent, "lifter");
         setConfig(settings, hardware);
+        constructThings();
+    }
+
+    private void constructThings(){
+        constructControllable();
     }
 
     public void liftWithPower(double power){
@@ -89,7 +96,12 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     }
 
     public void setGrabberClosed(boolean isClosed){
+        this.closed = isClosed;
         getHardware().grabServo.setPosition(isClosed ? getSettings().grabberServoClosePos : getSettings().grabberServoOpenPos);
+    }
+
+    public boolean isClosed(){
+        return closed;
     }
 
     @Override

@@ -25,7 +25,7 @@ import om.self.ezftc.core.Robot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Robot Test", group="Linear Opmode")
+@TeleOp(name="drive Test", group="Linear Opmode")
 public class Test extends LinearOpMode {
     @Override
     public void runOpMode() {

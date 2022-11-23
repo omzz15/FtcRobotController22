@@ -4,7 +4,7 @@ public class LifterSettings {
     //turn servos
     public final double turnServoMinPosition;
     public final double turnServoMaxPosition;
-    public final double rightTurnServoOffset;
+    public double rightTurnServoOffset; //TODO return to final
     //grabber servo
     public final double grabberServoOpenPos;
     public final double grabberServoClosePos;
@@ -30,16 +30,16 @@ public class LifterSettings {
 
     public static LifterSettings makeDefault(){
         return new LifterSettings(
-                0,
+                .2,
                 1,
                 0,
-                1,
+                .92,
                 0.88,
                 0.05,
-                4,
-                8,
+                32,
+                32,
                 0,
-                1000
+                10000
         );
     }
 }
