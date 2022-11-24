@@ -1,21 +1,16 @@
 package om.self.ezftc.core;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.internal.opmode.OpModeServices;
 
-import java.lang.ref.SoftReference;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Hashtable;
+import java.util.Optional;
+import java.util.function.Supplier;
 
-import om.self.beans.PackageBeanManager;
-import om.self.beans.core.Utils;
-import om.self.ezftc.other.control.ControlGenerator;
+import om.self.beans.core.BeanManager;
+import om.self.ezftc.core.part.PartParent;
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;
+import om.self.task.core.OrderedGroup;
 
 /**
  * Sets up the framework by configuring base events, adding all the core beans(ex: OpMode), and generating other bean from classes
@@ -27,81 +22,85 @@ import om.self.task.core.Group;
  *     <li>START</li>
  *     <li>STOP</li>
  * </ul>
- * USED BEANS:
- * <ul>
- *     <li>NONE</li>
- * </ul>
- * ADDED BEANS:
- * <ul>
- *   <li>{@link Robot}</li>
- *   <li>{@link Group}(taskManager)</li>
- *   <li>{@link EventManager}</li>
- *   <li>{@link OpMode}</li>
- *   <li>{@link HardwareMap}</li>
- *   <li>{@link Telemetry}</li>
- *   <li>{@link OpModeServices}</li>
  */
-public class Robot {
+public class Robot implements PartParent{
+    public boolean enableTelemetry = true;
+    public boolean enableDashboard = true;
+    public boolean enableTelemetryDebug = true;
+    public boolean enableDashboardDebug = true;
+
     //managers
-    public final EventManager eventManager = new EventManager();
-    public final PackageBeanManager beanManager = new PackageBeanManager();
-    public final Group taskManager = new Group("main");
+    public final EventManager eventManager = new EventManager("main");
+
+    public final Group taskManager = new OrderedGroup("main");
+    public final Group startTaskManager = new Group("start tasks", taskManager);
+    public final Group regularTaskManager = new Group("regular tasks", taskManager);
+    public final Group endTaskManager = new Group("end tasks", taskManager);
+
+    public final BeanManager beanManager = new BeanManager();
 
     //other things
-    private final Set<String> parts = new HashSet<>();
     public final OpMode opMode;
 
     public Robot(OpMode opMode) {
         this.opMode = opMode;
-    }
-
-    public Robot(OpMode opMode, String... parts){
-        this.opMode = opMode;
-        this.parts.addAll(Arrays.stream(parts).collect(Collectors.toList()));
-    }
-
-    public Set<String> getParts() {
-        return parts;
-    }
-
-    public void addPart(String part){
-        parts.add(part);
-    }
-
-    public void removePart(String part){
-        parts.remove(part);
-    }
-
-    public void init(){
         //add events
-        eventManager.attachToEvent(EventManager.CommonTrigger.START, () -> taskManager.runCommand(Group.Command.START));
-        eventManager.attachToEvent(EventManager.CommonTrigger.STOP, () -> taskManager.runCommand(Group.Command.PAUSE));
-
-        //add all the beans
-        beanManager.addBean(this, false, true);
-        beanManager.addBean(taskManager, false, true);
-        beanManager.addBean(eventManager, false, true);
-
-        beanManager.addBean(opMode, false, true);
-        beanManager.addBean(opMode.hardwareMap, false, true);
-        beanManager.addBean(opMode.telemetry, false, true);
-        beanManager.addBean(opMode.internalOpModeServices, false, true);
-
-        //load everything
-        beanManager.setFilter(
-                bean -> {
-                    Part part = Utils.getAnnotationRecursively(bean.getClass(), Part.class);
-                    return part == null || parts.contains(part.value());
-                }
-        );
-        beanManager.load();
-
-        //trigger init
-        eventManager.triggerEvent(EventManager.CommonTrigger.INIT);
+        eventManager.attachToEvent(EventManager.CommonEvent.INIT, "load dependencies", beanManager::load);
+        eventManager.attachToEvent(EventManager.CommonEvent.START, "start taskManager",() -> taskManager.runCommand(Group.Command.START));
+        eventManager.attachToEvent(EventManager.CommonEvent.STOP, "stop taskManager", () -> taskManager.runCommand(Group.Command.PAUSE));
+        //add different task stages
+        startTaskManager.autoStopPolicy = Group.AutoManagePolicy.DISABLED; //ensure it never turns off so order is maintained
+        startTaskManager.runCommand(Group.Command.START);
+        regularTaskManager.autoStopPolicy = Group.AutoManagePolicy.DISABLED; //ensure it never turns off so order is maintained
+        regularTaskManager.runCommand(Group.Command.START);
+        endTaskManager.autoStopPolicy = Group.AutoManagePolicy.DISABLED; //ensure it never turns off so order is maintained
+        endTaskManager.runCommand(Group.Command.START);
+        //add bean!!
+        getBeanManager().addBean(this, null, false, true);
     }
+
+    @Override
+    public String getName() {
+        return "robot";
+    }
+
+    @Override
+    public Group getTaskManager() {
+        return taskManager;
+    }
+
+    public Group getTaskManager(RunPosition runPosition){
+        switch (runPosition){
+            case START: return startTaskManager;
+            case REGULAR: return regularTaskManager;
+            case END: return endTaskManager;
+        }
+        throw new RuntimeException("tried to call getTaskManager with argument " + runPosition + " which is not valid");
+    }
+
+    @Override
+    public EventManager getEventManager() {
+        return eventManager;
+    }
+
+    @Override
+    public BeanManager getBeanManager(){return beanManager;}
+
+
+    public void addDebugSource(Supplier<String> source){
+        if(enableTelemetryDebug){
+
+        }
+        if(enableDashboardDebug){
+
+        }
+    }
+
+
+    public void init(){eventManager.triggerEventRecursively(EventManager.CommonEvent.INIT);}
 
     public void start(){
-        eventManager.triggerEvent(EventManager.CommonTrigger.START);
+        eventManager.triggerEventRecursively(EventManager.CommonEvent.START);
     }
 
     public void run(){
@@ -109,6 +108,12 @@ public class Robot {
     }
 
     public void stop(){
-        eventManager.triggerEvent(EventManager.CommonTrigger.STOP);
+        eventManager.triggerEventRecursively(EventManager.CommonEvent.STOP);
+    }
+
+    public enum RunPosition{
+        START,
+        REGULAR,
+        END
     }
 }

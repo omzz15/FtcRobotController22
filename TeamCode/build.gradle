@@ -36,8 +36,13 @@ dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
 
-    //custom stuff
-    implementation 'io.github.omzz15:supplier:1.2.3-RELEASE'
-    implementation 'io.github.omzz15:task:2.1.3-RELEASE'
-    implementation 'io.github.omzz15:beans:1.0.6-FTCRELEASE'
+
+//    implementation 'com.acmerobotics.dashboard:dashboard:0.4.6'
+//    implementation 'com.intel.realsense:2.41.1-ftc265@arr'
+//    implementation 'org.openftc:i2cdrivers:1.0.0'
+
+//    custom stuff
+    implementation 'io.github.omzz15:supplier:1.0.0-FTCRELEASE'
+    implementation 'io.github.omzz15:task:3.3.3-FTCRELEASE'
+    implementation 'io.github.omzz15:beans:2.1.1-FTCRELEASE'
 }

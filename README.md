@@ -474,7 +474,7 @@ Version 5.5 requires Android Studio 4.0 or later.
 * Fix RenderScript usage
     * Use androidx.renderscript variant: increased compatibility
     * Use RenderScript in Java mode, not native: simplifies build
-* Fixes webcam-frame-to-bitmap conversion problem: alpha channel wasn't being initialized, only R, G, & B
+* Fixes webcam-frame-to-bitmap conversion problem: alpha channel wasn't being initialized, only Z, G, & B
 * Fixes possible arithmetic overflow in Deadline
 * Fixes deadlock in Vuforia webcam support which could cause 5-second delays when stopping OpMode
 
