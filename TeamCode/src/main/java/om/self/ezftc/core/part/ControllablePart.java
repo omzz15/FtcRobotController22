@@ -11,7 +11,7 @@ import om.self.task.core.Group;
 import om.self.task.core.Task;
 
 //TODO figure out how to reserve certain positions for specific parts to maintain an order
-public interface ControllablePart<PARENT extends PartParent, CONTROL> extends Part<PARENT> {
+public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARDWARE, CONTROL> extends Part<PARENT, SETTINGS, HARDWARE> {
     //----------Names----------//
     class EventNames{
         public static final String startControllers = "START_CONTROLLERS";
@@ -21,17 +21,31 @@ public interface ControllablePart<PARENT extends PartParent, CONTROL> extends Pa
         public static final String mainControlLoop = "main control loop";
     }
 
+    //controls
+    private Supplier<CONTROL> baseController;
+    private LinkedList<Consumer<CONTROL>> controllers = new LinkedList<>();
+    private Hashtable<String, Consumer<CONTROL>> controllerNameMapping = new Hashtable<>();
 
-    default void constructControllable(){
-        getVars().put("controllers", new LinkedList<CONTROL>());
-        getVars().put("nameMapping", new Hashtable<String, Consumer<CONTROL>>());
+    private LinkedList<Consumer<CONTROL>> controllersBackup = new LinkedList<>();
+    private Hashtable<String, Consumer<CONTROL>> controllerNameMappingBackup = new Hashtable<>();
 
+    public ControllablePart(PARENT parent, String name, Supplier<CONTROL> baseController) {
+        super(parent, name);
+        constructControllable();
+    }
+
+    public ControllablePart(PARENT parent, String name, Group taskManager, Supplier<CONTROL> baseController) {
+        super(parent, name, taskManager);
+        constructControllable();
+    }
+
+    void constructControllable(){
         //add main control loop
         Task controlLoop = new Task(TaskNames.mainControlLoop, getTaskManager());
         controlLoop.autoStart = false; // ensure it doesn't run right away
         controlLoop.setRunnable(() -> {
             CONTROL c = getBaseController().get();
-            for (Consumer<CONTROL> controller: getControllers()) {controller.accept(c);}
+            for (Consumer<CONTROL> controller: controllers) {controller.accept(c);}
             onRun(c);
         });//basically just runs the controllers
         //add events to stop and start controllers
@@ -39,42 +53,60 @@ public interface ControllablePart<PARENT extends PartParent, CONTROL> extends Pa
         getEventManager().attachToEvent(EventNames.stopControllers, "stop control loop", () -> controlLoop.runCommand(Group.Command.PAUSE));
     }
 
-    default boolean isControlActive() {
+    public boolean isControlActive() {
         return getTaskManager().isChildRunning(TaskNames.mainControlLoop);
     }
 
-    default Supplier<CONTROL> getBaseController() {
-        return (Supplier<CONTROL>) getVars().get("baseController");
+    public Supplier<CONTROL> getBaseController() {
+        return baseController;
     }
 
-    default void setBaseController(Supplier<CONTROL> baseController, boolean start) {
-        getVars().put("baseController", baseController);
+    public void setBaseController(Supplier<CONTROL> baseController, boolean start) {
+        this.baseController = baseController;
         if(start)
             getTaskManager().runKeyedCommand(TaskNames.mainControlLoop, Group.Command.START);
     }
 
-    default List<Consumer<CONTROL>> getControllers() {
-        return (List<Consumer<CONTROL>>) getVars().get("controllers");
+    public List<Consumer<CONTROL>> getControllers() {
+        return controllers;
     }
 
-    default Hashtable<String, Consumer<CONTROL>> getNameMapping(){
-        return (Hashtable<String, Consumer<CONTROL>>)getVars().get("nameMapping");
+    public void addController(String name, Consumer<CONTROL> controller){
+        controllerNameMapping.put(name, controller);
+        controllers.add(controller);
     }
 
-    default void addController(String name, Consumer<CONTROL> controller){
-        getNameMapping().put(name, controller);
-        getControllers().add(controller);
+    public void addController(String name, Consumer<CONTROL> controller, int location){
+        controllerNameMapping.put(name, controller);
+        controllers.add(location, controller);
     }
 
-    default void addController(String name, Consumer<CONTROL> controller, int location){
-        getNameMapping().put(name, controller);
-        getControllers().add(location, controller);
+    public void removeController(String name){
+        if(controllerNameMapping.containsKey(name))
+            controllers.remove(controllerNameMapping.remove(name));
     }
 
-    default void removeController(String name){
-        if(getNameMapping().containsKey(name))
-            getControllers().remove(getNameMapping().remove(name));
+    public void moveController(String name, int location){
+        if(controllerNameMapping.containsKey(name)){
+            Consumer<CONTROL> controller = controllerNameMapping.get(name);
+            controllers.remove(controller);
+            controllers.add(location, controller);
+        }
+        throw new RuntimeException("attempted to move controller named '" + name + "' in " + this.getClass() + " but it could not b found.");
     }
 
-    void onRun(CONTROL control);
+    public void createTempEnvironment(){
+        controllersBackup = (LinkedList<Consumer<CONTROL>>) controllers.clone();
+        controllerNameMappingBackup = (Hashtable<String, Consumer<CONTROL>>) controllerNameMapping.clone();
+
+        controllers.clear();
+        controllerNameMapping.clear();
+    }
+
+    public void killTempEnvironment(){
+        controllers = (LinkedList<Consumer<CONTROL>>) controllersBackup.clone();
+        controllerNameMapping = (Hashtable<String, Consumer<CONTROL>>) controllerNameMappingBackup.clone();
+    }
+
+    public abstract void onRun(CONTROL control);
 }

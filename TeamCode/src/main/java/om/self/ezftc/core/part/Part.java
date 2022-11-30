@@ -1,5 +1,12 @@
 package om.self.ezftc.core.part;
 
+import org.apache.commons.lang3.ObjectUtils;
+
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import om.self.beans.core.BeanManager;
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;
@@ -17,34 +24,33 @@ import om.self.task.core.Task;
  * </ul>
  * @param <PARENT> the type of the part you want to extend
  */
-public abstract class Part<PARENT extends PartParent> implements PartParent {
-    public static final class TaskNames{
-        public static final String mainLoop = "main loop";
-    }
-
-
+public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implements PartParent {
+    //basic
     public final PARENT parent;
     private final Group taskManager;
     private final EventManager eventManager;
     private final String name;
 
-    public Part(PARENT parent, String name, boolean enableLoop) {
+    private SETTINGS settings;
+    private HARDWARE hardware;
+
+    public Part(PARENT parent, String name) {
         this.parent = parent;
         this.name = name;
         taskManager = new Group(name,  parent.getTaskManager());
         eventManager = new EventManager(name, parent.getEventManager());
-        construct(enableLoop);
+        construct();
     }
 
-    public Part(PARENT parent, String name, Group taskManager, boolean enableLoop){
+    public Part(PARENT parent, String name, Group taskManager){
         this.parent = parent;
         this.name = name;
         this.taskManager = taskManager;
         eventManager = new EventManager(name, parent.getEventManager());
-        construct(enableLoop);
+        construct();
     }
 
-    private void construct(boolean enableLoop){
+    private void construct(){
         //-----event manager-----//
         //make/attach start
         eventManager.attachToEvent(EventManager.CommonEvent.INIT, "onInit", this::onInit);
@@ -55,14 +61,8 @@ public abstract class Part<PARENT extends PartParent> implements PartParent {
         eventManager.attachToEvent(EventManager.CommonEvent.STOP, "stop taskManager", () -> taskManager.runCommand(Group.Command.PAUSE));
         //add bean!!
         getBeanManager().addBean(this, this::onBeanLoad, true, false);
-
-        if(enableLoop)
-            constructLoop();
     }
 
-    private void constructLoop(){
-        new Task(TaskNames.mainLoop, getTaskManager()).setRunnable(this::onRun);
-    }
 
     @Override
     public String getName() {
@@ -79,18 +79,47 @@ public abstract class Part<PARENT extends PartParent> implements PartParent {
         return eventManager;
     }
 
+    public void triggerEvent(String event){
+        eventManager.triggerEventRecursively(event);
+    }
+
+    public void triggerEvent(Enum event){
+        eventManager.triggerEventRecursively(event);
+    }
+
     @Override
     public BeanManager getBeanManager(){
         return parent.getBeanManager();
     }
 
+    public SETTINGS getSettings() {
+        return settings;
+    }
+
+    public void setSettings(SETTINGS settings) {
+        onSettingsUpdate(settings);
+        this.settings = settings;
+    }
+
+    public HARDWARE getHardware() {
+        return hardware;
+    }
+
+    public void setHardware(HARDWARE hardware) {
+        onHardwareUpdate(hardware);
+        this.hardware = hardware;
+    }
+
+
     public abstract void onBeanLoad();
 
     public abstract void onInit();
 
-    public abstract void onStart();
+    public void onSettingsUpdate(SETTINGS settings){}
 
-    public void onRun(){}
+    public void onHardwareUpdate(HARDWARE hardware){}
+
+    public abstract void onStart();
 
     public abstract void onStop();
 }
