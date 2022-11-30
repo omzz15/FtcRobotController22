@@ -76,6 +76,14 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
 //        }
     }
 
+    public void setLiftToTop(){
+        setLiftPosition(getSettings().maxLiftPosition);
+    }
+
+    public void setLiftToBottom(){
+        setLiftPosition(getSettings().minLiftPosition);
+    }
+
     public int getLiftPosition(){
         return getHardware().leftLiftMotor.getCurrentPosition();
     }
