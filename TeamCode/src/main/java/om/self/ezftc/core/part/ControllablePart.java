@@ -32,9 +32,21 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
     public ControllablePart(PARENT parent, String name, Supplier<CONTROL> baseController) {
         super(parent, name);
         constructControllable();
+        setBaseController(baseController, true);
     }
 
     public ControllablePart(PARENT parent, String name, Group taskManager, Supplier<CONTROL> baseController) {
+        super(parent, name, taskManager);
+        constructControllable();
+        setBaseController(baseController, true);
+    }
+
+    public ControllablePart(PARENT parent, String name) {
+        super(parent, name);
+        constructControllable();
+    }
+
+    public ControllablePart(PARENT parent, String name, Group taskManager) {
         super(parent, name, taskManager);
         constructControllable();
     }

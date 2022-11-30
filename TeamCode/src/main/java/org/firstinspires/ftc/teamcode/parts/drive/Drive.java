@@ -6,12 +6,12 @@ import org.firstinspires.ftc.teamcode.parts.drive.settings.DriveSettings;
 import java.util.function.Function;
 
 import om.self.ezftc.core.Robot;
+import om.self.ezftc.core.part.ControllableLoopedPart;
 import om.self.ezftc.core.part.ControllablePart;
-import om.self.ezftc.core.part.RobotPart;
 import om.self.ezftc.utils.Vector3;
 import om.self.supplier.modifiers.SimpleRampedModifier;
 
-public class Drive extends RobotPart implements ControllablePart<Robot, DriveControl>, ConfigurablePart<Robot, DriveSettings, DriveHardware>, LoopedPart<Robot> {
+public class Drive extends ControllableLoopedPart<Robot,DriveSettings, DriveHardware, DriveControl> {
     private double xTarget = 0;
     private double yTarget = 0;
     private double rTarget = 0;
@@ -29,7 +29,7 @@ public class Drive extends RobotPart implements ControllablePart<Robot, DriveCon
     private boolean smoothing = false;
 
     public Drive(Robot robot){
-        super(robot, "drive");
+        super(robot, "drive", robot.getTaskManager(Robot.RunPosition.REGULAR));
         make();
         setConfig(
                 DriveSettings.makeDefault(),
