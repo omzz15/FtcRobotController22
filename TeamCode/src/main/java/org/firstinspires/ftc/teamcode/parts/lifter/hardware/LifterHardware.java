@@ -25,7 +25,7 @@ public class LifterHardware {
     }
 
     public static LifterHardware makeDefault(HardwareMap hardwareMap){
-        final double liftHoldPower = 0.5;
+        final double liftHoldPower = 0.7;
 
         MotorSettings leftMotorSettings = new MotorSettings(MotorSettings.Number.ZERO_B, DcMotorSimple.Direction.FORWARD, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.RunMode.RUN_TO_POSITION, liftHoldPower);
         MotorSettings rightMotorSettings = new MotorSettings(MotorSettings.Number.ONE_B, DcMotorSimple.Direction.REVERSE, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.RunMode.RUN_TO_POSITION, liftHoldPower);
