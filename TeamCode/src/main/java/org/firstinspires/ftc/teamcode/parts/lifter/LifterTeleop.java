@@ -2,19 +2,22 @@ package org.firstinspires.ftc.teamcode.parts.lifter;
 
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterTeleopSettings;
 
+import om.self.ezftc.core.part.LoopedPart;
 import om.self.ezftc.core.part.implementations.PartImpl;
 
-public class LifterTeleop extends PartImpl<Lifter> {
+public class LifterTeleop extends PartImpl<Lifter> implements LoopedPart<Lifter> {
     private LifterTeleopSettings settings;
 
     public LifterTeleop(Lifter parent) {
         super(parent, "lifter teleop");
         setSettings(LifterTeleopSettings.makeDefault(parent.parent));
+        constructLooped();
     }
 
     public LifterTeleop(Lifter parent, LifterTeleopSettings settings) {
         super(parent, "lifter teleop");
         setSettings(settings);
+        constructLooped();
     }
 
     public LifterTeleopSettings getSettings() {
@@ -42,6 +45,12 @@ public class LifterTeleop extends PartImpl<Lifter> {
                 (double)settings.turnSpeedSupplier.get() * settings.turnSpeedMultiplier,
                 settings.grabberCloseSupplier.get()
         ), true);
+    }
+
+    @Override
+    public void onRun() {
+        if(settings.goToBottomSupplier.get()) parent.setLiftToBottom();
+        else if(settings.goToTopSupplier.get()) parent.setLiftToTop();
     }
 
     @Override
