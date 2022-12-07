@@ -1,8 +1,6 @@
 package om.self.ezftc.utils;
 
 
-import androidx.annotation.Nullable;
-
 public class Vector3 {
 	public final double X,Y,Z;
 
@@ -61,7 +59,7 @@ public class Vector3 {
 		return new Vector3(X, -Y, Z);
 	}
 
-	public Vector3 invertR(){
+	public Vector3 invertZ(){
 		return new Vector3(X, Y, -Z);
 	}
 
@@ -80,7 +78,7 @@ public class Vector3 {
 	}
 
 	@Override
-	public boolean equals(@Nullable Object obj) {
+	public boolean equals(Object obj) {
 		if(! (obj instanceof Vector3)) return false;
 		Vector3 other = (Vector3) obj;
 		return other.X == X && other.Y == Y && other.Z == Z;

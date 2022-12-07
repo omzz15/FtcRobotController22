@@ -8,14 +8,19 @@ import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 import om.self.ezftc.core.part.LoopedPartImpl;
 import om.self.ezftc.core.part.Part;
 import om.self.ezftc.utils.PID;
+import om.self.ezftc.utils.Vector2;
 import om.self.ezftc.utils.Vector3;
 
 public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUtils.Null> {
-    private PositionTracker positionTracker;
+    protected PositionTracker positionTracker;
 
-    private Vector3 targetPos;
-    private long startTime;
-    private int timesToStayInTolerance;
+    private Vector2 xyTargetPos;
+    private long xyStartTime;
+    private int xyTimesInTolerance;
+
+    private double rTargetPos;
+    private double rStartTime;
+    private int rTimesInTolerance;
 
 	private PID xPID;
     private PID yPID;
@@ -32,6 +37,21 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
         setSettings(settings);
     }
 
+    public void resetXY(){
+        xyTimesInTolerance = 0;
+        xPID.resetErrors();
+        yPID.resetErrors();
+    }
+
+    public void resetR(){
+        rTimesInTolerance = 0;
+        rPID.resetErrors();
+    }
+
+    public void setXYPosition(Vector2 position, boolean reset){
+        if(reset) resetXY();
+
+    }
 
     @Override
     public void onBeanLoad() {

@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 
 import om.self.task.core.Group;
 import om.self.task.core.Task;
+import om.self.task.core.TaskEx;
 
 //TODO figure out how to reserve certain positions for specific parts to maintain an order
 public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARDWARE, CONTROL> extends Part<PARENT, SETTINGS, HARDWARE> {
@@ -108,9 +109,27 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
         controllers.add(controller);
     }
 
+    public void addController(String name, Consumer<CONTROL> controller, Supplier<Boolean> end){
+        Consumer<CONTROL> controllerWithEnd = (control) -> {
+            controller.accept(control);
+            if(end.get()) removeController(name);
+        } ;
+
+        addController(name, controllerWithEnd);
+    }
+
     public void addController(String name, Consumer<CONTROL> controller, int location){
         controllerNameMapping.put(name, controller);
         controllers.add(location, controller);
+    }
+
+    public void addController(String name, Consumer<CONTROL> controller, Supplier<Boolean> end, int location){
+        Consumer<CONTROL> controllerWithEnd = (control) -> {
+            controller.accept(control);
+            if(end.get()) removeController(name);
+        } ;
+
+        addController(name, controllerWithEnd, location);
     }
 
     public void removeController(String name){

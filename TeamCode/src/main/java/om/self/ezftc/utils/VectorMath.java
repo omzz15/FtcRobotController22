@@ -34,4 +34,8 @@ public class VectorMath {
     public static boolean inTolerance(Vector3 currPos, Vector3 targetPos, Vector3 tol){
         return inTolerance(currPos.toArray(), targetPos.toArray(), tol.toArray());
     }
+
+    public static boolean inTolerance(Vector2 currPos, Vector2 targetPos, Vector2 tol){
+        return inTolerance(currPos.toArray(), targetPos.toArray(), tol.toArray());
+    }
 }
