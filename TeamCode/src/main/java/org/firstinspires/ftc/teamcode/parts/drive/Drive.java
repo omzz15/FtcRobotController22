@@ -11,7 +11,7 @@ import om.self.ezftc.core.part.ControllablePart;
 import om.self.ezftc.utils.Vector3;
 import om.self.supplier.modifiers.SimpleRampedModifier;
 
-public class Drive extends ControllableLoopedPart<Robot,DriveSettings, DriveHardware, DriveControl> {
+public final class Drive extends ControllableLoopedPart<Robot,DriveSettings, DriveHardware, DriveControl> {
     private double xTarget = 0;
     private double yTarget = 0;
     private double rTarget = 0;
@@ -29,8 +29,7 @@ public class Drive extends ControllableLoopedPart<Robot,DriveSettings, DriveHard
     private boolean smoothing = false;
 
     public Drive(Robot robot){
-        super(robot, "drive", robot.getTaskManager(Robot.RunPosition.REGULAR));
-        make();
+        super(robot, "drive", robot.getTaskManager(Robot.RunPosition.REGULAR), () -> new DriveControl(new Vector3(0,0,0),false));
         setConfig(
                 DriveSettings.makeDefault(),
                 DriveHardware.makeDefault(robot.opMode.hardwareMap)
@@ -39,15 +38,10 @@ public class Drive extends ControllableLoopedPart<Robot,DriveSettings, DriveHard
     }
 
     public Drive(Robot robot, DriveSettings driveSettings, DriveHardware driveHardware) {
-        super(robot, "drive");
-        make();
+        super(robot, "drive", () -> new DriveControl(new Vector3(0,0,0),false));
         setConfig(driveSettings, driveHardware);
     }
 
-    private void make(){
-        constructControllable();
-        constructLooped();
-    }
 
     public boolean isSmoothing() {
         return smoothing;
@@ -179,10 +173,6 @@ public class Drive extends ControllableLoopedPart<Robot,DriveSettings, DriveHard
         else setTargetPower(control.power);
     }
 
-    interface DrivePowerConverter{
-        double[] convert(double x, double y, double r);
-    }
-
     @Override
     public void onBeanLoad() {
 
@@ -200,5 +190,10 @@ public class Drive extends ControllableLoopedPart<Robot,DriveSettings, DriveHard
     @Override
     public void onStop() {
 
+    }
+
+
+    interface DrivePowerConverter{
+        double[] convert(double x, double y, double r);
     }
 }

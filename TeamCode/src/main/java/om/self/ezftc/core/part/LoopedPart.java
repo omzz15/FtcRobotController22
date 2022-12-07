@@ -1,5 +1,7 @@
 package om.self.ezftc.core.part;
 
+import om.self.task.core.EventManager;
+import om.self.task.core.Group;
 import om.self.task.core.Task;
 
 public interface LoopedPart extends PartParent{
@@ -8,7 +10,9 @@ public interface LoopedPart extends PartParent{
     }
 
     default void constructLoop(){
-        new Task(TaskNames.mainLoop, getTaskManager()).setRunnable(this::onRun);
+        Task t = new Task(TaskNames.mainLoop, getTaskManager());
+        t.setRunnable(this::onRun);
+        getEventManager().attachToEvent(EventManager.CommonEvent.START, "start main loop", () -> t.runCommand(Group.Command.START));
     }
 
     void onRun();

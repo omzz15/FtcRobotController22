@@ -29,18 +29,38 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
     private LinkedList<Consumer<CONTROL>> controllersBackup = new LinkedList<>();
     private Hashtable<String, Consumer<CONTROL>> controllerNameMappingBackup = new Hashtable<>();
 
+    /**
+     * base constructor
+     * @param parent the parent of this part
+     * @param name the name of the part(used to register an event manager and task manager so it must be unique)
+     * @param baseController the default(starting) controller. this can be changed later using {@link ControllablePart#setBaseController(Supplier, boolean)}
+     */
     public ControllablePart(PARENT parent, String name, Supplier<CONTROL> baseController) {
         super(parent, name);
         constructControllable();
         setBaseController(baseController, true);
     }
 
+    /**
+     * base constructor with a custom task manager
+     * @param parent the parent of this part
+     * @param name the name of the part(used to register an event manager and task manager so it must be unique)
+     * @param taskManager the cut
+     * @param baseController the default(starting) controller. this can be changed later using {@link ControllablePart#setBaseController(Supplier, boolean)}
+     */
     public ControllablePart(PARENT parent, String name, Group taskManager, Supplier<CONTROL> baseController) {
         super(parent, name, taskManager);
         constructControllable();
         setBaseController(baseController, true);
     }
 
+    /**
+     * constructor that doesn't set the base controller
+     * @param parent the parent of this part
+     * @param name the name of the part(used to register an event manager and task manager so it must be unique)
+     * @deprecated please use {@link ControllablePart#ControllablePart(PARENT, String, Supplier<CONTROL>)} because this will not ensure that {@link ControllablePart#onRun(Object)} and controllers will be run
+     */
+    @Deprecated
     public ControllablePart(PARENT parent, String name) {
         super(parent, name);
         constructControllable();
@@ -104,7 +124,7 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
             controllers.remove(controller);
             controllers.add(location, controller);
         }
-        throw new RuntimeException("attempted to move controller named '" + name + "' in " + this.getClass() + " but it could not b found.");
+        throw new RuntimeException("attempted to move controller named '" + name + "' in " + this.getClass() + " but it could not be found.");
     }
 
     public void createTempEnvironment(){

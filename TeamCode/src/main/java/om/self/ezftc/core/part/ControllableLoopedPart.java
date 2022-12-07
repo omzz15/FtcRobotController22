@@ -16,4 +16,17 @@ public abstract class ControllableLoopedPart<PARENT extends PartParent, SETTINGS
         constructLoop();
         constructControllable();
     }
+
+    public ControllableLoopedPart(PARENT parent, String name) {
+        super(parent, name);
+        constructLoop();
+        constructControllable();
+    }
+
+    public ControllableLoopedPart(PARENT parent, String name, Group taskManager) {
+        super(parent, name, taskManager);
+        constructLoop();
+        constructControllable();
+    }
+
 }

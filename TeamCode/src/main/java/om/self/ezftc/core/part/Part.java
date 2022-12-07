@@ -34,6 +34,11 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
     private SETTINGS settings;
     private HARDWARE hardware;
 
+    /**
+     * A constructor for Part that creates task and event managers attached to the parents task and event managers
+     * @param parent the parent of this part(CAN NOT BE NULL)
+     * @param name the name of this part (used to register an event manager and task manager so it must be unique in the scope of the parent)
+     */
     public Part(PARENT parent, String name) {
         this.parent = parent;
         this.name = name;
@@ -42,10 +47,16 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
         construct();
     }
 
+    /**
+     * A constructor for Parts that create an event managers attached to the parents and a task managers attached to the custom task manager
+     * @param parent the parent of this part(CAN NOT BE NULL)
+     * @param name the name of this part (used to register an event manager and task manager so it must be unique in the scope of the parent)
+     * @param taskManager the custom task manager that is the parent for this parts task manager
+     */
     public Part(PARENT parent, String name, Group taskManager){
         this.parent = parent;
         this.name = name;
-        this.taskManager = taskManager;
+        this.taskManager = new Group(name, taskManager);
         eventManager = new EventManager(name, parent.getEventManager());
         construct();
     }
@@ -110,6 +121,10 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
         this.hardware = hardware;
     }
 
+    public void setConfig(SETTINGS settings, HARDWARE hardware){
+        setSettings(settings);
+        setHardware(hardware);
+    }
 
     public abstract void onBeanLoad();
 
