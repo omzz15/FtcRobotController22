@@ -31,13 +31,13 @@ public class LifterSettings {
     public static LifterSettings makeDefault(){
         return new LifterSettings(
                 .2,
-                1,
                 0,
-                .90,
+                0,
+                .88,
                 1,
                 0.05,
-                64,
-                64,
+                150,
+                150,
                 0,
                 3200
         );

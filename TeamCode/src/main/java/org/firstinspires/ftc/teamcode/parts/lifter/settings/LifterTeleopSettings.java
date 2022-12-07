@@ -32,7 +32,7 @@ public class LifterTeleopSettings {
         return new LifterTeleopSettings(
                 () -> gamepad.right_trigger - gamepad.left_trigger, //heightSpeedSupplier
                 () -> -gamepad.left_stick_y, //turnSpeedSupplier
-                0.003,
+                0.01,
                 () -> !gamepad.a, //grabberCloseSupplier
                 () -> gamepad.b,
                 () -> gamepad.y

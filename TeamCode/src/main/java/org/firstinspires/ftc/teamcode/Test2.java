@@ -32,10 +32,10 @@ public class Test2 extends LinearOpMode {
     @Override
     public void runOpMode() {
         Robot r = new Robot(this);
-        //Drive d = new Drive(r);
-        //    new DriveTeleop(d);
-        //    new HeaderKeeper(d);
-        //PositionTracker pt = new PositionTracker(r);
+        Drive d = new Drive(r);
+            new DriveTeleop(d);
+            new HeaderKeeper(d);
+        PositionTracker pt = new PositionTracker(r);
         //    new EncoderTracker(pt);
         Lifter l = new Lifter(r);
             new LifterTeleop(l);
