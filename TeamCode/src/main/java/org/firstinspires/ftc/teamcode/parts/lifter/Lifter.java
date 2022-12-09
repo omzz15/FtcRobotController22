@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.parts.lifter;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 
@@ -79,6 +80,8 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     public int getLiftPosition(){
         return getHardware().leftLiftMotor.getCurrentPosition();
     }
+    public double getLeftRange(){return getHardware().leftRange.getDistance(DistanceUnit.INCH);}
+    public double getRightRange(){return getHardware().rightRange.getDistance(DistanceUnit.INCH);}
 
     public void turnWithPower(double power){
         setTurnPosition(getCurrentTurnPosition() + power);
