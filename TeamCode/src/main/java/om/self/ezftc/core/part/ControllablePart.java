@@ -105,6 +105,7 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
     }
 
     public void addController(String name, Consumer<CONTROL> controller){
+        if(controllerNameMapping.containsKey(name)) return;
         controllerNameMapping.put(name, controller);
         controllers.add(controller);
     }
@@ -135,6 +136,10 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
     public void removeController(String name){
         if(controllerNameMapping.containsKey(name))
             controllers.remove(controllerNameMapping.remove(name));
+    }
+
+    public void queRemoveController(String name){
+        getTaskManager().attachChild("remove controller " + name, () -> removeController(name));
     }
 
     public void moveController(String name, int location){
