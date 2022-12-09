@@ -16,7 +16,9 @@ public class LifterSettings {
     public final int minLiftPosition;
     public final int maxLiftPosition;
 
-    public LifterSettings(double turnServoMinPosition, double turnServoMaxPosition, double turnServoStartPosition, double grabberServoOpenPos, double grabberServoClosePos, double minRegisterVal, int maxDownLiftSpeed, int maxUpLiftSpeed, int minLiftPosition, int maxLiftPosition) {
+    public final boolean useOldGrabber;
+
+    public LifterSettings(double turnServoMinPosition, double turnServoMaxPosition, double turnServoStartPosition, double grabberServoOpenPos, double grabberServoClosePos, double minRegisterVal, int maxDownLiftSpeed, int maxUpLiftSpeed, int minLiftPosition, int maxLiftPosition, boolean useOldGrabber) {
         this.turnServoMinPosition = turnServoMinPosition;
         this.turnServoMaxPosition = turnServoMaxPosition;
         this.turnServoStartPosition = turnServoStartPosition;
@@ -27,6 +29,7 @@ public class LifterSettings {
         this.maxUpLiftSpeed = maxUpLiftSpeed;
         this.minLiftPosition = minLiftPosition;
         this.maxLiftPosition = maxLiftPosition;
+        this.useOldGrabber = useOldGrabber;
     }
 
     public static LifterSettings makeDefault(){
@@ -34,13 +37,14 @@ public class LifterSettings {
                 0,
                 1,
                 0.75,
-                .88,
+                .9,
                 1,
                 0.05,
                 150,
                 150,
                 0,
-                3200
+                3200,
+                true
         );
     }
 }

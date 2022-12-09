@@ -88,10 +88,10 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     public int getLiftPosition(){
         return getHardware().leftLiftMotor.getCurrentPosition();
     }
-    public double getLeftRange(){return getHardware().leftRange.getDistance(DistanceUnit.CM);}
-    public double getRightRange(){return getHardware().rightRange.getDistance(DistanceUnit.CM);}
-    public double getLeftDistance(){return getHardware().leftDistance.getDistance(DistanceUnit.CM);}
-    public double getRightDistance(){return getHardware().rightDistance.getDistance(DistanceUnit.CM);}
+    //public double getLeftRange(){return getHardware().leftRange.getDistance(DistanceUnit.CM);}
+    //public double getRightRange(){return getHardware().rightRange.getDistance(DistanceUnit.CM);}
+    //public double getLeftDistance(){return getHardware().leftDistance.getDistance(DistanceUnit.CM);}
+    //public double getRightDistance(){return getHardware().rightDistance.getDistance(DistanceUnit.CM);}
 
     public void turnWithPower(double power){
         setTurnPosition(getCurrentTurnPosition() + power);
@@ -113,6 +113,10 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
         getHardware().rightGrabServo.setPower(power);
     }
 
+    public void setGrabberClosed(boolean closed){
+        getHardware().grabServo.setPosition(closed ? getSettings().grabberServoClosePos : getSettings().grabberServoOpenPos);
+    }
+
     //public boolean isClosed(){
     //    return closed;
     //}
@@ -122,6 +126,7 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
         liftWithPower(control.lifterPower);
         turnWithPower(control.turningPower);
         setGrabberPower(control.closePower);
+        setGrabberClosed(control.close);
     }
 
     @Override

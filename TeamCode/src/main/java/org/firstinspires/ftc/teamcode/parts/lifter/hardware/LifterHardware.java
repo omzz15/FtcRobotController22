@@ -18,27 +18,28 @@ public class LifterHardware {
 
     public final Servo leftTurnServo;
     public final Servo rightTurnServo;
-    //public final Servo grabServo;
+    public final Servo grabServo;
     public final CRServo leftGrabServo;
     public final CRServo rightGrabServo;
 
-    public final ColorRangeSensor leftRange;
-    public final ColorRangeSensor rightRange;
-    public final DistanceSensor leftDistance;
-    public final DistanceSensor rightDistance;
+    //public final ColorRangeSensor leftRange;
+    //public final ColorRangeSensor rightRange;
+    //public final DistanceSensor leftDistance;
+    //public final DistanceSensor rightDistance;
 
 
-    public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo, Servo rightTurnServo, CRServo leftGrabServo, CRServo rightGrabServo, ColorRangeSensor leftRange, ColorRangeSensor rightRange, DistanceSensor leftDistance, DistanceSensor rightDistance) {
+    public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo, Servo rightTurnServo, Servo grabServo, CRServo leftGrabServo, CRServo rightGrabServo, ColorRangeSensor leftRange, ColorRangeSensor rightRange, DistanceSensor leftDistance, DistanceSensor rightDistance) {
         this.leftLiftMotor = leftLiftMotor;
         this.rightLiftMotor = rightLiftMotor;
         this.leftTurnServo = leftTurnServo;
         this.rightTurnServo = rightTurnServo;
+        this.grabServo = grabServo;
         this.leftGrabServo = leftGrabServo;
         this.rightGrabServo = rightGrabServo;
-        this.leftRange = leftRange;
-        this.rightRange = rightRange;
-        this.leftDistance = leftDistance;
-        this.rightDistance = rightDistance;
+        //this.leftRange = leftRange;
+        //this.rightRange = rightRange;
+        //this.leftDistance = leftDistance;
+        //this.rightDistance = rightDistance;
     }
 
     public static LifterHardware makeDefault(HardwareMap hardwareMap){
@@ -50,16 +51,14 @@ public class LifterHardware {
         ServoSettings leftServoSettings = new ServoSettings(ServoSettings.Number.ZERO, Servo.Direction.FORWARD);
         ServoSettings rightServoSettings = new ServoSettings(ServoSettings.Number.TWO, Servo.Direction.REVERSE);
 
+        ServoSettings grabServoSettings = new ServoSettings(ServoSettings.Number.FOUR, Servo.Direction.FORWARD);
         MotorSettings leftGrabServoSettings = new MotorSettings(ServoSettings.Number.ZERO_B, DcMotorSimple.Direction.REVERSE);
         MotorSettings rightGrabServoSettings = new MotorSettings(ServoSettings.Number.TWO_B, DcMotorSimple.Direction.FORWARD);
 
-        ColorRangeSensor leftRange = hardwareMap.get(ColorRangeSensor.class, "range2");
-        ColorRangeSensor rightRange = hardwareMap.get(ColorRangeSensor.class, "range1");
-        DistanceSensor leftDistance = hardwareMap.get(DistanceSensor.class, "blueWallSensor");
-        DistanceSensor rightDistance = hardwareMap.get(DistanceSensor.class, "redWallSensor");
-
-        //ServoSettings grabServoSettings = new ServoSettings(ServoSettings.Number.FOUR, Servo.Direction.FORWARD);
-
+        //ColorRangeSensor leftRange = hardwareMap.get(ColorRangeSensor.class, "range2");
+        //ColorRangeSensor rightRange = hardwareMap.get(ColorRangeSensor.class, "range1");
+        //DistanceSensor leftDistance = hardwareMap.get(DistanceSensor.class, "blueWallSensor");
+        //DistanceSensor rightDistance = hardwareMap.get(DistanceSensor.class, "redWallSensor");
 
 
         return new LifterHardware(
@@ -67,13 +66,13 @@ public class LifterHardware {
                 rightMotorSettings.makeMotor(hardwareMap),
                 leftServoSettings.makeServo(hardwareMap),
                 rightServoSettings.makeServo(hardwareMap),
+                grabServoSettings.makeServo(hardwareMap),
                 leftGrabServoSettings.makeCRServo(hardwareMap),
                 rightGrabServoSettings.makeCRServo(hardwareMap),
-
-                leftRange,
-                rightRange,
-                leftDistance,
-                rightDistance
+                null,//leftRange,
+                null,//rightRange,
+                null,//leftDistance,
+                null//rightDistance
         );
     }
 }

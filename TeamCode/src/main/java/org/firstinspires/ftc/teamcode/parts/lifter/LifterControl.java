@@ -5,6 +5,7 @@ public class LifterControl {
     public double turningPower;
     //public boolean close;
     public double closePower;
+    public boolean close;
 
 //    public LifterControl(double lifterPower, double turningPower, boolean close) {
 //        this.lifterPower = lifterPower;
@@ -17,5 +18,13 @@ public class LifterControl {
         this.lifterPower = lifterPower;
         this.turningPower = turningPower;
         this.closePower = closePower;
+        this.close = false;
+    }
+
+    public LifterControl(double lifterPower, double turningPower, boolean close) {
+        this.lifterPower = lifterPower;
+        this.turningPower = turningPower;
+        this.closePower = 0;
+        this.close = close;
     }
 }
