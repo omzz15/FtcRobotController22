@@ -87,6 +87,10 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     public int getLiftPosition(){
         return getHardware().leftLiftMotor.getCurrentPosition();
     }
+    public double getLeftRange(){return getHardware().leftRange.getDistance(DistanceUnit.CM);}
+    public double getRightRange(){return getHardware().rightRange.getDistance(DistanceUnit.CM);}
+    public double getLeftDistance(){return getHardware().leftDistance.getDistance(DistanceUnit.CM);}
+    public double getRightDistance(){return getHardware().rightDistance.getDistance(DistanceUnit.CM);}
 
     public void turnWithPower(double power){
         setTurnPosition(getCurrentTurnPosition() + power);
