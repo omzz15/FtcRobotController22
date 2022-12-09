@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.parts.lifter;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 
@@ -13,7 +12,7 @@ import om.self.ezftc.core.part.RobotPart;
 
 public class Lifter extends RobotPart implements ControllablePart<Robot, LifterControl>, ConfigurablePart<Robot, LifterSettings, LifterHardware> {
     //private EdgeExModifier powerEdgeDetector = new EdgeExModifier();
-    private boolean closed = false;
+    //private boolean closed = false;
 
     public Lifter(Robot parent) {
         super(parent, "lifter");
@@ -88,8 +87,6 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     public int getLiftPosition(){
         return getHardware().leftLiftMotor.getCurrentPosition();
     }
-    public double getLeftRange(){return getHardware().leftRange.getDistance(DistanceUnit.INCH);}
-    public double getRightRange(){return getHardware().rightRange.getDistance(DistanceUnit.INCH);}
 
     public void turnWithPower(double power){
         setTurnPosition(getCurrentTurnPosition() + power);
@@ -106,20 +103,20 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
         return getHardware().leftTurnServo.getPosition();
     }
 
-    public void setGrabberClosed(boolean isClosed){
-        this.closed = isClosed;
-        getHardware().grabServo.setPosition(isClosed ? getSettings().grabberServoClosePos : getSettings().grabberServoOpenPos);
+    public void setGrabberPower(double power){
+        getHardware().leftGrabServo.setPower(power);
+        getHardware().rightGrabServo.setPower(power);
     }
 
-    public boolean isClosed(){
-        return closed;
-    }
+    //public boolean isClosed(){
+    //    return closed;
+    //}
 
     @Override
     public void onRun(LifterControl control) { //TODO separate keeping lifter motor position from onRun
         liftWithPower(control.lifterPower);
         turnWithPower(control.turningPower);
-        setGrabberClosed(control.close);
+        setGrabberPower(control.closePower);
     }
 
     @Override
@@ -144,7 +141,7 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
 
     @Override
     public void onStart() {
-
+        setTurnPosition(getSettings().turnServoStartPosition);
     }
 
     @Override

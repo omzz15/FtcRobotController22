@@ -11,8 +11,6 @@ import org.firstinspires.ftc.teamcode.parts.lifter.LifterTeleop;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
 
-import java.text.DecimalFormat;
-
 import om.self.ezftc.core.Robot;
 
 /**
@@ -40,8 +38,7 @@ public class Test2 extends LinearOpMode {
         PositionTracker pt = new PositionTracker(r);
         //    new EncoderTracker(pt);
         Lifter l = new Lifter(r);
-        new LifterTeleop(l);
-        DecimalFormat df = new DecimalFormat("#0.0");
+            new LifterTeleop(l);
 
         r.init();
 
@@ -54,10 +51,8 @@ public class Test2 extends LinearOpMode {
             //if(gamepad1.y) pt.setAngle(0);
             //telemetry.addData("position", pt.getCurrentPosition());
             telemetry.addData("tilt position", l.getCurrentTurnPosition());
-            telemetry.addData("is closed", l.isClosed());
+            //telemetry.addData("is closed", l.isClosed());
             telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
-            telemetry.addData("rightRange", df.format(l.getRightRange()));
-            telemetry.addData("rightRange", df.format(l.getLeftRange()));
             if(gamepad2.dpad_left){
                 l.getSettings().rightTurnServoOffset -= 0.0001;
             }

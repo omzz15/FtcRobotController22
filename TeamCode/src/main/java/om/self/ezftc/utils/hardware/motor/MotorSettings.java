@@ -2,36 +2,43 @@ package om.self.ezftc.utils.hardware.motor;
 
 import androidx.annotation.NonNull;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import om.self.ezftc.utils.hardware.Valuable;
+
 public class MotorSettings {
-    public Number number;
+    public Valuable number;
     public DcMotorSimple.Direction direction;
     public DcMotor.ZeroPowerBehavior zeroPowerBehavior;
     public DcMotor.RunMode runMode;
     public double power;
     public int targetPos;
 
-    public MotorSettings(Number number){
+    public MotorSettings(Valuable number){
         construct(number, DcMotorSimple.Direction.FORWARD, DcMotor.ZeroPowerBehavior.FLOAT, DcMotor.RunMode.RUN_WITHOUT_ENCODER, 0,0);
     }
 
-    public MotorSettings(Number number, DcMotorSimple.Direction direction, DcMotor.ZeroPowerBehavior zeroPowerBehavior){
+    public MotorSettings(Valuable number, DcMotorSimple.Direction direction){
+        construct(number, direction, DcMotor.ZeroPowerBehavior.FLOAT, DcMotor.RunMode.RUN_WITHOUT_ENCODER, 0,0);
+    }
+
+    public MotorSettings(Valuable number, DcMotorSimple.Direction direction, DcMotor.ZeroPowerBehavior zeroPowerBehavior){
         construct(number,direction,zeroPowerBehavior, DcMotor.RunMode.RUN_WITHOUT_ENCODER, 0,0);
     }
 
-    public MotorSettings(Number number, DcMotorSimple.Direction direction, DcMotor.ZeroPowerBehavior zeroPowerBehavior, DcMotor.RunMode runMode, double power){
+    public MotorSettings(Valuable number, DcMotorSimple.Direction direction, DcMotor.ZeroPowerBehavior zeroPowerBehavior, DcMotor.RunMode runMode, double power){
         construct(number,direction,zeroPowerBehavior,runMode,power,0);
     }
 
-    public MotorSettings(Number number, DcMotorSimple.Direction direction, DcMotor.ZeroPowerBehavior zeroPowerBehavior, DcMotor.RunMode runMode, double power, int targetPos){
+    public MotorSettings(Valuable number, DcMotorSimple.Direction direction, DcMotor.ZeroPowerBehavior zeroPowerBehavior, DcMotor.RunMode runMode, double power, int targetPos){
         construct(number,direction,zeroPowerBehavior,runMode,power,targetPos);
     }
 
-    void construct(Number number, DcMotorSimple.Direction direction, DcMotor.ZeroPowerBehavior zeroPowerBehavior, DcMotor.RunMode runMode, double power, int targetPos){
+    void construct(Valuable number, DcMotorSimple.Direction direction, DcMotor.ZeroPowerBehavior zeroPowerBehavior, DcMotor.RunMode runMode, double power, int targetPos){
         this.number = number;
         this.direction = direction;
         this.zeroPowerBehavior = zeroPowerBehavior;
@@ -41,14 +48,20 @@ public class MotorSettings {
     }
 
     public DcMotor makeMotor(@NonNull HardwareMap hardwareMap){
-        DcMotor motor = hardwareMap.get(DcMotor.class, number.value);
+        DcMotor motor = hardwareMap.get(DcMotor.class, number.getValue());
         updateMotor(motor, true);
         return motor;
     }
 
     public DcMotorEx makeExMotor(@NonNull HardwareMap hardwareMap){
-        DcMotorEx motor = hardwareMap.get(DcMotorEx.class, number.value);
+        DcMotorEx motor = hardwareMap.get(DcMotorEx.class, number.getValue());
         updateMotor(motor, true);
+        return motor;
+    }
+
+    public CRServo makeCRServo(@NonNull HardwareMap hardwareMap){
+        CRServo motor = hardwareMap.get(CRServo.class, number.getValue());
+        updateSimpleMotor(motor);
         return motor;
     }
 
@@ -66,7 +79,12 @@ public class MotorSettings {
         motor.setMode(runMode);
     }
 
-    public enum Number {
+    public void updateSimpleMotor(@NonNull DcMotorSimple motor){
+        motor.setDirection(direction);
+        motor.setPower(power);
+    }
+
+    public enum Number implements Valuable {
         ZERO("motor0"),
         ONE("motor1"),
         TWO("motor2"),
@@ -77,6 +95,10 @@ public class MotorSettings {
         THREE_B("motor3B");
 
         public String value;
+
+        public String getValue(){
+            return value;
+        }
 
         Number(String value){
             this.value = value;
