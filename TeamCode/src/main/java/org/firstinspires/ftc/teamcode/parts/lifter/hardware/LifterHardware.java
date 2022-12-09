@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.parts.lifter.hardware;
 
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -18,8 +19,10 @@ public class LifterHardware {
     public final Servo grabServo;
     public final ColorRangeSensor leftRange;
     public final ColorRangeSensor rightRange;
+    public final DistanceSensor leftDistance;
+    public final DistanceSensor rightDistance;
 
-    public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo, Servo rightTurnServo, Servo grabServo, ColorRangeSensor leftRange, ColorRangeSensor rightRange) {
+    public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo, Servo rightTurnServo, Servo grabServo, ColorRangeSensor leftRange, ColorRangeSensor rightRange, DistanceSensor leftDistance, DistanceSensor rightDistance) {
         this.leftLiftMotor = leftLiftMotor;
         this.rightLiftMotor = rightLiftMotor;
         this.leftTurnServo = leftTurnServo;
@@ -27,6 +30,8 @@ public class LifterHardware {
         this.grabServo = grabServo;
         this.leftRange = leftRange;
         this.rightRange = rightRange;
+        this.leftDistance = leftDistance;
+        this.rightDistance = rightDistance;
     }
 
     public static LifterHardware makeDefault(HardwareMap hardwareMap){
@@ -39,6 +44,8 @@ public class LifterHardware {
         ServoSettings grabServoSettings = new ServoSettings(ServoSettings.Number.FOUR, Servo.Direction.FORWARD);
         ColorRangeSensor leftRange = hardwareMap.get(ColorRangeSensor.class, "range2");
         ColorRangeSensor rightRange = hardwareMap.get(ColorRangeSensor.class, "range1");
+        DistanceSensor leftDistance = hardwareMap.get(DistanceSensor.class, "blueWallSensor");
+        DistanceSensor rightDistance = hardwareMap.get(DistanceSensor.class, "redWallSensor");
 
         return new LifterHardware(
                 leftMotorSettings.makeMotor(hardwareMap),
@@ -47,7 +54,9 @@ public class LifterHardware {
                 rightServoSettings.makeServo(hardwareMap),
                 grabServoSettings.makeServo(hardwareMap),
                 leftRange,
-                rightRange
+                rightRange,
+                leftDistance,
+                rightDistance
         );
     }
 }

@@ -57,7 +57,9 @@ public class Test2 extends LinearOpMode {
             telemetry.addData("is closed", l.isClosed());
             telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
             telemetry.addData("rightRange", df.format(l.getRightRange()));
-            telemetry.addData("rightRange", df.format(l.getLeftRange()));
+            telemetry.addData("leftRange", df.format(l.getLeftRange()));
+            telemetry.addData("leftDistance", df.format(l.getLeftDistance()));
+            telemetry.addData("rightDistance", df.format(l.getRightDistance()));
             if(gamepad2.dpad_left){
                 l.getSettings().rightTurnServoOffset -= 0.0001;
             }
