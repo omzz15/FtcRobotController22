@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.parts.lifter;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 
