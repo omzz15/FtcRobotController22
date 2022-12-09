@@ -13,22 +13,29 @@ public class LifterTeleopSettings {
     public final double turnSpeedMultiplier;
 
     public final Supplier<Boolean> grabberCloseSupplier;
+    public final Supplier<Boolean> goToBottomSupplier;
+    public final Supplier<Boolean> goToTopSupplier;
 
-    public LifterTeleopSettings(Supplier<Float> heightSpeedSupplier, Supplier<Float> turnSpeedSupplier, double turnSpeedMultiplier, Supplier<Boolean> grabberCloseSupplier) {
+
+    public LifterTeleopSettings(Supplier<Float> heightSpeedSupplier, Supplier<Float> turnSpeedSupplier, double turnSpeedMultiplier, Supplier<Boolean> grabberCloseSupplier, Supplier<Boolean> goToBottomSupplier, Supplier<Boolean> goToTopSupplier) {
         this.heightSpeedSupplier = heightSpeedSupplier;
         this.turnSpeedSupplier = turnSpeedSupplier;
         this.turnSpeedMultiplier = turnSpeedMultiplier;
         this.grabberCloseSupplier = grabberCloseSupplier;
+        this.goToBottomSupplier = goToBottomSupplier;
+        this.goToTopSupplier = goToTopSupplier;
     }
 
     public static LifterTeleopSettings makeDefault(Robot robot){
         Gamepad gamepad = robot.opMode.gamepad2;
 
         return new LifterTeleopSettings(
-                () -> gamepad.right_trigger - gamepad.left_trigger,
-                () -> -gamepad.left_stick_y,
-                0.003,
-                () -> !gamepad.a
+                () -> gamepad.right_trigger - gamepad.left_trigger, //heightSpeedSupplier
+                () -> -gamepad.left_stick_y, //turnSpeedSupplier
+                0.01,
+                () -> !gamepad.a, //grabberCloseSupplier
+                () -> gamepad.b,
+                () -> gamepad.y
         );
     }
 }
