@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.parts.lifter;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 
@@ -10,10 +7,19 @@ import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.ConfigurablePart;
 import om.self.ezftc.core.part.ControllablePart;
 import om.self.ezftc.core.part.RobotPart;
+import om.self.task.other.TimedTask;
 
 public class Lifter extends RobotPart implements ControllablePart<Robot, LifterControl>, ConfigurablePart<Robot, LifterSettings, LifterHardware> {
-    //private EdgeExModifier powerEdgeDetector = new EdgeExModifier();
+    public static final class TaskNames{
+        public final static String autoGrab = "auto grab";
+    }
+
     //private boolean closed = false;
+    private int liftTargetPosition = 0;
+
+    private final TimedTask autoGrabTask = new TimedTask(TaskNames.autoGrab, getTaskManager());
+    private int conePos = 0;//how high the cone is based on lifter position
+
 
     public Lifter(Robot parent) {
         super(parent, "lifter");
@@ -42,39 +48,21 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
         else
             power *= getSettings().maxUpLiftSpeed;
 
-//        if(power > getSettings().minRegisterVal){
-//            if(getHardware().leftLiftMotor.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
-//                getHardware().leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//                getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//            }
-//            getHardware().leftLiftMotor.setPower(power);
-//            getHardware().rightLiftMotor.setPower(power);
-//        } else if(getHardware().leftLiftMotor.getMode() == DcMotor.RunMode.RUN_USING_ENCODER){
-
-            setLiftPosition(getHardware().leftLiftMotor.getCurrentPosition() + (int)power);
-
-//            getHardware().leftLiftMotor.setPower(getSettings().liftHoldPower);
-//            getHardware().rightLiftMotor.setPower(getSettings().liftHoldPower);
-//
-//            getHardware().leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        }
+        setLiftPosition(getHardware().leftLiftMotor.getCurrentPosition() + (int)power);
     }
 
     public void setLiftPosition(int position){
         position = Math.min(getSettings().maxLiftPosition, Math.max(getSettings().minLiftPosition, position));
         int diff = getHardware().rightLiftMotor.getCurrentPosition() - getHardware().leftLiftMotor.getCurrentPosition();
 
+        liftTargetPosition = position;
+
         getHardware().leftLiftMotor.setTargetPosition(position);
         getHardware().rightLiftMotor.setTargetPosition(position + diff);
+    }
 
-//        if(getHardware().leftLiftMotor.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
-//            getHardware().leftLiftMotor.setPower(getSettings().liftHoldPower);
-//            getHardware().rightLiftMotor.setPower(getSettings().liftHoldPower);
-//
-//            getHardware().leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        }
+    public boolean isLiftInTolerance(){
+        return Math.abs(liftTargetPosition - getLiftPosition()) <= getSettings().tolerance;
     }
 
     public void setLiftToTop(){
@@ -88,6 +76,7 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     public int getLiftPosition(){
         return getHardware().leftLiftMotor.getCurrentPosition();
     }
+
     //public double getLeftRange(){return getHardware().leftRange.getDistance(DistanceUnit.CM);}
     //public double getRightRange(){return getHardware().rightRange.getDistance(DistanceUnit.CM);}
     //public double getLeftDistance(){return getHardware().leftDistance.getDistance(DistanceUnit.CM);}
@@ -121,6 +110,19 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     //    return closed;
     //}
 
+    public void constructAutoGrab(){
+        autoGrabTask.addStep(() -> setGrabberClosed(true));
+        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
+        autoGrabTask.addStep(() -> setTurnPosition(0.95));
+        autoGrabTask.addDelay(500);
+        autoGrabTask.addStep(() -> setGrabberClosed(false));
+        autoGrabTask.addStep(this::isLiftInTolerance);
+        autoGrabTask.addStep(() -> setLiftPosition(conePos));
+        autoGrabTask.addStep(() -> setGrabberClosed(true));
+        autoGrabTask.addDelay(100);
+        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
+    }
+
     @Override
     public void onRun(LifterControl control) { //TODO separate keeping lifter motor position from onRun
         liftWithPower(control.lifterPower);
@@ -147,6 +149,7 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     @Override
     public void onInit() {
         //powerEdgeDetector.setOnFall(() -> se);
+        constructAutoGrab();
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterTeleopSettings
 
 import om.self.ezftc.core.part.LoopedPart;
 import om.self.ezftc.core.part.implementations.PartImpl;
+import om.self.task.core.Group;
 
 public class LifterTeleop extends PartImpl<Lifter> implements LoopedPart<Lifter> {
     private LifterTeleopSettings settings;
@@ -59,7 +60,7 @@ public class LifterTeleop extends PartImpl<Lifter> implements LoopedPart<Lifter>
     @Override
     public void onRun() {
         if(settings.goToBottomSupplier.get()) parent.setLiftToBottom();
-        else if(settings.goToTopSupplier.get()) parent.setLiftToTop();
+        else if(settings.autoGrabSupplier.get()) parent.getTaskManager().runKeyedCommand(Lifter.TaskNames.autoGrab, Group.Command.START);
     }
 
     @Override

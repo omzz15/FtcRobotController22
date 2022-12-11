@@ -15,17 +15,17 @@ public class LifterTeleopSettings {
     public final Supplier<Boolean> grabberCloseSupplier;
     public final Supplier<Double> grabberMoveSupplier;
     public final Supplier<Boolean> goToBottomSupplier;
-    public final Supplier<Boolean> goToTopSupplier;
+    public final Supplier<Boolean> autoGrabSupplier;
 
 
-    public LifterTeleopSettings(Supplier<Float> heightSpeedSupplier, Supplier<Float> turnSpeedSupplier, double turnSpeedMultiplier, Supplier<Boolean> grabberCloseSupplier, Supplier<Double> grabberMoveSupplier, Supplier<Boolean> goToBottomSupplier, Supplier<Boolean> goToTopSupplier) {
+    public LifterTeleopSettings(Supplier<Float> heightSpeedSupplier, Supplier<Float> turnSpeedSupplier, double turnSpeedMultiplier, Supplier<Boolean> grabberCloseSupplier, Supplier<Double> grabberMoveSupplier, Supplier<Boolean> goToBottomSupplier, Supplier<Boolean> autoGrabSupplier) {
         this.heightSpeedSupplier = heightSpeedSupplier;
         this.turnSpeedSupplier = turnSpeedSupplier;
         this.turnSpeedMultiplier = turnSpeedMultiplier;
         this.grabberCloseSupplier = grabberCloseSupplier;
         this.grabberMoveSupplier = grabberMoveSupplier;
         this.goToBottomSupplier = goToBottomSupplier;
-        this.goToTopSupplier = goToTopSupplier;
+        this.autoGrabSupplier = autoGrabSupplier;
     }
 
     public static LifterTeleopSettings makeDefault(Robot robot){
