@@ -40,6 +40,8 @@ public class LifterHardware {
         //this.rightRange = rightRange;
         //this.leftDistance = leftDistance;
         //this.rightDistance = rightDistance;
+        //this.leftUltrasonic = leftUltrasonic;
+        //this.rightUltrasonic = rightUltrasonic;
     }
 
     public static LifterHardware makeDefault(HardwareMap hardwareMap){
