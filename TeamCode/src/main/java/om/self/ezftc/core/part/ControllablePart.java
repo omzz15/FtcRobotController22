@@ -35,8 +35,8 @@ public interface ControllablePart<PARENT extends PartParent, CONTROL> extends Pa
             onRun(c);
         });//basically just runs the controllers
         //add events to stop and start controllers
-        getEventManager().attachToEvent(EventNames.startControllers, "start control loop", () -> controlLoop.runCommand(Group.Command.START));
-        getEventManager().attachToEvent(EventNames.stopControllers, "stop control loop", () -> controlLoop.runCommand(Group.Command.PAUSE));
+        getEventManager().attachToEvent(EventNames.startControllers, "start control loop", () -> controlLoop.runCommand(Group.Command.QUE_START));
+        getEventManager().attachToEvent(EventNames.stopControllers, "stop control loop", () -> controlLoop.runCommand(Group.Command.QUE_PAUSE));
     }
 
     default boolean isControlActive() {

@@ -51,7 +51,7 @@ public class LifterHardware {
         ServoSettings leftServoSettings = new ServoSettings(ServoSettings.Number.ZERO, Servo.Direction.FORWARD);
         ServoSettings rightServoSettings = new ServoSettings(ServoSettings.Number.TWO, Servo.Direction.REVERSE);
 
-        ServoSettings grabServoSettings = new ServoSettings(ServoSettings.Number.FOUR, Servo.Direction.FORWARD);
+        ServoSettings grabServoSettings = new ServoSettings(ServoSettings.Number.FOUR_B, Servo.Direction.FORWARD);
         MotorSettings leftGrabServoSettings = new MotorSettings(ServoSettings.Number.ZERO_B, DcMotorSimple.Direction.REVERSE);
         MotorSettings rightGrabServoSettings = new MotorSettings(ServoSettings.Number.TWO_B, DcMotorSimple.Direction.FORWARD);
 
