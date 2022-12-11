@@ -2,9 +2,9 @@
 package org.firstinspires.ftc.teamcode.parts.positionsolver.settings;
 
 public class PositionSolverSettings {
-    private final ChannelSolverSettings xChannelSettings;
-    private final ChannelSolverSettings yChannelSettings;
-    private final ChannelSolverSettings rChannelSettings;
+    public final ChannelSolverSettings xChannelSettings;
+    public final ChannelSolverSettings yChannelSettings;
+    public final ChannelSolverSettings rChannelSettings;
 
     public PositionSolverSettings(ChannelSolverSettings xChannelSettings, ChannelSolverSettings yChannelSettings, ChannelSolverSettings rChannelSettings) {
         this.xChannelSettings = xChannelSettings;
