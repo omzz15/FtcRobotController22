@@ -34,6 +34,8 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
     private SETTINGS settings;
     private HARDWARE hardware;
 
+    private boolean running;
+
     /**
      * A constructor for Part that creates task and event managers attached to the parents task and event managers
      * @param parent the parent of this part(CAN NOT BE NULL)
@@ -66,9 +68,15 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
         //make/attach start
         eventManager.attachToEvent(EventManager.CommonEvent.INIT, "onInit", this::onInit);
         //make/attach start
-        eventManager.attachToEvent(EventManager.CommonEvent.START, "onStart", this::onStart);
+        eventManager.attachToEvent(EventManager.CommonEvent.START, "onStart", () -> {
+            running = true;
+            onStart();
+        });
         //make/attach stop
-        eventManager.attachToEvent(EventManager.CommonEvent.STOP, "onStop", this::onStop);
+        eventManager.attachToEvent(EventManager.CommonEvent.STOP, "onStop", () -> {
+            running = false;
+            onStop();
+        });
         eventManager.attachToEvent(EventManager.CommonEvent.STOP, "stop taskManager", () -> taskManager.runCommand(Group.Command.PAUSE));
         //add bean!!
         getBeanManager().addBean(this, this::onBeanLoad, true, false);
@@ -124,6 +132,10 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
     public void setConfig(SETTINGS settings, HARDWARE hardware){
         setSettings(settings);
         setHardware(hardware);
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 
     public abstract void onBeanLoad();

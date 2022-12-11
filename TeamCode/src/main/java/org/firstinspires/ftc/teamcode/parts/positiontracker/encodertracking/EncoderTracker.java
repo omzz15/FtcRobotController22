@@ -1,35 +1,27 @@
 package org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
+import om.self.ezftc.core.part.LoopedPartImpl;
+import om.self.ezftc.core.part.Part;
 import om.self.ezftc.utils.Vector3;
 import om.self.ezftc.utils.VectorMath;
 
-public class EncoderTracker extends PartImpl<PositionTracker> implements LoopedPart<PositionTracker> {
+public class EncoderTracker extends LoopedPartImpl<PositionTracker, EncoderTrackerSettings, ObjectUtils.Null> {
     private Drive drive;
 
     private int[] lastMotorPos = new int[4];
-    private EncoderTrackerSettings settings;
 
     public EncoderTracker(PositionTracker parent, EncoderTrackerSettings settings) {
         super(parent, "encoder tracker");
-        make();
         setSettings(settings);
     }
 
     public EncoderTracker(PositionTracker parent) {
         super(parent, "encoder tracker");
-        make();
         setSettings(EncoderTrackerSettings.makeDefault());
-    }
-
-    private void make(){
-        constructLooped();
-    }
-
-    public void setSettings(EncoderTrackerSettings settings) {
-        this.settings = settings;
     }
 
 
@@ -61,8 +53,8 @@ public class EncoderTracker extends PartImpl<PositionTracker> implements LoopedP
          lastMotorPos = currMotorPos;
 
         //get the X and Y movement of the robot
-        double XMove = (.25 * (-diff[0] + diff[2] + diff[1] - diff[3])) / settings.ticksPerInchSideways;
-        double YMove = (.25 * (diff[0] + diff[2] + diff[1] + diff[3])) / settings.ticksPerInchForward;
+        double XMove = (.25 * (-diff[0] + diff[2] + diff[1] - diff[3])) / getSettings().ticksPerInchSideways;
+        double YMove = (.25 * (diff[0] + diff[2] + diff[1] + diff[3])) / getSettings().ticksPerInchForward;
 
         //rotate movement and add to robot positionTracker
         Vector3 movement = new Vector3(

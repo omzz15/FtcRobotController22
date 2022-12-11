@@ -1,15 +1,17 @@
 package org.firstinspires.ftc.teamcode.parts.drive.headerkeeper;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
+import om.self.ezftc.core.part.Part;
 import om.self.ezftc.utils.AngleMath;
 import om.self.ezftc.utils.PID;
 import om.self.supplier.modifiers.EdgeExModifier;
 import om.self.task.core.Group;
 import om.self.task.other.TimedTask;
 
-public class HeaderKeeper extends PartImpl<Drive> {
+public class HeaderKeeper extends Part<Drive, HeaderKeeperSettings, ObjectUtils.Null> {
     private PositionTracker pt;
     private HeaderKeeperSettings settings;
 

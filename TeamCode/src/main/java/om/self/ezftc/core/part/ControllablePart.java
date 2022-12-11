@@ -138,6 +138,7 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
             controllers.remove(controllerNameMapping.remove(name));
     }
 
+    @Deprecated
     public void queRemoveController(String name){
         getTaskManager().attachChild("remove controller " + name, () -> removeController(name));
     }
