@@ -9,12 +9,13 @@ import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 import om.self.ezftc.core.part.ControllablePart;
 import om.self.ezftc.core.part.Part;
 import om.self.ezftc.utils.AngleMath;
+import om.self.ezftc.utils.PID;
 import om.self.ezftc.utils.Vector3;
 
 public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUtils.Null> {
     protected PositionTracker positionTracker;
 
-    private final ChannelSolver xChannel = new ChannelSolver(this, "x channel") {
+    public final ChannelSolver xChannel = new ChannelSolver(this, "x channel") {
         @Override
         public double getError(double target) {
             return target - positionTracker.getCurrentPosition().X;
@@ -22,10 +23,12 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
 
         @Override
         public void move(DriveControl base) {
+            double r = Math.toRadians(positionTracker.getCurrentPosition().Z);
+            base.power = base.power.addX(pid.returnValue() * Math.cos(r)).addY(pid.returnValue() * Math.sin(r));
         }
     };
 
-    private final ChannelSolver yChannel = new ChannelSolver(this, "y channel") {
+    public final ChannelSolver yChannel = new ChannelSolver(this, "y channel") {
         @Override
         public double getError(double target) {
             return target - positionTracker.getCurrentPosition().Y;
@@ -33,10 +36,12 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
 
         @Override
         public void move(DriveControl base) {
+            double r = Math.toRadians(positionTracker.getCurrentPosition().Z);
+            base.power = base.power.addY(pid.returnValue() * Math.cos(r)).addX(pid.returnValue() * Math.sin(r));
         }
     };
 
-    private final ChannelSolver rChannel = new ChannelSolver(this, "r channel") {
+    public final ChannelSolver rChannel = new ChannelSolver(this, "r channel") {
         @Override
         public double getError(double target) {
             return AngleMath.findAngleError(positionTracker.getCurrentPosition().Z, target);
@@ -56,6 +61,12 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
     public PositionSolver(Drive parent, PositionSolverSettings settings){
         super(parent, "position solver");
         setSettings(settings);
+    }
+
+    public void setNewTarget(Vector3 target, boolean resetPID){
+        xChannel.setNewTarget(target.X, resetPID);
+        yChannel.setNewTarget(target.Y, resetPID);
+        rChannel.setNewTarget(target.Z, resetPID);
     }
 
     @Override

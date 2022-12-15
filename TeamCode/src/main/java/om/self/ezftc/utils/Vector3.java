@@ -1,6 +1,8 @@
 package om.self.ezftc.utils;
 
 
+import java.security.acl.Group;
+
 public class Vector3 {
 	public final double X,Y,Z;
 
@@ -65,9 +67,15 @@ public class Vector3 {
 
 	public Vector3 withX(double X){return new Vector3(X,Y,Z);}
 
+	public Vector3 addX(double X){return new Vector3(this.X + X,Y,Z);}
+
 	public Vector3 withY(double Y){return new Vector3(X,Y,Z);}
 
+	public Vector3 addY(double Y){return new Vector3(X, this.Y + Y,Z);}
+
 	public Vector3 withZ(double Z){return new Vector3(X,Y,Z);}
+
+	public Vector3 addZ(double Z){return new Vector3(X,Y,this.Z + Z);}
 
 	public boolean inTolerance(Vector3 targetPos, Vector3 tol){
 		return VectorMath.inTolerance(this, targetPos, tol);

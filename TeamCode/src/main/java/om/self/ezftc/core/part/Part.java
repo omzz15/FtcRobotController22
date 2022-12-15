@@ -1,16 +1,9 @@
 package om.self.ezftc.core.part;
 
-import org.apache.commons.lang3.ObjectUtils;
-
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 import om.self.beans.core.BeanManager;
+import om.self.ezftc.core.Robot;
 import om.self.task.core.EventManager;
 import om.self.task.core.Group;
-import om.self.task.core.Task;
 
 /**
  * Provides a simple configuration of events, beans, and tasks that allow you to make extensions(ex: robot parts or telemetry).
@@ -25,6 +18,7 @@ import om.self.task.core.Task;
  * @param <PARENT> the type of the part you want to extend
  */
 public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implements PartParent {
+
     //basic
     public final PARENT parent;
     private final Group taskManager;
@@ -66,18 +60,18 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
     private void construct(){
         //-----event manager-----//
         //make/attach start
-        eventManager.attachToEvent(EventManager.CommonEvent.INIT, "onInit", this::onInit);
+        eventManager.attachToEvent(Robot.Events.INIT, "onInit", this::onInit);
         //make/attach start
-        eventManager.attachToEvent(EventManager.CommonEvent.START, "onStart", () -> {
+        eventManager.attachToEvent(Robot.Events.START, "onStart", () -> {
             running = true;
             onStart();
         });
         //make/attach stop
-        eventManager.attachToEvent(EventManager.CommonEvent.STOP, "onStop", () -> {
+        eventManager.attachToEvent(Robot.Events.STOP, "onStop", () -> {
             running = false;
             onStop();
         });
-        eventManager.attachToEvent(EventManager.CommonEvent.STOP, "stop taskManager", () -> taskManager.runCommand(Group.Command.PAUSE));
+        eventManager.attachToEvent(Robot.Events.STOP, "stop taskManager", () -> taskManager.runCommand(Group.Command.PAUSE));
         //add bean!!
         getBeanManager().addBean(this, this::onBeanLoad, true, false);
     }

@@ -7,26 +7,19 @@ import java.util.function.Function;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.ControllableLoopedPart;
-import om.self.ezftc.core.part.ControllablePart;
 import om.self.ezftc.utils.Vector3;
 import om.self.supplier.modifiers.SimpleRampedModifier;
 
 public final class Drive extends ControllableLoopedPart<Robot,DriveSettings, DriveHardware, DriveControl> {
-    private double xTarget = 0;
-    private double yTarget = 0;
-    private double rTarget = 0;
+    private Vector3 targetPower;
 
     private final SimpleRampedModifier xRamp = new SimpleRampedModifier();
     private final SimpleRampedModifier yRamp = new SimpleRampedModifier();
     private final SimpleRampedModifier rRamp = new SimpleRampedModifier();
 
-    private Function<Double, Double> xPowerFilter = pow -> pow;
-    private Function<Double, Double> yPowerFilter = pow -> pow;
-    private Function<Double, Double> rPowerFilter = pow -> pow;
+    private Function<Vector3, Vector3> powerFilter = pow -> pow;
 
     private DrivePowerConverter dpc;
-
-    private boolean smoothing = false;
 
     public Drive(Robot robot){
         super(robot, "drive", robot.getTaskManager(Robot.RunPosition.REGULAR), () -> new DriveControl(new Vector3(0,0,0),false));
@@ -42,27 +35,8 @@ public final class Drive extends ControllableLoopedPart<Robot,DriveSettings, Dri
         setConfig(driveSettings, driveHardware);
     }
 
-
-    public boolean isSmoothing() {
-        return smoothing;
-    }
-
-    public void setSmoothing(boolean smoothing) {
-        this.smoothing = smoothing;
-        if(!smoothing){
-            xPowerFilter = pow -> pow;
-            yPowerFilter = pow -> pow;
-            rPowerFilter = pow -> pow;
-            return;
-        }
-
-        xPowerFilter = xRamp;
-        yPowerFilter = yRamp;
-        rPowerFilter = rRamp;
-    }
-
     public Vector3 getTargetPower(){
-        return new Vector3(xTarget, yTarget, rTarget);
+        return targetPower;
     }
 
     public int[] getMotorPositions(){
@@ -74,18 +48,13 @@ public final class Drive extends ControllableLoopedPart<Robot,DriveSettings, Dri
         };
     }
 
-    public void setTargetPower(double x, double y, double r){
-        xTarget = x;
-        yTarget = y;
-        rTarget = r;
-    }
 
-    public void setTargetPower(Vector3 powers){
-        setTargetPower(powers.X, powers.Y, powers.Z);
+    public void setTargetPower(Vector3 targetPower){
+        this.targetPower = targetPower;
     }
 
     /**
-     * this method is a direct connection to the drive and bypasses things like motion smoothing. Use {@link Drive#setTargetPower(double, double, double)}
+     * this method is a direct connection to the drive and bypasses things like motion smoothing. Use {@link Drive#setTargetPower(Vector3)}
      */
     public void moveRobot(double x, double y, double r){
         double[] pows = dpc.convert(x,y,r);
@@ -118,6 +87,17 @@ public final class Drive extends ControllableLoopedPart<Robot,DriveSettings, Dri
         xRamp.setRamp(driveSettings.smoothingValues.X);
         yRamp.setRamp(driveSettings.smoothingValues.Y);
         rRamp.setRamp(driveSettings.smoothingValues.Z);
+
+        //set smoothing
+        if(driveSettings.useSmoothing){
+            powerFilter = (pow) -> new Vector3(
+                    xRamp.apply(pow.X),
+                    yRamp.apply(pow.Y),
+                    rRamp.apply(pow.Z)
+            );
+        } else {
+            powerFilter = (pow) -> pow;
+        }
 
         //set the conversion function
         switch (driveSettings.driveMode){
@@ -162,12 +142,12 @@ public final class Drive extends ControllableLoopedPart<Robot,DriveSettings, Dri
 
     @Override
     public void onRun() {
-        moveRobot(xPowerFilter.apply(xTarget), yPowerFilter.apply(yTarget), rPowerFilter.apply(rTarget));
+        moveRobot(powerFilter.apply(targetPower));
     }
 
     @Override
     public void onRun(DriveControl control) {
-        parent.opMode.telemetry.addData("drive powers", control.power);
+        parent.opMode.telemetry.addData("drive powers", control.power);//TODO remove
 
         if(control.stop) stopRobot();
         else setTargetPower(control.power);

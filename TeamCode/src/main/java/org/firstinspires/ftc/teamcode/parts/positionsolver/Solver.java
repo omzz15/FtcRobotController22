@@ -6,11 +6,10 @@ import org.firstinspires.ftc.teamcode.parts.positionsolver.settings.ChannelSolve
 
 import java.util.function.Consumer;
 
+import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.ControllablePart;
 import om.self.ezftc.core.part.Part;
 import om.self.ezftc.utils.PID;
-import om.self.ezftc.utils.Vector3;
-import om.self.task.core.EventManager;
 
 public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<PARENT, ChannelSolverSettings, ObjectUtils.Null> {
     public final class Events{
@@ -46,7 +45,7 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
 
         getEventManager().attachToEvent(events.timedOut, "set vars and stop part", () -> {
             successful = false;
-            triggerEvent(EventManager.CommonEvent.STOP);
+            triggerEvent(Robot.Events.STOP);
         });
     }
 
@@ -56,7 +55,7 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
         if(getSettings().alwaysRun)
             getEventManager().detachFromEvent(events.complete, "stop part");
         else
-            getEventManager().attachToEvent(events.complete, "stop part", () -> getEventManager().triggerEvent(EventManager.CommonEvent.STOP));
+            getEventManager().attachToEvent(events.complete, "stop part", () -> getEventManager().triggerEvent(Robot.Events.STOP));
     }
 
     public abstract double getError(double target);
@@ -69,9 +68,9 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
         return successful;
     }
 
-    public void setNewTarget(double target){
+    public void setNewTarget(double target, boolean resetPID){
         this.target = target;
-        reset();
+        reset(resetPID);
     }
 
     public void reset(boolean resetPID){
