@@ -13,15 +13,14 @@ import om.self.ezftc.utils.PID;
 
 public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<PARENT, ChannelSolverSettings, ObjectUtils.Null> {
     public final class Events{
-        public final String complete = getName() + "_COMPLETE";
-        public final String timedOut = getName() + "_TIMEOUT";
+        public static final String complete = "COMPLETE";
+        public static final String timedOut = "TIMEOUT";
     }
 
     public final class Controllers{
         public final String driveController = getName() + " controller";
     }
 
-    public final Events events;
     public final Controllers controllers;
 
     private double target;
@@ -35,15 +34,14 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
 
     public Solver(PARENT parent, String name) {
         super(parent, name);
-        events = new Events();
         controllers = new Controllers();
 
         //add event things
-        getEventManager().attachToEvent(events.complete, "set vars", () -> {
+        getEventManager().attachToEvent(Events.complete, "set vars", () -> {
             successful = true;
         });
 
-        getEventManager().attachToEvent(events.timedOut, "set vars and stop part", () -> {
+        getEventManager().attachToEvent(Events.timedOut, "set vars and stop part", () -> {
             successful = false;
             triggerEvent(Robot.Events.STOP);
         });
@@ -53,9 +51,9 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
     public void onSettingsUpdate(ChannelSolverSettings settings) {
         pid.PIDs = settings.PIDCoefficients;
         if(getSettings().alwaysRun)
-            getEventManager().detachFromEvent(events.complete, "stop part");
+            getEventManager().detachFromEvent(Events.complete, "stop part");
         else
-            getEventManager().attachToEvent(events.complete, "stop part", () -> getEventManager().triggerEvent(Robot.Events.STOP));
+            getEventManager().attachToEvent(Events.complete, "stop part", () -> getEventManager().triggerEvent(Robot.Events.STOP));
     }
 
     public abstract double getError(double target);
@@ -66,6 +64,10 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
 
     public boolean isSuccessful(){
         return successful;
+    }
+
+    public boolean isDone(){
+        return successful || !isRunning();
     }
 
     public void setNewTarget(double target, boolean resetPID){
@@ -109,7 +111,7 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
                 if(error <= getSettings().tolerance) {
                     timesInTolerance ++;
                     if(timesInTolerance == getSettings().reqTimesInTolerance)
-                        triggerEvent(events.complete);
+                        triggerEvent(Events.complete);
                 }
                 else
                     timesInTolerance = 0;
@@ -124,13 +126,13 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
             if(error <= getSettings().tolerance) {
                 timesInTolerance ++;
                 if(timesInTolerance == getSettings().reqTimesInTolerance)
-                    triggerEvent(events.complete);
+                    triggerEvent(Events.complete);
             }
             else
                 timesInTolerance = 0;
 
             if(System.currentTimeMillis() - startTime >= getSettings().maxRuntime)
-                triggerEvent(events.timedOut);
+                triggerEvent(Events.timedOut);
 
             move(base);
         };
