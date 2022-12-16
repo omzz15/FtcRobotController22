@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.parts.positionsolver;
 
 import org.firstinspires.ftc.teamcode.parts.drive.DriveControl;
+import org.firstinspires.ftc.teamcode.parts.positionsolver.settings.ChannelSolverSettings;
+import org.firstinspires.ftc.teamcode.parts.positionsolver.settings.PositionSolverSettings;
 
 import om.self.ezftc.core.part.ControllablePart;
 

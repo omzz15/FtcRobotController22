@@ -4,6 +4,8 @@ package om.self.ezftc.core.part;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -24,11 +26,11 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
 
     //controls
     private Supplier<CONTROL> baseController;
-    private LinkedList<Consumer<CONTROL>> controllers = new LinkedList<>();
-    private Hashtable<String, Consumer<CONTROL>> controllerNameMapping = new Hashtable<>();
+    private ConcurrentLinkedQueue<Consumer<CONTROL>> controllers = new ConcurrentLinkedQueue<>();
+    private ConcurrentHashMap<String, Consumer<CONTROL>> controllerNameMapping = new ConcurrentHashMap<>();
 
     private LinkedList<Consumer<CONTROL>> controllersBackup = new LinkedList<>();
-    private Hashtable<String, Consumer<CONTROL>> controllerNameMappingBackup = new Hashtable<>();
+    private ConcurrentHashMap<String, Consumer<CONTROL>> controllerNameMappingBackup = new ConcurrentHashMap<>();
 
     /**
      * base constructor
@@ -100,8 +102,12 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
             getTaskManager().runKeyedCommand(TaskNames.mainControlLoop, Group.Command.START);
     }
 
-    public List<Consumer<CONTROL>> getControllers() {
+    public ConcurrentLinkedQueue<Consumer<CONTROL>> getControllers() {
         return controllers;
+    }
+
+    public ConcurrentHashMap<String, Consumer<CONTROL>> getControllerNameMapping() {
+        return controllerNameMapping;
     }
 
     public void addController(String name, Consumer<CONTROL> controller){
@@ -119,19 +125,19 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
         addController(name, controllerWithEnd);
     }
 
-    public void addController(String name, Consumer<CONTROL> controller, int location){
-        controllerNameMapping.put(name, controller);
-        controllers.add(location, controller);
-    }
-
-    public void addController(String name, Consumer<CONTROL> controller, Supplier<Boolean> end, int location){
-        Consumer<CONTROL> controllerWithEnd = (control) -> {
-            controller.accept(control);
-            if(end.get()) removeController(name);
-        } ;
-
-        addController(name, controllerWithEnd, location);
-    }
+//    public void addController(String name, Consumer<CONTROL> controller, int location){
+//        controllerNameMapping.put(name, controller);
+//        controllers.add(location, controller);
+//    }
+//
+//    public void addController(String name, Consumer<CONTROL> controller, Supplier<Boolean> end, int location){
+//        Consumer<CONTROL> controllerWithEnd = (control) -> {
+//            controller.accept(control);
+//            if(end.get()) removeController(name);
+//        } ;
+//
+//        addController(name, controllerWithEnd, location);
+//    }
 
     public void removeController(String name){
         if(controllerNameMapping.containsKey(name))
@@ -143,27 +149,27 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
         getTaskManager().attachChild("remove controller " + name, () -> removeController(name));
     }
 
-    public void moveController(String name, int location){
-        if(controllerNameMapping.containsKey(name)){
-            Consumer<CONTROL> controller = controllerNameMapping.get(name);
-            controllers.remove(controller);
-            controllers.add(location, controller);
-        }
-        throw new RuntimeException("attempted to move controller named '" + name + "' in " + this.getClass() + " but it could not be found.");
-    }
+//    public void moveController(String name, int location){
+//        if(controllerNameMapping.containsKey(name)){
+//            Consumer<CONTROL> controller = controllerNameMapping.get(name);
+//            controllers.remove(controller);
+//            controllers.add(location, controller);
+//        }
+//        throw new RuntimeException("attempted to move controller named '" + name + "' in " + this.getClass() + " but it could not be found.");
+//    }
 
-    public void createTempEnvironment(){
-        controllersBackup = (LinkedList<Consumer<CONTROL>>) controllers.clone();
-        controllerNameMappingBackup = (Hashtable<String, Consumer<CONTROL>>) controllerNameMapping.clone();
-
-        controllers.clear();
-        controllerNameMapping.clear();
-    }
-
-    public void killTempEnvironment(){
-        controllers = (LinkedList<Consumer<CONTROL>>) controllersBackup.clone();
-        controllerNameMapping = (Hashtable<String, Consumer<CONTROL>>) controllerNameMappingBackup.clone();
-    }
+//    public void createTempEnvironment(){
+//        controllersBackup = (LinkedList<Consumer<CONTROL>>) controllers.clone();
+//        controllerNameMappingBackup = (Hashtable<String, Consumer<CONTROL>>) controllerNameMapping;
+//
+//        controllers.clear();
+//        controllerNameMapping.clear();
+//    }
+//
+//    public void killTempEnvironment(){
+//        controllers = (LinkedList<Consumer<CONTROL>>) controllersBackup.clone();
+//        controllerNameMapping = (Hashtable<String, Consumer<CONTROL>>) controllerNameMappingBackup.clone();
+//    }
 
     public abstract void onRun(CONTROL control);
 }

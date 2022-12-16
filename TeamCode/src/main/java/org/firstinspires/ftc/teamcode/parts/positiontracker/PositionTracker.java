@@ -18,12 +18,12 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
     private long lastUpdateTime = System.currentTimeMillis();
 
     public PositionTracker(Robot robot) {
-        super(robot, "position tracker");
+        super(robot, "position tracker", robot.startTaskManager);
         setConfig(PositionTrackerSettings.makeDefault(), PositionTrackerHardware.makeDefault(robot));
     }
 
     public PositionTracker(Robot robot, PositionTrackerSettings positionTrackerSettings, PositionTrackerHardware positionTrackerHardware) {
-        super(robot, "position tracker");
+        super(robot, "position tracker", robot.startTaskManager);
         setConfig(positionTrackerSettings, positionTrackerHardware);
     }
 

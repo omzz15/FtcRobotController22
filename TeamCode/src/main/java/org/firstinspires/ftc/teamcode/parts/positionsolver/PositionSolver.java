@@ -6,6 +6,7 @@ import org.firstinspires.ftc.teamcode.parts.drive.DriveControl;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.settings.PositionSolverSettings;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
+import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.ControllablePart;
 import om.self.ezftc.core.part.Part;
 import om.self.ezftc.utils.AngleMath;
@@ -29,7 +30,10 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
         @Override
         public void move(DriveControl base) {
             double r = Math.toRadians(positionTracker.getCurrentPosition().Z);
-            base.power = base.power.addX(pid.returnValue() * Math.cos(r)).addY(pid.returnValue() * Math.sin(r));
+            base.power = base.power.addX(pid.returnValue() * Math.cos(r)).addY(-pid.returnValue() * Math.sin(r));
+
+            parent.parent.parent.opMode.telemetry.addData("x pid", pid.returnValue());
+            parent.parent.parent.opMode.telemetry.addData("pid coeff", pid.PIDs);
         }
     };
 
@@ -42,7 +46,7 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
         @Override
         public void move(DriveControl base) {
             double r = Math.toRadians(positionTracker.getCurrentPosition().Z);
-            base.power = base.power.addY(pid.returnValue() * Math.cos(r)).addX(pid.returnValue() * Math.sin(r));
+            base.power = base.power.addY(pid.returnValue() * Math.cos(r)).addX(-pid.returnValue() * Math.sin(r));
         }
     };
 
@@ -72,6 +76,8 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
         xChannel.setNewTarget(target.X, resetPID);
         yChannel.setNewTarget(target.Y, resetPID);
         rChannel.setNewTarget(target.Z, resetPID);
+
+        triggerEvent(Robot.Events.START);//TODO make this better
     }
 
     public boolean isDone(){
@@ -107,8 +113,6 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
 
     @Override
     public void onStop() {
-
-
 
     }
 }

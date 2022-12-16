@@ -14,7 +14,11 @@ public class PID
 	private double lastError = 0;
 	private long lastTime = System.nanoTime();
 
-	public PID(){}
+	public PID(){
+		this.PIDs = new PIDCoefficients(0,0,0);
+		this.minClamp = -1;
+		this.maxClamp = 1;
+	}
 
 	public PID(PIDCoefficients PIDs, double minClamp, double maxClamp)
 	{

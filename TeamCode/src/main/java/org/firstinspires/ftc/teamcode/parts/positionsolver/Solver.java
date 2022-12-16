@@ -11,7 +11,7 @@ import om.self.ezftc.core.part.ControllablePart;
 import om.self.ezftc.core.part.Part;
 import om.self.ezftc.utils.PID;
 
-public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<PARENT, ChannelSolverSettings, ObjectUtils.Null> {
+public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<PARENT, ChannelSolverSettings, ObjectUtils.Null> { //TODO make settings generic
     public final class Events{
         public static final String complete = "COMPLETE";
         public static final String timedOut = "TIMEOUT";
@@ -35,7 +35,6 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
     public Solver(PARENT parent, String name) {
         super(parent, name);
         controllers = new Controllers();
-
         //add event things
         getEventManager().attachToEvent(Events.complete, "set vars", () -> {
             successful = true;
@@ -50,7 +49,7 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
     @Override
     public void onSettingsUpdate(ChannelSolverSettings settings) {
         pid.PIDs = settings.PIDCoefficients;
-        if(getSettings().alwaysRun)
+        if(settings.alwaysRun)
             getEventManager().detachFromEvent(Events.complete, "stop part");
         else
             getEventManager().attachToEvent(Events.complete, "stop part", () -> getEventManager().triggerEvent(Robot.Events.STOP));
