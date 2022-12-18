@@ -150,10 +150,14 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     }
 
     public void doConeRange() {
-        if (Math.abs(getRightUltra() - getLeftUltra()) < 4 && getLeftUltra() < 20) {
+        if (Math.abs(getRightUltra() - getLeftUltra()) < 2 && getLeftUltra() < 20) {
             getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-        } else if(getRightUltra() + getLeftUltra() < 40){
+//        } else if(getRightUltra() + getLeftUltra() < 40){
+//            getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+        } else if (getRightUltra() < getLeftUltra() && getRightUltra() <= 10){  //closer to right
             getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+        } else if (getLeftUltra() < getRightUltra() && getLeftUltra() <= 10){  //closer to left
+            getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
         } else {
             getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
         }
