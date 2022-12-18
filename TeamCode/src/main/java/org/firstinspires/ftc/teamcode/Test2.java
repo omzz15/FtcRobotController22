@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.parts.bulkread.BulkRead;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.drive.DriveTeleop;
 import org.firstinspires.ftc.teamcode.parts.drive.headerkeeper.HeaderKeeper;
@@ -10,6 +11,7 @@ import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
 import org.firstinspires.ftc.teamcode.parts.lifter.LifterTeleop;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
 
 import java.text.DecimalFormat;
 
@@ -33,14 +35,18 @@ import om.self.ezftc.core.Robot;
 public class Test2 extends LinearOpMode {
     @Override
     public void runOpMode() {
+        long start;
+
         Robot r = new Robot(this);
+        new BulkRead(r);
         Drive d = new Drive(r);
             new DriveTeleop(d);
             //new HeaderKeeper(d);
         PositionTracker pt = new PositionTracker(r);
-        //    new EncoderTracker(pt);
+            //new Slamra(pt);
+            new EncoderTracker(pt);
         Lifter l = new Lifter(r);
-        new LifterTeleop(l);
+            new LifterTeleop(l);
         DecimalFormat df = new DecimalFormat("#0.0");
 
         r.init();
@@ -50,9 +56,10 @@ public class Test2 extends LinearOpMode {
         r.start();
 
         while (opModeIsActive()) {
+            start = System.currentTimeMillis();
             r.run();
             //if(gamepad1.y) pt.setAngle(0);
-            //telemetry.addData("position", pt.getCurrentPosition());
+            telemetry.addData("position", pt.getCurrentPosition());
             telemetry.addData("tilt position", l.getCurrentTurnPosition());
             //telemetry.addData("is closed", l.isClosed());
             telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
@@ -65,15 +72,17 @@ public class Test2 extends LinearOpMode {
             telemetry.addData("rightUltra", df.format(l.getRightUltra()));
             telemetry.addData("midUltra", df.format(l.getMidUltra()));
 
-            if(gamepad2.dpad_left){
-                l.getSettings().rightTurnServoOffset -= 0.0001;
-            }
-            if(gamepad2.dpad_right){
-                l.getSettings().rightTurnServoOffset += 0.0001;
-            }
+//            if(gamepad2.dpad_left){
+//                l.getSettings().rightTurnServoOffset -= 0.0001;
+//            }
+//            if(gamepad2.dpad_right){
+//                l.getSettings().rightTurnServoOffset += 0.0001;
+//            }
 
             if(gamepad1.dpad_down) telemetry.addData("tasks", r.getTaskManager());
             if(gamepad1.dpad_down) telemetry.addData("events", r.getEventManager());
+            r.opMode.telemetry.addData("time", System.currentTimeMillis() - start);
+
             telemetry.update();
         }
 

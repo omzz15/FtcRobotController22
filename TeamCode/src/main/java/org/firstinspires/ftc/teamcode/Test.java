@@ -33,6 +33,8 @@ import om.self.task.core.TaskEx;
 public class Test extends LinearOpMode {
     @Override
     public void runOpMode() {
+        long start;
+
         Robot r = new Robot(this);
         Drive d = new Drive(r);
         new DriveTeleop(d);
@@ -51,6 +53,7 @@ public class Test extends LinearOpMode {
         r.start();
 
         while (opModeIsActive()) {
+            start = System.currentTimeMillis();
             r.run();
             r.opMode.telemetry.addData("position", pt.getCurrentPosition());
             r.opMode.telemetry.addData("solver", ps.isDone());
@@ -60,6 +63,7 @@ public class Test extends LinearOpMode {
 
             if(r.opMode.gamepad1.a) r.opMode.telemetry.addData("task manager", r.getTaskManager());
             if(r.opMode.gamepad1.b) r.opMode.telemetry.addData("event manager", r.getEventManager());
+            r.opMode.telemetry.addData("time", System.currentTimeMillis() - start);
             r.opMode.telemetry.update();
         }
 

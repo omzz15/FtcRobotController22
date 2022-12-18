@@ -3,11 +3,13 @@ package org.firstinspires.ftc.teamcode.parts.lifter;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
+import org.firstinspires.ftc.teamcode.parts.drive.DriveControl;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.ControllablePart;
+import om.self.task.core.Group;
 import om.self.task.other.TimedTask;
 
 public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardware, LifterControl>{
@@ -15,6 +17,10 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         public final static String autoGrab = "auto grab";
         public static String autoDrop;
         public final static String coneMeasureRanges = "measure cone range";
+    }
+
+    public static final class Contollers{
+        public static final String distanceContoller = "distance contoller"; //TODO make better
     }
 
     private Drive drive;
@@ -26,6 +32,10 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     private final TimedTask coneRangeingTask = new TimedTask(TaskNames.coneMeasureRanges, getTaskManager());
     private int conePos = 0;//how high the cone is based on lifter position
     private int ultraRangeModule = 0; // keeps track of measuring ranges
+
+    private double leftDist;
+    private double rightDist;
+    private double midDist;
 
     public Lifter(Robot parent) {
         super(parent, "lifter", () -> new LifterControl(0,0,true));
@@ -81,9 +91,9 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     //public double getRightRange(){return getHardware().rightRange.getDistance(DistanceUnit.CM);}
     //public double getLeftDistance(){return getHardware().leftDistance.getDistance(DistanceUnit.CM);}
     //public double getRightDistance(){return getHardware().rightDistance.getDistance(DistanceUnit.CM);}
-    public double getRightUltra(){return getHardware().rightUltrasonic.getDistanceCm();}
-    public double getLeftUltra(){return getHardware().leftUltrasonic.getDistanceCm();}
-    public double getMidUltra(){return getHardware().midUltrasonic.getDistanceCm();}
+    public double getRightUltra(){return rightDist;}
+    public double getLeftUltra(){return leftDist;}
+    public double getMidUltra(){return midDist;}
 
 
     public void turnWithPower(double power){
@@ -128,25 +138,45 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     }
 
     public void constructConeRanging(){
-        coneRangeingTask.addStep(() -> getHardware().leftUltrasonic.measureRange());
+        coneRangeingTask.addStep(() -> {
+            getHardware().leftUltrasonic.measureRange();
+            midDist = getHardware().midUltrasonic.getDistanceCm();
+        });
         coneRangeingTask.addDelay(30);
-        coneRangeingTask.addStep(() -> getHardware().rightUltrasonic.measureRange());
+        coneRangeingTask.addStep(() -> {
+            getHardware().rightUltrasonic.measureRange();
+            leftDist = getHardware().leftUltrasonic.getDistanceCm();
+        });
         coneRangeingTask.addDelay(30);
-        coneRangeingTask.addStep(() -> getHardware().midUltrasonic.measureRange());
+        coneRangeingTask.addStep(() -> {
+            getHardware().midUltrasonic.measureRange();
+            rightDist = getHardware().rightUltrasonic.getDistanceCm();
+        });
         coneRangeingTask.addDelay(30);
         coneRangeingTask.autoReset = true;
         coneRangeingTask.autoStart = true;
     }
 
-    public void doConeRange() {
-        if (Math.abs(getRightUltra() - getLeftUltra()) < 2 && getLeftUltra() < 20) {
-            getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+    public void doConeRange(DriveControl control) {
+        if (Math.abs(getRightUltra() - getLeftUltra()) <= 2 && getLeftUltra() < 20) {
+            if (getMidUltra() < 6) {
+                control.power = control.power.addY(-0.11);
+                getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
+            }
+            else if (getMidUltra() > 9) {
+                control.power = control.power.addY(0.11);
+                getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
+            } else {
+                getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+            }
 //        } else if(getRightUltra() + getLeftUltra() < 40){
 //            getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
         } else if (getRightUltra() < getLeftUltra() && getRightUltra() <= 10){  //closer to right
             getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+            control.power = control.power.addX(0.15);
         } else if (getLeftUltra() < getRightUltra() && getLeftUltra() <= 10){  //closer to left
             getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
+            control.power = control.power.addX(-0.15);
         } else {
             getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
         }
@@ -158,7 +188,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         turnWithPower(control.turningPower);
         setGrabberPower(control.closePower);
         setGrabberClosed(control.close);
-        doConeRange();
+        //doConeRange();
     }
 
     @Override
@@ -186,10 +216,11 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     @Override
     public void onStart() {
         setTurnPosition(getSettings().turnServoStartPosition);
+        //drive.addController(Contollers.distanceContoller, (control) -> doConeRange(control));
     }
 
     @Override
     public void onStop() {
-
+        //drive.removeController(Contollers.distanceContoller);
     }
 }

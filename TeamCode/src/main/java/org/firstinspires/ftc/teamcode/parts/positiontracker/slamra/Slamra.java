@@ -47,6 +47,9 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 
 	@Override
 	public void onSettingsUpdate(SlamraSettings settings) {
+		if (slamra == null) {
+			slamra = new T265Camera(settings.slamraRobotOffset.toTransform2d(), 0.1, hardwareMap.appContext);
+		}
 		slamra.setPose(settings.slamraStartPosition.toPose2d());
 	}
 
