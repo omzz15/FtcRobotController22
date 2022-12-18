@@ -41,8 +41,8 @@ public class Test extends LinearOpMode {
         PositionSolver ps = new PositionSolver(d);
 
         TaskEx test = new TaskEx("auto test", r.taskManager);
-        ps.addMoveToTaskEx(new Vector3(0,30,90), test);
-        ps.addMoveToTaskEx(new Vector3(0,-10,-90), test);
+        ps.addMoveToTaskEx(new Vector3(0,30,0), test);
+        ps.addMoveToTaskEx(new Vector3(0,-30,0), test);
 
         r.init();
 
