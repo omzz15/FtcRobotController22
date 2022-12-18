@@ -24,12 +24,12 @@ public interface Part<PARENT extends PartParent> extends PartParent {
     default void construct(){
         //-----event manager-----//
         //make/attach start
-        getEventManager().attachToEvent(EventManager.CommonEvent.INIT, "onInit", this::onInit);
+        getEventManager().attachToEvent(Robot.Events.INIT, "onInit", this::onInit);
         //make/attach start
-        getEventManager().attachToEvent(EventManager.CommonEvent.START, "onStart", this::onStart);
+        getEventManager().attachToEvent(Robot.Events.START, "onStart", this::onStart);
         //make/attach stop
-        getEventManager().attachToEvent(EventManager.CommonEvent.STOP, "onStop", this::onStop);
-        getEventManager().attachToEvent(EventManager.CommonEvent.STOP, "stop taskManager", () -> getTaskManager().runCommand(Group.Command.PAUSE));
+        getEventManager().attachToEvent(Robot.Events.STOP, "onStop", this::onStop);
+        getEventManager().attachToEvent(Robot.Events.STOP, "stop taskManager", () -> getTaskManager().runCommand(Group.Command.PAUSE));
         //add bean!!
         getBeanManager().addBean(this, this::onBeanLoad, true, false);
     }

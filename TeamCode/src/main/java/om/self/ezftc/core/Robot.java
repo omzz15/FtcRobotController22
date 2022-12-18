@@ -45,9 +45,9 @@ public class Robot implements PartParent{
     public Robot(OpMode opMode) {
         this.opMode = opMode;
         //add events
-        eventManager.attachToEvent(EventManager.CommonEvent.INIT, "load dependencies", beanManager::load);
-        eventManager.attachToEvent(EventManager.CommonEvent.START, "start taskManager",() -> taskManager.runCommand(Group.Command.START));
-        eventManager.attachToEvent(EventManager.CommonEvent.STOP, "stop taskManager", () -> taskManager.runCommand(Group.Command.PAUSE));
+        eventManager.attachToEvent(Events.INIT, "load dependencies", beanManager::load);
+        eventManager.attachToEvent(Events.START, "start taskManager",() -> taskManager.runCommand(Group.Command.START));
+        eventManager.attachToEvent(Events.STOP, "stop taskManager", () -> taskManager.runCommand(Group.Command.PAUSE));
         //add different task stages
         startTaskManager.autoStopPolicy = Group.AutoManagePolicy.DISABLED; //ensure it never turns off so order is maintained
         startTaskManager.runCommand(Group.Command.START);
@@ -97,10 +97,10 @@ public class Robot implements PartParent{
     }
 
 
-    public void init(){eventManager.triggerEventRecursively(EventManager.CommonEvent.INIT);}
+    public void init(){eventManager.triggerEventRecursively(Events.INIT);}
 
     public void start(){
-        eventManager.triggerEventRecursively(EventManager.CommonEvent.START);
+        eventManager.triggerEventRecursively(Events.START);
     }
 
     public void run(){
@@ -108,12 +108,18 @@ public class Robot implements PartParent{
     }
 
     public void stop(){
-        eventManager.triggerEventRecursively(EventManager.CommonEvent.STOP);
+        eventManager.triggerEventRecursively(Events.STOP);
     }
 
     public enum RunPosition{
         START,
         REGULAR,
         END
+    }
+
+    public enum Events{
+        INIT,
+        START,
+        STOP
     }
 }
