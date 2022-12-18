@@ -1,24 +1,22 @@
 package org.firstinspires.ftc.teamcode.parts.lifter;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterTeleopSettings;
 
-import om.self.ezftc.core.part.LoopedPart;
-import om.self.ezftc.core.part.implementations.PartImpl;
+import om.self.ezftc.core.part.LoopedPartImpl;
 import om.self.task.core.Group;
 
-public class LifterTeleop extends PartImpl<Lifter> implements LoopedPart<Lifter> {
+public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, ObjectUtils.Null> {
     private LifterTeleopSettings settings;
 
     public LifterTeleop(Lifter parent) {
         super(parent, "lifter teleop");
         setSettings(LifterTeleopSettings.makeDefault(parent.parent));
-        constructLooped();
     }
 
     public LifterTeleop(Lifter parent, LifterTeleopSettings settings) {
         super(parent, "lifter teleop");
         setSettings(settings);
-        constructLooped();
     }
 
     public LifterTeleopSettings getSettings() {

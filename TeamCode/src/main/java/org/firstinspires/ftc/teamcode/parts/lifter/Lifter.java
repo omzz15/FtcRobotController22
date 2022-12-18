@@ -1,21 +1,16 @@
 package org.firstinspires.ftc.teamcode.parts.lifter;
 
-import android.widget.Switch;
-
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 
 import om.self.ezftc.core.Robot;
-import om.self.ezftc.core.part.ConfigurablePart;
 import om.self.ezftc.core.part.ControllablePart;
-import om.self.ezftc.core.part.RobotPart;
 import om.self.task.other.TimedTask;
 
-public class Lifter extends RobotPart implements ControllablePart<Robot, LifterControl>, ConfigurablePart<Robot, LifterSettings, LifterHardware> {
+public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardware, LifterControl>{
     public static final class TaskNames{
         public final static String autoGrab = "auto grab";
         public static String autoDrop;
@@ -33,22 +28,16 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     private int ultraRangeModule = 0; // keeps track of measuring ranges
 
     public Lifter(Robot parent) {
-        super(parent, "lifter");
+        super(parent, "lifter", () -> new LifterControl(0,0,true));
         setConfig(
                 LifterSettings.makeDefault(),
                 LifterHardware.makeDefault(parent.opMode.hardwareMap)
         );
-        constructThings();
     }
 
     public Lifter(Robot parent, LifterSettings settings, LifterHardware hardware){
-        super(parent, "lifter");
+        super(parent, "lifter", () -> new LifterControl(0,0,true));
         setConfig(settings, hardware);
-        constructThings();
-    }
-
-    private void constructThings(){
-        constructControllable();
     }
 
     public void liftWithPower(double power){
