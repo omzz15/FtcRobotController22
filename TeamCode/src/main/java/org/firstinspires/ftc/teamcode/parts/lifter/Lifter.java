@@ -1,0 +1,186 @@
+package org.firstinspires.ftc.teamcode.parts.lifter;
+
+import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
+import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
+
+import om.self.ezftc.core.Robot;
+import om.self.ezftc.core.part.ConfigurablePart;
+import om.self.ezftc.core.part.ControllablePart;
+import om.self.ezftc.core.part.RobotPart;
+import om.self.task.other.TimedTask;
+
+public class Lifter extends RobotPart implements ControllablePart<Robot, LifterControl>, ConfigurablePart<Robot, LifterSettings, LifterHardware> {
+    public static final class TaskNames{
+        public final static String autoGrab = "auto grab";
+        public final static String autoDrop = "auto drop";
+    }
+
+    //private boolean closed = false;
+    private int liftTargetPosition = 0;
+
+    private final TimedTask autoGrabTask = new TimedTask(TaskNames.autoGrab, getTaskManager());
+    private final TimedTask autoDropTask = new TimedTask(TaskNames.autoDrop, getTaskManager());
+
+    private int conePos = 0;//how high the cone is based on lifter position
+    private int depositPos = 2060;//how high the pole is based on lifter position
+
+    public Lifter(Robot parent) {
+        super(parent, "lifter");
+        setConfig(
+                LifterSettings.makeDefault(),
+                LifterHardware.makeDefault(parent.opMode.hardwareMap)
+        );
+        constructThings();
+    }
+
+    public Lifter(Robot parent, LifterSettings settings, LifterHardware hardware){
+        super(parent, "lifter");
+        setConfig(settings, hardware);
+        constructThings();
+    }
+
+    private void constructThings(){
+        constructControllable();
+    }
+
+    public void liftWithPower(double power){
+        if(Math.abs(power) < getSettings().minRegisterVal) return;
+
+        if(power < 0)
+            power *= getSettings().maxDownLiftSpeed;
+        else
+            power *= getSettings().maxUpLiftSpeed;
+
+        setLiftPosition(getHardware().leftLiftMotor.getCurrentPosition() + (int)power);
+    }
+
+    public void setLiftPosition(int position){
+        position = Math.min(getSettings().maxLiftPosition, Math.max(getSettings().minLiftPosition, position));
+        int diff = getHardware().rightLiftMotor.getCurrentPosition() - getHardware().leftLiftMotor.getCurrentPosition();
+
+        liftTargetPosition = position;
+
+        getHardware().leftLiftMotor.setTargetPosition(position);
+        getHardware().rightLiftMotor.setTargetPosition(position + diff);
+    }
+
+    public boolean isLiftInTolerance(){
+        return Math.abs(liftTargetPosition - getLiftPosition()) <= getSettings().tolerance;
+    }
+
+    public void setLiftToTop(){
+        setLiftPosition(getSettings().maxLiftPosition);
+    }
+
+    public void setLiftToBottom(){
+        setLiftPosition(getSettings().minLiftPosition);
+    }
+
+    public int getLiftPosition(){
+        return getHardware().leftLiftMotor.getCurrentPosition();
+    }
+
+    //public double getLeftRange(){return getHardware().leftRange.getDistance(DistanceUnit.CM);}
+    //public double getRightRange(){return getHardware().rightRange.getDistance(DistanceUnit.CM);}
+    //public double getLeftDistance(){return getHardware().leftDistance.getDistance(DistanceUnit.CM);}
+    //public double getRightDistance(){return getHardware().rightDistance.getDistance(DistanceUnit.CM);}
+
+    public void turnWithPower(double power){
+        setTurnPosition(getCurrentTurnPosition() + power);
+    }
+
+    public void setTurnPosition(double position){
+        position = Math.min(getSettings().turnServoMaxPosition, Math.max(getSettings().turnServoMinPosition, position));
+
+        getHardware().leftTurnServo.setPosition(position);
+        getHardware().rightTurnServo.setPosition(position + getSettings().rightTurnServoOffset);
+    }
+
+    public double getCurrentTurnPosition(){
+        return getHardware().leftTurnServo.getPosition();
+    }
+
+    public void setGrabberPower(double power){
+        getHardware().leftGrabServo.setPower(power);
+        getHardware().rightGrabServo.setPower(power);
+    }
+
+    public void setGrabberClosed(boolean closed){
+        getHardware().grabServo.setPosition(closed ? getSettings().grabberServoClosePos : getSettings().grabberServoOpenPos);
+    }
+
+    //public boolean isClosed(){
+    //    return closed;
+    //}
+
+    public void constructAutoGrab(){
+        autoGrabTask.autoStart = false;
+        autoGrabTask.addStep(() -> getEventManager().triggerEvent(EventNames.stopControllers));
+        autoGrabTask.addStep(() -> setGrabberClosed(true));
+        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
+        autoGrabTask.addStep(() -> setTurnPosition(0.95));
+        autoGrabTask.addDelay(500);
+        autoGrabTask.addStep(() -> setGrabberClosed(false));
+        autoGrabTask.addStep(this::isLiftInTolerance);
+        autoGrabTask.addStep(() -> setLiftPosition(conePos));
+        autoGrabTask.addStep(this::isLiftInTolerance);
+        autoGrabTask.addStep(() -> setGrabberClosed(true));
+        autoGrabTask.addDelay(500);
+        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
+        autoGrabTask.addStep(() -> getEventManager().triggerEvent(EventNames.startControllers));
+    }
+
+    public void constructAutoDrop(){
+        autoDropTask.autoStart = false;
+        autoDropTask.addStep(() -> getEventManager().triggerEvent(EventNames.stopControllers));
+        autoDropTask.addStep(() -> setLiftPosition(depositPos));
+        autoDropTask.addStep(this::isLiftInTolerance);
+        autoDropTask.addStep(() -> setTurnPosition(0.286));
+        autoDropTask.addDelay(500);
+        autoDropTask.addStep(() -> setLiftPosition(depositPos - 200));
+        autoDropTask.addStep(() -> setGrabberClosed(false));
+        autoDropTask.addStep(this::isLiftInTolerance);
+        autoDropTask.addStep(() -> setLiftPosition(depositPos));
+        autoDropTask.addStep(() -> getEventManager().triggerEvent(EventNames.startControllers));
+    }
+
+    @Override
+    public void onRun(LifterControl control) { //TODO separate keeping lifter motor position from onRun
+        liftWithPower(control.lifterPower);
+        turnWithPower(control.turningPower);
+        setGrabberPower(control.closePower);
+        setGrabberClosed(control.close);
+    }
+
+    @Override
+    public void onBeanLoad() {
+
+    }
+
+    @Override
+    public void onSettingsUpdate(LifterSettings lifterSettings) {
+
+    }
+
+    @Override
+    public void onHardwareUpdate(LifterHardware lifterHardware) {
+
+    }
+
+    @Override
+    public void onInit() {
+        //powerEdgeDetector.setOnFall(() -> se);
+        constructAutoGrab();
+        constructAutoDrop();
+    }
+
+    @Override
+    public void onStart() {
+        setTurnPosition(getSettings().turnServoStartPosition);
+    }
+
+    @Override
+    public void onStop() {
+
+    }
+}

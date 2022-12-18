@@ -1,7 +1,10 @@
 package om.self.ezftc.utils.hardware.servo;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import om.self.ezftc.utils.hardware.Valuable;
 
 public class ServoSettings {
     public Number number;
@@ -24,6 +27,7 @@ public class ServoSettings {
         this.number = number;
         this.direction = direction;
         this.targetPos = targetPos;
+
     }
 
     public Servo makeServo(HardwareMap hardwareMap){
@@ -38,19 +42,25 @@ public class ServoSettings {
             servo.setPosition(targetPos);
     }
 
-    public enum Number {
-        ONE("servo0"),
-        TWO("servo1"),
-        THREE("servo2"),
-        FOUR("servo3"),
-        FIVE("servo4"),
-        ONE_B("servo0B"),
-        TWO_B("servo1B"),
-        THREE_B("servo2B"),
-        FOUR_B("servo3B"),
-        FIVE_B("servo4B");
+    public enum Number implements Valuable {
+        ZERO("servo0"),
+        ONE("servo1"),
+        TWO("servo2"),
+        THREE("servo3"),
+        FOUR("servo4"),
+        FIVE("servo5"),
+        ZERO_B("servo0B"),
+        ONE_B("servo1B"),
+        TWO_B("servo2B"),
+        THREE_B("servo3B"),
+        FOUR_B("servo4B"),
+        FIVE_B("servo5B");
 
         public String value;
+
+        public String getValue(){
+            return value;
+        }
 
         Number(String value){
             this.value = value;
