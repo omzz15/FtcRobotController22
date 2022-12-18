@@ -21,9 +21,9 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
 
     //basic
     public final PARENT parent;
-    private final Group taskManager;
-    private final EventManager eventManager;
-    private final String name;
+    public final Group taskManager;
+    public final EventManager eventManager;
+    public final String name;
 
     private SETTINGS settings;
     private HARDWARE hardware;
