@@ -24,10 +24,10 @@ import om.self.task.core.OrderedGroup;
  * </ul>
  */
 public class Robot implements PartParent{
-    public boolean enableTelemetry = true;
-    public boolean enableDashboard = true;
-    public boolean enableTelemetryDebug = true;
-    public boolean enableDashboardDebug = true;
+//    public boolean enableTelemetry = true;
+//    public boolean enableDashboard = true;
+//    public boolean enableTelemetryDebug = true;
+//    public boolean enableDashboardDebug = true;
 
     //managers
     public final EventManager eventManager = new EventManager("main");
@@ -69,15 +69,6 @@ public class Robot implements PartParent{
         return taskManager;
     }
 
-    public Group getTaskManager(RunPosition runPosition){
-        switch (runPosition){
-            case START: return startTaskManager;
-            case REGULAR: return regularTaskManager;
-            case END: return endTaskManager;
-        }
-        throw new RuntimeException("tried to call getTaskManager with argument " + runPosition + " which is not valid");
-    }
-
     @Override
     public EventManager getEventManager() {
         return eventManager;
@@ -87,14 +78,14 @@ public class Robot implements PartParent{
     public BeanManager getBeanManager(){return beanManager;}
 
 
-    public void addDebugSource(Supplier<String> source){
-        if(enableTelemetryDebug){
-
-        }
-        if(enableDashboardDebug){
-
-        }
-    }
+//    public void addDebugSource(Supplier<String> source){
+//        if(enableTelemetryDebug){
+//
+//        }
+//        if(enableDashboardDebug){
+//
+//        }
+//    }
 
 
     public void init(){eventManager.triggerEventRecursively(Events.INIT);}
@@ -109,12 +100,6 @@ public class Robot implements PartParent{
 
     public void stop(){
         eventManager.triggerEventRecursively(Events.STOP);
-    }
-
-    public enum RunPosition{
-        START,
-        REGULAR,
-        END
     }
 
     public static final class Events{

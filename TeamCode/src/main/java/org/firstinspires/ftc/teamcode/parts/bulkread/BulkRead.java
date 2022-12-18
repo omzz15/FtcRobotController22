@@ -13,7 +13,7 @@ public class BulkRead extends LoopedPartImpl<Robot, ObjectUtils.Null, ObjectUtil
     private List<LynxModule> allHubs;
 
     public BulkRead(Robot parent) {
-        super(parent, "bulk read", parent.getTaskManager(Robot.RunPosition.START));
+        super(parent, "bulk read", parent.endTaskManager);
     }
 
     @Override

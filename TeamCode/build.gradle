@@ -30,6 +30,10 @@ android {
 
 repositories {
     mavenCentral()
+
+    maven { url = "https://dl.bintray.com/first-tech-challenge/ftcsdk/" }
+    // Add this line
+    maven { url = "https://maven.0x778.tk" }
 }
 
 dependencies {
@@ -38,8 +42,9 @@ dependencies {
 
 
 //    implementation 'com.acmerobotics.dashboard:dashboard:0.4.6'
-//    implementation 'com.intel.realsense:2.41.1-ftc265@arr'
 //    implementation 'org.openftc:i2cdrivers:1.0.0'
+
+    implementation 'com.spartronics4915.lib:ftc265:2.1.9'
 
 //    custom stuff
     implementation 'io.github.omzz15:supplier:1.0.0-FTCRELEASE'
