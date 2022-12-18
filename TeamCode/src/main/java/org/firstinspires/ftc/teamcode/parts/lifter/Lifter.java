@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.parts.lifter;
 
+import android.widget.Switch;
+
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 
@@ -12,17 +18,19 @@ import om.self.task.other.TimedTask;
 public class Lifter extends RobotPart implements ControllablePart<Robot, LifterControl>, ConfigurablePart<Robot, LifterSettings, LifterHardware> {
     public static final class TaskNames{
         public final static String autoGrab = "auto grab";
-        public final static String autoDrop = "auto drop";
+        public static String autoDrop;
+        public final static String coneMeasureRanges = "measure cone range";
     }
+
+    private Drive drive;
 
     //private boolean closed = false;
     private int liftTargetPosition = 0;
 
     private final TimedTask autoGrabTask = new TimedTask(TaskNames.autoGrab, getTaskManager());
-    private final TimedTask autoDropTask = new TimedTask(TaskNames.autoDrop, getTaskManager());
-
+    private final TimedTask coneRangeingTask = new TimedTask(TaskNames.coneMeasureRanges, getTaskManager());
     private int conePos = 0;//how high the cone is based on lifter position
-    private int depositPos = 2060;//how high the pole is based on lifter position
+    private int ultraRangeModule = 0; // keeps track of measuring ranges
 
     public Lifter(Robot parent) {
         super(parent, "lifter");
@@ -84,6 +92,10 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     //public double getRightRange(){return getHardware().rightRange.getDistance(DistanceUnit.CM);}
     //public double getLeftDistance(){return getHardware().leftDistance.getDistance(DistanceUnit.CM);}
     //public double getRightDistance(){return getHardware().rightDistance.getDistance(DistanceUnit.CM);}
+    public double getRightUltra(){return getHardware().rightUltrasonic.getDistanceCm();}
+    public double getLeftUltra(){return getHardware().leftUltrasonic.getDistanceCm();}
+    public double getMidUltra(){return getHardware().midUltrasonic.getDistanceCm();}
+
 
     public void turnWithPower(double power){
         setTurnPosition(getCurrentTurnPosition() + power);
@@ -114,8 +126,6 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     //}
 
     public void constructAutoGrab(){
-        autoGrabTask.autoStart = false;
-        autoGrabTask.addStep(() -> getEventManager().triggerEvent(EventNames.stopControllers));
         autoGrabTask.addStep(() -> setGrabberClosed(true));
         autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
         autoGrabTask.addStep(() -> setTurnPosition(0.95));
@@ -123,25 +133,34 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
         autoGrabTask.addStep(() -> setGrabberClosed(false));
         autoGrabTask.addStep(this::isLiftInTolerance);
         autoGrabTask.addStep(() -> setLiftPosition(conePos));
-        autoGrabTask.addStep(this::isLiftInTolerance);
         autoGrabTask.addStep(() -> setGrabberClosed(true));
-        autoGrabTask.addDelay(500);
+        autoGrabTask.addDelay(100);
         autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
-        autoGrabTask.addStep(() -> getEventManager().triggerEvent(EventNames.startControllers));
     }
 
-    public void constructAutoDrop(){
-        autoDropTask.autoStart = false;
-        autoDropTask.addStep(() -> getEventManager().triggerEvent(EventNames.stopControllers));
-        autoDropTask.addStep(() -> setLiftPosition(depositPos));
-        autoDropTask.addStep(this::isLiftInTolerance);
-        autoDropTask.addStep(() -> setTurnPosition(0.286));
-        autoDropTask.addDelay(500);
-        autoDropTask.addStep(() -> setLiftPosition(depositPos - 200));
-        autoDropTask.addStep(() -> setGrabberClosed(false));
-        autoDropTask.addStep(this::isLiftInTolerance);
-        autoDropTask.addStep(() -> setLiftPosition(depositPos));
-        autoDropTask.addStep(() -> getEventManager().triggerEvent(EventNames.startControllers));
+    public void constructConeRanging(){
+        coneRangeingTask.addStep(() -> getHardware().leftUltrasonic.measureRange());
+        coneRangeingTask.addDelay(30);
+        coneRangeingTask.addStep(() -> getHardware().rightUltrasonic.measureRange());
+        coneRangeingTask.addDelay(30);
+        coneRangeingTask.addStep(() -> getHardware().midUltrasonic.measureRange());
+        coneRangeingTask.addDelay(30);
+        coneRangeingTask.autoReset = true;
+        coneRangeingTask.autoStart = true;
+    }
+
+    public void doConeRange() {
+        if (Math.abs(getRightUltra() - getLeftUltra()) < 2 && getLeftUltra() < 20) {
+            getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+//        } else if(getRightUltra() + getLeftUltra() < 40){
+//            getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+        } else if (getRightUltra() < getLeftUltra() && getRightUltra() <= 10){  //closer to right
+            getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+        } else if (getLeftUltra() < getRightUltra() && getLeftUltra() <= 10){  //closer to left
+            getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
+        } else {
+            getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+        }
     }
 
     @Override
@@ -150,11 +169,12 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
         turnWithPower(control.turningPower);
         setGrabberPower(control.closePower);
         setGrabberClosed(control.close);
+        doConeRange();
     }
 
     @Override
     public void onBeanLoad() {
-
+        drive = getBeanManager().getBestMatch(Drive.class, false);
     }
 
     @Override
@@ -171,7 +191,7 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     public void onInit() {
         //powerEdgeDetector.setOnFall(() -> se);
         constructAutoGrab();
-        constructAutoDrop();
+        constructConeRanging();
     }
 
     @Override

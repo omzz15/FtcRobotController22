@@ -36,7 +36,7 @@ public class Test2 extends LinearOpMode {
         Robot r = new Robot(this);
         Drive d = new Drive(r);
             new DriveTeleop(d);
-            new HeaderKeeper(d);
+            //new HeaderKeeper(d);
         PositionTracker pt = new PositionTracker(r);
         //    new EncoderTracker(pt);
         Lifter l = new Lifter(r);
@@ -60,6 +60,11 @@ public class Test2 extends LinearOpMode {
             //telemetry.addData("leftRange", df.format(l.getLeftRange()));
             //telemetry.addData("leftDistance", df.format(l.getLeftDistance()));
             //telemetry.addData("rightDistance", df.format(l.getRightDistance()));
+            telemetry.addData("lift position:",l.getLiftPosition());
+            telemetry.addData("leftUltra", df.format(l.getLeftUltra()));
+            telemetry.addData("rightUltra", df.format(l.getRightUltra()));
+            telemetry.addData("midUltra", df.format(l.getMidUltra()));
+
             if(gamepad2.dpad_left){
                 l.getSettings().rightTurnServoOffset -= 0.0001;
             }

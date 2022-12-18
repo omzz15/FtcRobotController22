@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.parts.lifter.hardware;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -7,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import org.firstinspires.ftc.teamcode.lib.DFR304Range;
 
 import om.self.ezftc.utils.hardware.motor.MotorFunction;
 import om.self.ezftc.utils.hardware.motor.MotorSettings;
@@ -26,9 +28,13 @@ public class LifterHardware {
     //public final ColorRangeSensor rightRange;
     //public final DistanceSensor leftDistance;
     //public final DistanceSensor rightDistance;
+    public final DFR304Range leftUltrasonic;
+    public final DFR304Range rightUltrasonic;
+    public final DFR304Range midUltrasonic;
+    public final RevBlinkinLedDriver blinkin;
 
 
-    public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo, Servo rightTurnServo, Servo grabServo, CRServo leftGrabServo, CRServo rightGrabServo, ColorRangeSensor leftRange, ColorRangeSensor rightRange, DistanceSensor leftDistance, DistanceSensor rightDistance) {
+    public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo, Servo rightTurnServo, Servo grabServo, CRServo leftGrabServo, CRServo rightGrabServo, ColorRangeSensor leftRange, ColorRangeSensor rightRange, DistanceSensor leftDistance, DistanceSensor rightDistance, DFR304Range leftUltrasonic, DFR304Range rightUltrasonic, DFR304Range midUltrasonic, RevBlinkinLedDriver blinkin) {
         this.leftLiftMotor = leftLiftMotor;
         this.rightLiftMotor = rightLiftMotor;
         this.leftTurnServo = leftTurnServo;
@@ -40,6 +46,10 @@ public class LifterHardware {
         //this.rightRange = rightRange;
         //this.leftDistance = leftDistance;
         //this.rightDistance = rightDistance;
+        this.leftUltrasonic = leftUltrasonic;
+        this.rightUltrasonic = rightUltrasonic;
+        this.midUltrasonic = midUltrasonic;
+        this.blinkin = blinkin;
     }
 
     public static LifterHardware makeDefault(HardwareMap hardwareMap){
@@ -59,6 +69,16 @@ public class LifterHardware {
         //ColorRangeSensor rightRange = hardwareMap.get(ColorRangeSensor.class, "range1");
         //DistanceSensor leftDistance = hardwareMap.get(DistanceSensor.class, "blueWallSensor");
         //DistanceSensor rightDistance = hardwareMap.get(DistanceSensor.class, "redWallSensor");
+        DFR304Range rightUltraDist = hardwareMap.get(DFR304Range.class, "rightUltraSensor");
+        DFR304Range leftUltraDist = hardwareMap.get(DFR304Range.class, "leftUltraSensor");
+        DFR304Range midUltraDist = hardwareMap.get(DFR304Range.class, "middleUltraSensor");
+        RevBlinkinLedDriver blinkin = hardwareMap.get(RevBlinkinLedDriver.class,"blinkin");
+        DFR304Range.Parameters parameters = new DFR304Range.Parameters();
+        parameters.maxRange = DFR304Range.MaxRange.CM150;
+        parameters.measureMode = DFR304Range.MeasureMode.PASSIVE;
+        leftUltraDist.initialize(parameters);
+        rightUltraDist.initialize(parameters);
+        midUltraDist.initialize(parameters);
 
 
         return new LifterHardware(
@@ -72,7 +92,11 @@ public class LifterHardware {
                 null,//leftRange,
                 null,//rightRange,
                 null,//leftDistance,
-                null//rightDistance
+                null,//rightDistance,
+                leftUltraDist,//leftUltraDist
+                rightUltraDist, //rightUltraDist
+                midUltraDist,
+                blinkin
         );
     }
 }
