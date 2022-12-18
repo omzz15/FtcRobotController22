@@ -61,6 +61,10 @@ public class Test2 extends LinearOpMode {
             //telemetry.addData("leftDistance", df.format(l.getLeftDistance()));
             //telemetry.addData("rightDistance", df.format(l.getRightDistance()));
             telemetry.addData("lift position:",l.getLiftPosition());
+            telemetry.addData("leftUltra", df.format(l.getLeftUltra()));
+            telemetry.addData("rightUltra", df.format(l.getRightUltra()));
+            telemetry.addData("midUltra", df.format(l.getMidUltra()));
+
             if(gamepad2.dpad_left){
                 l.getSettings().rightTurnServoOffset -= 0.0001;
             }

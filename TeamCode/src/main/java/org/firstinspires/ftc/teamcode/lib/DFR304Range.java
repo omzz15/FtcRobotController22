@@ -172,8 +172,8 @@ public class DFR304Range extends I2cDeviceSynchDeviceWithParameters<I2cDeviceSyn
     {
         I2cAddr i2cAddr = ADDRESS_I2C_DEFAULT;
 
-        MaxRange maxRange = MaxRange.CM150;
-        MeasureMode measureMode = MeasureMode.PASSIVE;
+        public MaxRange maxRange = MaxRange.CM150;
+        public MeasureMode measureMode = MeasureMode.PASSIVE;
 
         public Parameters clone()
         {
