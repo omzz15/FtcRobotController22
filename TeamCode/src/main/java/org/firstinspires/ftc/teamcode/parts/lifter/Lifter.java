@@ -5,6 +5,7 @@ import android.widget.Switch;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 
@@ -20,6 +21,8 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
         public static String autoDrop;
         public final static String coneMeasureRanges = "measure cone range";
     }
+
+    private Drive drive;
 
     //private boolean closed = false;
     private int liftTargetPosition = 0;
@@ -142,20 +145,11 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
         coneRangeingTask.addDelay(30);
         coneRangeingTask.addStep(() -> getHardware().midUltrasonic.measureRange());
         coneRangeingTask.addDelay(30);
+        coneRangeingTask.autoReset = true;
+        coneRangeingTask.autoStart = true;
     }
 
     public void doConeRange() {
-        //if (coneRangeingTask.isDone()) coneRangeingTask.run();
-        if (ultraRangeModule > 12) ultraRangeModule = 0;
-        switch(ultraRangeModule++){
-            case 0:
-                getHardware().leftUltrasonic.measureRange();
-            case 4:
-                getHardware().midUltrasonic.measureRange();
-            case 8:
-                getHardware().rightUltrasonic.measureRange();
-        }
-
         if (Math.abs(getRightUltra() - getLeftUltra()) < 4 && getLeftUltra() < 20) {
             getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
         } else if(getRightUltra() + getLeftUltra() < 40){
@@ -176,7 +170,7 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
 
     @Override
     public void onBeanLoad() {
-
+        drive = getBeanManager().getBestMatch(Drive.class, false);
     }
 
     @Override
@@ -193,7 +187,7 @@ public class Lifter extends RobotPart implements ControllablePart<Robot, LifterC
     public void onInit() {
         //powerEdgeDetector.setOnFall(() -> se);
         constructAutoGrab();
-        //constructConeRanging();
+        constructConeRanging();
     }
 
     @Override
