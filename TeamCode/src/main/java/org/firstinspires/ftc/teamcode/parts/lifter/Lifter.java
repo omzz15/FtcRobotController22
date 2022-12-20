@@ -140,17 +140,20 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     public void constructConeRanging(){
         coneRangeingTask.addStep(() -> {
             getHardware().leftUltrasonic.measureRange();
-            midDist = getHardware().midUltrasonic.getDistanceCm();
+            double thisDist = getHardware().midUltrasonic.getDistanceCm();
+            midDist = (thisDist == -1) ? (150) : (thisDist); // when out of range report max
         });
         coneRangeingTask.addDelay(30);
         coneRangeingTask.addStep(() -> {
             getHardware().rightUltrasonic.measureRange();
-            leftDist = getHardware().leftUltrasonic.getDistanceCm();
+            double thisDist = getHardware().leftUltrasonic.getDistanceCm();
+            leftDist = (thisDist == -1) ? (150) : (thisDist); // when out of range report max
         });
         coneRangeingTask.addDelay(30);
         coneRangeingTask.addStep(() -> {
             getHardware().midUltrasonic.measureRange();
-            rightDist = getHardware().rightUltrasonic.getDistanceCm();
+            double thisDist = getHardware().rightUltrasonic.getDistanceCm();
+            rightDist = (thisDist == -1) ? (150) : (thisDist); // when out of range report max
         });
         coneRangeingTask.addDelay(30);
         coneRangeingTask.autoReset = true;

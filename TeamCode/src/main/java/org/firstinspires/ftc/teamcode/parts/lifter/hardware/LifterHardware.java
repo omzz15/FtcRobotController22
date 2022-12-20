@@ -17,13 +17,11 @@ import om.self.ezftc.utils.hardware.servo.ServoSettings;
 public class LifterHardware {
     public final DcMotor leftLiftMotor;
     public final DcMotor rightLiftMotor;
-
     public final Servo leftTurnServo;
     public final Servo rightTurnServo;
     public final Servo grabServo;
     public final CRServo leftGrabServo;
     public final CRServo rightGrabServo;
-
     //public final ColorRangeSensor leftRange;
     //public final ColorRangeSensor rightRange;
     //public final DistanceSensor leftDistance;
@@ -33,8 +31,13 @@ public class LifterHardware {
     public final DFR304Range midUltrasonic;
     public final RevBlinkinLedDriver blinkin;
 
-
-    public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo, Servo rightTurnServo, Servo grabServo, CRServo leftGrabServo, CRServo rightGrabServo, ColorRangeSensor leftRange, ColorRangeSensor rightRange, DistanceSensor leftDistance, DistanceSensor rightDistance, DFR304Range leftUltrasonic, DFR304Range rightUltrasonic, DFR304Range midUltrasonic, RevBlinkinLedDriver blinkin) {
+    public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo,
+                          Servo rightTurnServo, Servo grabServo, CRServo leftGrabServo,
+                          CRServo rightGrabServo, ColorRangeSensor leftRange,
+                          ColorRangeSensor rightRange, DistanceSensor leftDistance,
+                          DistanceSensor rightDistance, DFR304Range leftUltrasonic,
+                          DFR304Range rightUltrasonic, DFR304Range midUltrasonic,
+                          RevBlinkinLedDriver blinkin) {
         this.leftLiftMotor = leftLiftMotor;
         this.rightLiftMotor = rightLiftMotor;
         this.leftTurnServo = leftTurnServo;
@@ -79,7 +82,6 @@ public class LifterHardware {
         leftUltraDist.initialize(parameters);
         rightUltraDist.initialize(parameters);
         midUltraDist.initialize(parameters);
-
 
         return new LifterHardware(
                 leftMotorSettings.makeMotor(hardwareMap),
