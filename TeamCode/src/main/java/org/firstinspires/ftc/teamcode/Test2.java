@@ -40,19 +40,22 @@ public class Test2 extends LinearOpMode {
         Robot r = new Robot(this);
         new BulkRead(r);
         Drive d = new Drive(r);
-            new DriveTeleop(d);
-            //new HeaderKeeper(d);
+        new DriveTeleop(d);
+        //new HeaderKeeper(d);
+
         PositionTracker pt = new PositionTracker(r);
-            //new Slamra(pt);
-            new EncoderTracker(pt);
+        //new Slamra(pt);
+        //new EncoderTracker(pt);
+
         Lifter l = new Lifter(r);
-            new LifterTeleop(l);
+        new LifterTeleop(l);
+
         DecimalFormat df = new DecimalFormat("#0.0");
 
         r.init();
+        new Slamra(pt);
 
         waitForStart();
-
         r.start();
 
         while (opModeIsActive()) {
@@ -67,10 +70,11 @@ public class Test2 extends LinearOpMode {
             //telemetry.addData("leftRange", df.format(l.getLeftRange()));
             //telemetry.addData("leftDistance", df.format(l.getLeftDistance()));
             //telemetry.addData("rightDistance", df.format(l.getRightDistance()));
-            telemetry.addData("lift position:",l.getLiftPosition());
-            telemetry.addData("leftUltra", df.format(l.getLeftUltra()));
-            telemetry.addData("rightUltra", df.format(l.getRightUltra()));
-            telemetry.addData("midUltra", df.format(l.getMidUltra()));
+            telemetry.addData("lift position:",df.format(l.getLiftPosition()));
+            telemetry.addData("Ultra [Left : Mid : Right]", "["
+                    + df.format(l.getLeftUltra()) + " : "
+                    + df.format(l.getMidUltra()) + " : "
+                    + df.format(l.getRightUltra()) +"]");
 
 //            if(gamepad2.dpad_left){
 //                l.getSettings().rightTurnServoOffset -= 0.0001;
