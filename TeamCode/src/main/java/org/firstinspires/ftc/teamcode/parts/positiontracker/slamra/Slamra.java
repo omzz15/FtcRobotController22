@@ -1,11 +1,8 @@
 package org.firstinspires.ftc.teamcode.parts.positiontracker.slamra;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
-import com.arcrobotics.ftclib.geometry.Pose2d;
-import com.arcrobotics.ftclib.geometry.Rotation2d;
-import com.arcrobotics.ftclib.geometry.Transform2d;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.spartronics4915.lib.T265Camera;
+import com.spartronics4915.lib.T265Helper;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
@@ -35,9 +32,7 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 
 	@Override
 	public void onInit() {
-		if (slamra == null) {
-			slamra = new T265Camera(getSettings().slamraRobotOffset.toTransform2d(), 0.1, parent.parent.opMode.hardwareMap.appContext);
-		}
+
 	}
 
 	@Override
@@ -48,9 +43,13 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 	@Override
 	public void onSettingsUpdate(SlamraSettings settings) {
 		if (slamra == null) {
-			slamra = new T265Camera(settings.slamraRobotOffset.toTransform2d(), 0.1, parent.parent.opMode.hardwareMap.appContext);
+			slamra = T265Helper.getCamera(
+					new T265Camera.OdometryInfo(
+							settings.robotOffset.toPose2d(),
+							settings.encoderCovariance
+					), parent.parent.opMode.hardwareMap.appContext);
 		}
-		slamra.setPose(settings.slamraStartPosition.toPose2d());
+		if (!slamra.isStarted()) slamra.start();
 	}
 
 	@Override
@@ -58,11 +57,12 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 		T265Camera.CameraUpdate up = slamra.getLastReceivedCameraUpdate();
 		if (up == null) return;
 		Pose2d update = up.pose;
-		parent.setCurrentPosition(new Vector3(update.getX(), update.getY(), update.getRotation().getDegrees()));
+		parent.setCurrentPosition(new Vector3(update.getX(), update.getY(), update.getHeading()));
 	}
 
 	@Override
 	public void onStop() {
 		slamra.stop();
+		slamra.free();
 	}
 }
