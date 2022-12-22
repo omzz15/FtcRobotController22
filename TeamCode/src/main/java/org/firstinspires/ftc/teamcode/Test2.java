@@ -53,7 +53,7 @@ public class Test2 extends LinearOpMode {
         DecimalFormat df = new DecimalFormat("#0.0");
 
         r.init();
-        new Slamra(pt);
+        //new Slamra(pt);
 
         waitForStart();
         r.start();
