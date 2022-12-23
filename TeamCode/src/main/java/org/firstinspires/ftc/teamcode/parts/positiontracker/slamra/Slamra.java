@@ -12,7 +12,7 @@ import om.self.ezftc.utils.Vector3;
 
 public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, ObjectUtils.Null> {
 	//variables
-	private static T265Camera slamra;
+	volatile T265Camera slamra;
 
 	//constructors
 	public Slamra(PositionTracker parent) {
@@ -32,24 +32,25 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 
 	@Override
 	public void onInit() {
-
+		if (slamra == null) {
+			slamra = T265Helper.getCamera(
+					new T265Camera.OdometryInfo(
+							getSettings().robotOffset.toPose2d(),
+							getSettings().encoderCovariance
+					), parent.parent.opMode.hardwareMap.appContext);
+		}
+		if (!slamra.isStarted()) slamra.start();
 	}
 
 	@Override
 	public void onStart() {
-		slamra.start();
+		slamra.setPose(parent.getCurrentPosition().toPose2d());
+
 	}
 
 	@Override
 	public void onSettingsUpdate(SlamraSettings settings) {
-		if (slamra == null) {
-			slamra = T265Helper.getCamera(
-					new T265Camera.OdometryInfo(
-							settings.robotOffset.toPose2d(),
-							settings.encoderCovariance
-					), parent.parent.opMode.hardwareMap.appContext);
-		}
-		if (!slamra.isStarted()) slamra.start();
+
 	}
 
 	@Override
@@ -62,7 +63,7 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 
 	@Override
 	public void onStop() {
-		slamra.stop();
-		slamra.free();
+		//slamra.stop();
+		//slamra.free();
 	}
 }

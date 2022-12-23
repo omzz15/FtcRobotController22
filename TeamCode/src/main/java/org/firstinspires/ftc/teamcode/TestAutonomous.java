@@ -1,78 +1,43 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.spartronics4915.lib.T265Camera;
+import com.spartronics4915.lib.T265Helper;
 
-import org.firstinspires.ftc.teamcode.parts.drive.Drive;
-import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
-import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
+import om.self.ezftc.utils.Vector3;
 
-import java.text.DecimalFormat;
+@TeleOp(name="Test slamra", group="Test")
+public class TestAutonomous extends LinearOpMode {
+    volatile T265Camera slamra;
 
-import om.self.ezftc.core.Robot;
+    @Override
+    public void runOpMode() throws InterruptedException {
+        if (slamra == null) {
+            slamra = T265Helper.getCamera(
+                    new T265Camera.OdometryInfo(
+                            new Pose2d(),
+                            0.1
+                    ), hardwareMap.appContext);
+        }
+        if (slamra.isStarted()) slamra.start();
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+        waitForStart();
 
-@Autonomous(name="Test Autonomous", group="Test")
-@Disabled
-public class TestAutonomous {
-/*    long start;
+        //slamra.setPose(new Pose2d(-1,1,10));
 
-    private OpMode TestAutonomous;
-    Robot r = new Robot(TestAutonomous);
-    Drive d = new Drive(r);
-    //new HeaderKeeper(d);
+        while (opModeIsActive()){
+            T265Camera.CameraUpdate up = slamra.getLastReceivedCameraUpdate();
+            if(up == null) telemetry.addData("update failed", "");
+            else{
+                Pose2d pos = up.pose;
+                telemetry.addData("pose x", pos.getX());
+                telemetry.addData("pose y", pos.getY());
+                telemetry.addData("pose r", pos.getHeading());
+            }
+            telemetry.update();
+        }
 
-    PositionTracker pt = new PositionTracker(r);
-    //new Slamra(pt);
-    //new EncoderTracker(pt);
-
-    Lifter l = new Lifter(r);
-        new LifterTeleop(l);
-
-    DecimalFormat df = new DecimalFormat("#0.0");
-
-        r.init();
-    //new Slamra(pt);
-
-    waitForStart();
-        r.start();
-
-        while (opModeIsActive()) {
-        start = System.currentTimeMillis();
-        r.run();
-        //if(gamepad1.y) pt.setAngle(0);
-        telemetry.addData("position", pt.getCurrentPosition());
-        telemetry.addData("tilt position", l.getCurrentTurnPosition());
-        //telemetry.addData("is closed", l.isClosed());
-        telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
-        //telemetry.addData("rightRange", df.format(l.getRightRange()));
-        //telemetry.addData("leftRange", df.format(l.getLeftRange()));
-        //telemetry.addData("leftDistance", df.format(l.getLeftDistance()));
-        //telemetry.addData("rightDistance", df.format(l.getRightDistance()));
-        telemetry.addData("lift position:",df.format(l.getLiftPosition()));
-        telemetry.addData("Ultra [Left : Mid : Right]", "["
-                + df.format(l.getLeftUltra()) + " : "
-                + df.format(l.getMidUltra()) + " : "
-                + df.format(l.getRightUltra()) +"]");
-
-//            if(gamepad2.dpad_left){
-//                l.getSettings().rightTurnServoOffset -= 0.0001;
-//            }
-//            if(gamepad2.dpad_right){
-//                l.getSettings().rightTurnServoOffset += 0.0001;
-//            }
-
-        if(gamepad1.dpad_down) telemetry.addData("tasks", r.getTaskManager());
-        if(gamepad1.dpad_down) telemetry.addData("events", r.getEventManager());
-        r.opMode.telemetry.addData("time", System.currentTimeMillis() - start);
-
-        telemetry.update();
     }
-
-        r.stop();
-}*/
 }
