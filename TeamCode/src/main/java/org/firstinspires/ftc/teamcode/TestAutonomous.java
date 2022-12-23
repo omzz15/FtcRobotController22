@@ -21,11 +21,10 @@ public class TestAutonomous extends LinearOpMode {
                             0.1
                     ), hardwareMap.appContext);
         }
-        if (slamra.isStarted()) slamra.start();
+        slamra.setPose(new Pose2d(-1,1,1));
+        if (!slamra.isStarted()) slamra.start();
 
         waitForStart();
-
-        //slamra.setPose(new Pose2d(-1,1,10));
 
         while (opModeIsActive()){
             T265Camera.CameraUpdate up = slamra.getLastReceivedCameraUpdate();

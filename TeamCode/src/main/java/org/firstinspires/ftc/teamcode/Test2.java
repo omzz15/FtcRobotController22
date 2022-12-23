@@ -44,11 +44,11 @@ public class Test2 extends LinearOpMode {
         //new HeaderKeeper(d);
 
         PositionTracker pt = new PositionTracker(r);
-        //new Slamra(pt);
+        new Slamra(pt);
         //new EncoderTracker(pt);
 
-        Lifter l = new Lifter(r);
-        new LifterTeleop(l);
+        //Lifter l = new Lifter(r);
+        //new LifterTeleop(l);
 
         DecimalFormat df = new DecimalFormat("#0.0");
 
@@ -63,18 +63,18 @@ public class Test2 extends LinearOpMode {
             r.run();
             //if(gamepad1.y) pt.setAngle(0);
             telemetry.addData("position", pt.getCurrentPosition());
-            telemetry.addData("tilt position", l.getCurrentTurnPosition());
-            //telemetry.addData("is closed", l.isClosed());
-            telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
-            //telemetry.addData("rightRange", df.format(l.getRightRange()));
-            //telemetry.addData("leftRange", df.format(l.getLeftRange()));
-            //telemetry.addData("leftDistance", df.format(l.getLeftDistance()));
-            //telemetry.addData("rightDistance", df.format(l.getRightDistance()));
-            telemetry.addData("lift position:",df.format(l.getLiftPosition()));
-            telemetry.addData("Ultra [Left : Mid : Right]", "["
-                    + df.format(l.getLeftUltra()) + " : "
-                    + df.format(l.getMidUltra()) + " : "
-                    + df.format(l.getRightUltra()) +"]");
+//            telemetry.addData("tilt position", l.getCurrentTurnPosition());
+//            //telemetry.addData("is closed", l.isClosed());
+//            telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
+//            //telemetry.addData("rightRange", df.format(l.getRightRange()));
+//            //telemetry.addData("leftRange", df.format(l.getLeftRange()));
+//            //telemetry.addData("leftDistance", df.format(l.getLeftDistance()));
+//            //telemetry.addData("rightDistance", df.format(l.getRightDistance()));
+//            telemetry.addData("lift position:",df.format(l.getLiftPosition()));
+//            telemetry.addData("Ultra [Left : Mid : Right]", "["
+//                    + df.format(l.getLeftUltra()) + " : "
+//                    + df.format(l.getMidUltra()) + " : "
+//                    + df.format(l.getRightUltra()) +"]");
 
 //            if(gamepad2.dpad_left){
 //                l.getSettings().rightTurnServoOffset -= 0.0001;

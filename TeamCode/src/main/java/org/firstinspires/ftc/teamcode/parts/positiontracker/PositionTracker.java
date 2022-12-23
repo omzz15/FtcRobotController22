@@ -62,7 +62,6 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
 
     @Override
     public void onInit() {
-        setAngle(getSettings().startAngle);
     }
 
     @Override
@@ -70,7 +69,8 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
 
     @Override
     public void onSettingsUpdate(PositionTrackerSettings positionTrackerSettings) {
-
+        setAngle(positionTrackerSettings.startPosition.Z);
+        currentPosition = positionTrackerSettings.startPosition;
     }
 
     @Override
