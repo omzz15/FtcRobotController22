@@ -6,19 +6,18 @@ public class SlamraSettings{
 	////////////
 	//settings//
 	////////////
-	public final Vector3 slamraRobotOffset;
-	//general
-    public final Vector3 slamraStartPosition;
+	public final Vector3 robotOffset;
+    public final double encoderCovariance;
 
-    public SlamraSettings(Vector3 slamraRobotOffset, Vector3 slamraStartPosition) {
-        this.slamraRobotOffset = slamraRobotOffset;
-        this.slamraStartPosition = slamraStartPosition;
+    public SlamraSettings(Vector3 robotOffset, double encoderCovariance) {
+        this.robotOffset = robotOffset;
+        this.encoderCovariance = encoderCovariance;
     }
 
     public static SlamraSettings makeDefault(){
         return new SlamraSettings(
                 new Vector3(0,0,0),
-                new Vector3(0,0,0)
+                0.1
         );
     }
 }

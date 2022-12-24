@@ -1,73 +1,42 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import org.firstinspires.ftc.teamcode.parts.drive.Drive;
-import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
-import org.firstinspires.ftc.teamcode.parts.lifter.LifterTeleop;
-import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.spartronics4915.lib.T265Camera;
+import com.spartronics4915.lib.T265Helper;
 
-import java.text.DecimalFormat;
-import om.self.ezftc.core.Robot;
+import om.self.ezftc.utils.Vector3;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+@TeleOp(name="Test slamra", group="Test")
+public class TestAutonomous extends LinearOpMode {
+    volatile T265Camera slamra;
 
-@Autonomous(name="Test Autonomous", group="Test")
-@Disabled
-public class TestAutonomous extends LinearOpMode{
     @Override
-    public void runOpMode() {
-    Robot r = new Robot(this);
-    Drive d = new Drive(r);
-    //new HeaderKeeper(d);
-    PositionTracker pt = new PositionTracker(r);
-    //new Slamra(pt);
-    //new EncoderTracker(pt);
-    Lifter l = new Lifter(r);
-        new LifterTeleop(l);
-    DecimalFormat df = new DecimalFormat("#0.0");
-    r.init();
-    //new Slamra(pt);
+    public void runOpMode() throws InterruptedException {
+        if (slamra == null) {
+            slamra = T265Helper.getCamera(
+                    new T265Camera.OdometryInfo(
+                            new Pose2d(),
+                            0.1
+                    ), hardwareMap.appContext);
+        }
+        slamra.setPose(new Pose2d(-1,1,1));
+        if (!slamra.isStarted()) slamra.start();
 
-    waitForStart();
-        r.start();
+        waitForStart();
 
-        while (opModeIsActive()) {
-            long start = System.currentTimeMillis();
-        r.run();
-        //if(gamepad1.y) pt.setAngle(0);
-        telemetry.addData("position", pt.getCurrentPosition());
-        telemetry.addData("tilt position", l.getCurrentTurnPosition());
-        //telemetry.addData("is closed", l.isClosed());
-        telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
-        //telemetry.addData("rightRange", df.format(l.getRightRange()));
-        //telemetry.addData("leftRange", df.format(l.getLeftRange()));
-        //telemetry.addData("leftDistance", df.format(l.getLeftDistance()));
-        //telemetry.addData("rightDistance", df.format(l.getRightDistance()));
-        telemetry.addData("lift position:",df.format(l.getLiftPosition()));
-        telemetry.addData("Ultra [Left : Mid : Right]", "["
-                + df.format(l.getLeftUltra()) + " : "
-                + df.format(l.getMidUltra()) + " : "
-                + df.format(l.getRightUltra()) +"]");
+        while (opModeIsActive()){
+            T265Camera.CameraUpdate up = slamra.getLastReceivedCameraUpdate();
+            if(up == null) telemetry.addData("update failed", "");
+            else{
+                Pose2d pos = up.pose;
+                telemetry.addData("pose x", pos.getX());
+                telemetry.addData("pose y", pos.getY());
+                telemetry.addData("pose r", pos.getHeading());
+            }
+            telemetry.update();
+        }
 
-//            if(gamepad2.dpad_left){
-//                l.getSettings().rightTurnServoOffset -= 0.0001;
-//            }
-//            if(gamepad2.dpad_right){
-//                l.getSettings().rightTurnServoOffset += 0.0001;
-//            }
-
-        if(gamepad1.dpad_down) telemetry.addData("tasks", r.getTaskManager());
-        if(gamepad1.dpad_down) telemetry.addData("events", r.getEventManager());
-        r.opMode.telemetry.addData("time", System.currentTimeMillis() - start);
-
-        telemetry.update();
     }
-
-        r.stop();
-}
 }

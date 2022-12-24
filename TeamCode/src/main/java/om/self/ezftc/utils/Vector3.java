@@ -1,12 +1,7 @@
 package om.self.ezftc.utils;
 
 
-import com.arcrobotics.ftclib.geometry.Pose2d;
-import com.arcrobotics.ftclib.geometry.Rotation2d;
-import com.arcrobotics.ftclib.geometry.Transform2d;
-import com.arcrobotics.ftclib.geometry.Translation2d;
-
-import java.security.acl.Group;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 public class Vector3 {
 	public final double X,Y,Z;
@@ -89,11 +84,7 @@ public class Vector3 {
 	public Vector3 addZ(double Z){return new Vector3(X,Y,this.Z + Z);}
 
 	public Pose2d toPose2d(){
-		return new Pose2d(X, Y, new Rotation2d(Math.toRadians(Z)));
-	}
-
-	public Transform2d toTransform2d(){
-		return new Transform2d(new Translation2d(X, Y), new Rotation2d(Math.toRadians(Z)));
+		return new Pose2d(X, Y, Math.toRadians(Z));
 	}
 
 	public boolean inTolerance(Vector3 targetPos, Vector3 tol){
