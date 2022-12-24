@@ -4,45 +4,40 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
+import org.firstinspires.ftc.teamcode.parts.lifter.LifterTeleop;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
 import java.text.DecimalFormat;
-
 import om.self.ezftc.core.Robot;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 @Autonomous(name="Test Autonomous", group="Test")
 @Disabled
-public class TestAutonomous {
-/*    long start;
-
-    private OpMode TestAutonomous;
-    Robot r = new Robot(TestAutonomous);
+public class TestAutonomous extends LinearOpMode{
+    @Override
+    public void runOpMode() {
+    Robot r = new Robot(this);
     Drive d = new Drive(r);
     //new HeaderKeeper(d);
-
     PositionTracker pt = new PositionTracker(r);
     //new Slamra(pt);
     //new EncoderTracker(pt);
-
     Lifter l = new Lifter(r);
         new LifterTeleop(l);
-
     DecimalFormat df = new DecimalFormat("#0.0");
-
-        r.init();
+    r.init();
     //new Slamra(pt);
 
     waitForStart();
         r.start();
 
         while (opModeIsActive()) {
-        start = System.currentTimeMillis();
+            long start = System.currentTimeMillis();
         r.run();
         //if(gamepad1.y) pt.setAngle(0);
         telemetry.addData("position", pt.getCurrentPosition());
@@ -74,5 +69,5 @@ public class TestAutonomous {
     }
 
         r.stop();
-}*/
+}
 }

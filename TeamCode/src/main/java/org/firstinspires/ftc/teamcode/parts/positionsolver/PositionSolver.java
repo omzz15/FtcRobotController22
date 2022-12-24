@@ -89,6 +89,10 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
         task.addStep(this::isDone);
     }
 
+    public void addMoveToTaskExNoWait(Vector3 target, TaskEx task){
+        task.addStep(() -> setNewTarget(target, true));
+    }
+
     @Override
     public void onBeanLoad() {
         positionTracker = getBeanManager().getBestMatch(PositionTracker.class, false, false);

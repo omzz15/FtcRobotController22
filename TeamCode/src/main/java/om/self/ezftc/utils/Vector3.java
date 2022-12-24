@@ -11,6 +11,12 @@ import java.security.acl.Group;
 public class Vector3 {
 	public final double X,Y,Z;
 
+	/**
+	 * hello this is a comment
+	 * @param X
+	 * @param Y
+	 * @param Z
+	 */
 	public Vector3(double X, double Y, double Z){
 		this.X = X;
 		this.Y = Y;
