@@ -21,7 +21,7 @@ public class TestAutonomous extends LinearOpMode {
                             0.1
                     ), hardwareMap.appContext);
         }
-        slamra.setPose(new Pose2d(-1,1,1));
+        slamra.setPose(new Pose2d(0,0,0));
         if (!slamra.isStarted()) slamra.start();
 
         waitForStart();

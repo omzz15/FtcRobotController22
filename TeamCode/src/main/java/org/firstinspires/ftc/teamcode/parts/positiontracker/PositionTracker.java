@@ -47,11 +47,13 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
     }
 
     private void updateAngle() {
-        double angle = getHardware().imu.getAngularOrientation(AxesReference.EXTRINSIC, getSettings().axesOrder, AngleUnit.DEGREES).thirdAngle;
-        if (getSettings().flipAngle)
-            angle *= -1;
-        angle -= offset;
-        setCurrentPosition(currentPosition.withZ(AngleMath.scaleAngle(angle)));
+        if(getHardware() != null) {
+            double angle = getHardware().imu.getAngularOrientation(AxesReference.EXTRINSIC, getSettings().axesOrder, AngleUnit.DEGREES).thirdAngle;
+            if (getSettings().flipAngle)
+                angle *= -1;
+            angle -= offset;
+            setCurrentPosition(currentPosition.withZ(AngleMath.scaleAngle(angle)));
+        }
     }
 
 

@@ -25,7 +25,7 @@ public class PositionTrackerSettings {
 				AxesOrder.XYZ,
 				true,
 				30,
-				new Vector3(10, 10, 10)
+				new Vector3(0, 0, 0)
 		);
 	}
 }
