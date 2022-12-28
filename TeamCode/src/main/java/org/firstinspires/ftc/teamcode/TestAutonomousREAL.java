@@ -79,6 +79,7 @@ public class TestAutonomousREAL extends LinearOpMode{
         positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
         */
 
+        //moveToPositionTask.run();
 
 
         while (opModeIsActive()) {
