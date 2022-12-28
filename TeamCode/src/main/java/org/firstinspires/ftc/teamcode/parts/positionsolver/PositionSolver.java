@@ -30,7 +30,7 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
         @Override
         public void move(DriveControl base) {
             double r = Math.toRadians(positionTracker.getCurrentPosition().Z);
-            base.power = base.power.addX(pid.returnValue() * Math.cos(r)).addY(-pid.returnValue() * Math.sin(r));
+            base.power = base.power.addY(pid.returnValue() * Math.cos(r)).addX(pid.returnValue() * Math.sin(r));
 
             parent.parent.parent.opMode.telemetry.addData("x pid", pid.returnValue());
             parent.parent.parent.opMode.telemetry.addData("pid coeff", pid.PIDs);
@@ -46,7 +46,7 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
         @Override
         public void move(DriveControl base) {
             double r = Math.toRadians(positionTracker.getCurrentPosition().Z);
-            base.power = base.power.addY(pid.returnValue() * Math.cos(r)).addX(-pid.returnValue() * Math.sin(r));
+            base.power = base.power.addX(-pid.returnValue() * Math.cos(r)).addY(+pid.returnValue() * Math.sin(r));
         }
     };
 

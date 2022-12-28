@@ -29,6 +29,7 @@ public class TestAutonomousREAL extends LinearOpMode{
     public Vector3 tilePos(Vector3 p){
         return new Vector3(p.X * tileSide, p.Y * tileSide, p.Z);
     }
+
     SlamraSettings slamrasettings =  new SlamraSettings(
             new Vector3(0,0,0),
             0.1
@@ -44,6 +45,7 @@ public class TestAutonomousREAL extends LinearOpMode{
         Slamra s = new Slamra(pt);
         //new EncoderTracker(pt);
         Lifter l = new Lifter(r);
+        PositionSolver positionSolver = new PositionSolver(d);
 
         DecimalFormat df = new DecimalFormat("#0.0");
         r.init();
@@ -64,10 +66,13 @@ public class TestAutonomousREAL extends LinearOpMode{
         r.start();
         s.setupFieldOffset();
 
-        PositionSolver positionSolver = new PositionSolver(d);
         TaskEx moveToPositionTask = new TaskEx("auto task");
-
-        positionSolver.addMoveToTaskEx(tilePos(new Vector3(0.5,0,90)), moveToPositionTask);
+        //positionSolver.addMoveToTaskEx(new Vector3(-36,40,0), moveToPositionTask);
+        positionSolver.addMoveToTaskEx(tilePos(new Vector3(-1.5,2.25,0)), moveToPositionTask);
+        positionSolver.rChannel.setNewTarget(-45,true);
+        positionSolver.addMoveToTaskEx(tilePos(new Vector3(-1.5,.5,-45)), moveToPositionTask);
+        //positionSolver.rChannel.setNewTarget(-45,true);
+        //positionSolver.addMoveToTaskEx(tilePos(new Vector3(-1.5,1.5,0)), moveToPositionTask);
         /*
         positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
         positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
@@ -79,11 +84,9 @@ public class TestAutonomousREAL extends LinearOpMode{
         positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
         */
 
-        //moveToPositionTask.run();
-
-
         while (opModeIsActive()) {
             r.run();
+            moveToPositionTask.run();
             //if(gamepad1.y) pt.setAngle(0);
             telemetry.addData("position", pt.getCurrentPosition());
             telemetry.addData("raw position", s.slamraRawPose);

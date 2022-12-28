@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
 import java.text.DecimalFormat;
 
 import om.self.ezftc.core.Robot;
+import om.self.ezftc.utils.Vector3;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -33,18 +34,29 @@ import om.self.ezftc.core.Robot;
 
 @TeleOp(name="lifter Test", group="Linear Opmode")
 public class Test2 extends LinearOpMode {
+    double tileSide = 23.5;
+    public Vector3 tiletoField(Vector3 p){
+        return new Vector3(p.X * tileSide, p.Y * tileSide, p.Z);
+    }
+
+    public Vector3 fieldToTile(Vector3 p){
+        return new Vector3(p.X / tileSide, p.Y / tileSide, p.Z);
+    }
+
+    Vector3 fieldStartPos = new Vector3(-36,63,-90);
+
     @Override
     public void runOpMode() {
         long start;
 
         Robot r = new Robot(this);
-        new BulkRead(r);
+        //new BulkRead(r);
         Drive d = new Drive(r);
         new DriveTeleop(d);
         //new HeaderKeeper(d);
 
         PositionTracker pt = new PositionTracker(r);
-        new Slamra(pt);
+        Slamra s = new Slamra(pt);
         //new EncoderTracker(pt);
 
         //Lifter l = new Lifter(r);
@@ -53,16 +65,28 @@ public class Test2 extends LinearOpMode {
         DecimalFormat df = new DecimalFormat("#0.0");
 
         r.init();
-        //new Slamra(pt);
+        s.onStart();
+        // inject initial autonomous field start position
+        s.slamraFieldStart = fieldStartPos;
 
-        waitForStart();
+        while (!isStarted()) {
+            s.updateSlamraPosition();
+            telemetry.addData("pt position", pt.getCurrentPosition());
+            telemetry.addData("raw position", s.slamraRawPose);
+            telemetry.addData("final position", s.slamraFinal);
+            r.opMode.telemetry.update();
+            sleep(50);
+        }
+
         r.start();
+        s.setupFieldOffset();
 
         while (opModeIsActive()) {
             start = System.currentTimeMillis();
             r.run();
             //if(gamepad1.y) pt.setAngle(0);
             telemetry.addData("position", pt.getCurrentPosition());
+            telemetry.addData("tile position", fieldToTile(pt.getCurrentPosition()));
 //            telemetry.addData("tilt position", l.getCurrentTurnPosition());
 //            //telemetry.addData("is closed", l.isClosed());
 //            telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
@@ -89,7 +113,6 @@ public class Test2 extends LinearOpMode {
 
             telemetry.update();
         }
-
         r.stop();
     }
 }

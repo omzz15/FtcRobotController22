@@ -16,9 +16,9 @@ public class PositionSolverSettings {
 
     public static PositionSolverSettings makeDefault(){
         return new PositionSolverSettings(
-                new ChannelSolverSettings(0.5, 10, false, 10000, new PIDCoefficients(0.1, 0, 0)),
-                new ChannelSolverSettings(0.5, 10, false, 10000, new PIDCoefficients(0.1, 0, 0)),
-                new ChannelSolverSettings(5, 10, false, 10000, new PIDCoefficients(0.05, 0, 0))
+                new ChannelSolverSettings(0.5, 10, true, 10000, new PIDCoefficients(0.1, 0, 0)),
+                new ChannelSolverSettings(0.5, 10, true, 10000, new PIDCoefficients(0.1, 0, 0)),
+                new ChannelSolverSettings(5, 10, true, 10000, new PIDCoefficients(0.05, 0, 0))
         );
     }
 
