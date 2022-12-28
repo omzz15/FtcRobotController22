@@ -219,11 +219,11 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     @Override
     public void onStart() {
         setTurnPosition(getSettings().turnServoStartPosition);
-        drive.addController(Contollers.distanceContoller, (control) -> doConeRange(control));
+        //drive.addController(Contollers.distanceContoller, (control) -> doConeRange(control));
     }
 
     @Override
     public void onStop() {
-        drive.removeController(Contollers.distanceContoller);
+        //drive.removeController(Contollers.distanceContoller);
     }
 }

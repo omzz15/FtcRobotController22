@@ -33,6 +33,7 @@ public class TestAutonomousREAL extends LinearOpMode{
             new Vector3(0,0,0),
             0.1
     );
+    Vector3 fieldStartPos = new Vector3(-36,63,-90);
 
     @Override
     public void runOpMode() {
@@ -40,25 +41,34 @@ public class TestAutonomousREAL extends LinearOpMode{
         Drive d = new Drive(r);
         //new HeaderKeeper(d);
         PositionTracker pt = new PositionTracker(r);
-        new Slamra(pt);
+        Slamra s = new Slamra(pt);
         //new EncoderTracker(pt);
-
         Lifter l = new Lifter(r);
 
         DecimalFormat df = new DecimalFormat("#0.0");
         r.init();
+        s.onStart();
+
+        // inject initial autonomous field start position
+        s.slamraFieldStart = fieldStartPos;
 
         while (!isStarted()) {
+            s.updateSlamraPosition();
             telemetry.addData("position", pt.getCurrentPosition());
+            telemetry.addData("raw position", s.slamraRawPose);
+            telemetry.addData("final position", s.slamraFinal);
             r.opMode.telemetry.update();
             sleep(50);
         }
-        waitForStart();
+
         r.start();
+        s.setupFieldOffset();
 
         PositionSolver positionSolver = new PositionSolver(d);
         TaskEx moveToPositionTask = new TaskEx("auto task");
 
+        positionSolver.addMoveToTaskEx(tilePos(new Vector3(0.5,0,90)), moveToPositionTask);
+        /*
         positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
         positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
         positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
@@ -66,11 +76,16 @@ public class TestAutonomousREAL extends LinearOpMode{
         positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
         positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
         positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
+        positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
+        */
+
+
 
         while (opModeIsActive()) {
             r.run();
             //if(gamepad1.y) pt.setAngle(0);
             telemetry.addData("position", pt.getCurrentPosition());
+            telemetry.addData("raw position", s.slamraRawPose);
             telemetry.addData("tilt position", l.getCurrentTurnPosition());
             //telemetry.addData("is closed", l.isClosed());
             telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
@@ -92,7 +107,6 @@ public class TestAutonomousREAL extends LinearOpMode{
 
             telemetry.update();
         }
-
         r.stop();
     }
 }

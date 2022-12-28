@@ -16,13 +16,12 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 
 	//LK ????????
 	public Vector3 slamraFieldStart = null;
-	public Vector3 slamraRobotOffset = new Vector3(0,0,0);
-
-	Vector3 slamraRawPose = new Vector3 (0,0,0);  // better name for currentPose?
+	public Vector3 slamraRobotOffset = new Vector3(-6.5,0,-90);
+	public Vector3 slamraRawPose = new Vector3 (0,0,0);  // better name for currentPose?
 	Vector3 slamraRobotPose = new Vector3 (0,0,0);
-	// Position slamraRobotOffset = new Position(-6.5,2.25,90);
+	// Position slamraRobotOffset = new Position(-6.5,0,90);
 	Vector3 slamraFieldOffset = new Vector3 (0,0,0);
-	Vector3 slamraFinal = new Vector3(0,0,0);
+	public Vector3 slamraFinal = new Vector3(0,0,0);
 	//End of LK ????????
 
 	//constructors
@@ -48,7 +47,8 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 
 	@Override
 	public void onStart() {
-		slamra.setPose(parent.getCurrentPosition().toPose2d());
+		//slamra.setPose(parent.getCurrentPosition().toPose2d());
+		//slamra.setPose(new Pose2d(0,0,0));
 		if (!slamra.isStarted()) slamra.start();
 	}
 
@@ -65,18 +65,33 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 
 	@Override
 	public void onRun() {
+		//updateSlamraPosition();
+	}
+
+	public void updateSlamraPosition() {
 		T265Camera.CameraUpdate up = slamra.getLastReceivedCameraUpdate();
 		if (up == null) return;
 		Pose2d update = up.pose;
-		parent.setCurrentPosition(new Vector3(update.getX(), update.getY(), update.getHeading()));
+		slamraRawPose = new Vector3(update.getX(), update.getY(), Math.toDegrees(update.getHeading()));
+
+		//LK
+		updateSlamraRobotPose();
+		setSlamraFinal();
+		parent.setCurrentPosition(new Vector3(slamraFinal.X, slamraFinal.Y, slamraFinal.Z));
+		//parent.setCurrentPosition(slamraRawPose);
 	}
 
-	//LK ????????
+	public void setupFieldOffset() {
+		updateSlamraPosition();
+		setSlamraFieldOffset();
+	}
+
+		//LK ????????
 	void updateSlamraRobotPose() {
 		double sX, sY, sR, rX, rY, rR;
 		sX = slamraRawPose.X;
 		sY = slamraRawPose.Y;
-		sR = slamraRawPose.Z;  // assuming was in radians
+		sR = slamraRawPose.Z;  // assuming was in radians tjk really degrees
 		//rX = robotOffset.getX();
 		//rY = robotOffset.getY();
 		//rR = robotOffset.getHeading();         // assuming was in degrees
@@ -126,7 +141,7 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 		slamraFinal = slamraFinal.withX((rX*Math.cos(Math.toRadians(oR)) - rY*Math.sin(Math.toRadians(oR))) + oX);
 		//=I11*SIN(RADIANS(r_field_slam))+J11*COS(RADIANS(r_field_slam))
 		slamraFinal = slamraFinal.withY((rX*Math.sin(Math.toRadians(oR)) + rY*Math.cos(Math.toRadians(oR))) + oY);
-		slamraFinal = slamraFinal.addZ(rR + oR);
+		slamraFinal = slamraFinal.withZ(rR + oR);
 	}
 	//End of LK ????????
 
