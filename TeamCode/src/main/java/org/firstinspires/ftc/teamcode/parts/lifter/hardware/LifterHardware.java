@@ -20,8 +20,6 @@ public class LifterHardware {
     public final Servo leftTurnServo;
     public final Servo rightTurnServo;
     public final Servo grabServo;
-    public final CRServo leftGrabServo;
-    public final CRServo rightGrabServo;
     //public final ColorRangeSensor leftRange;
     //public final ColorRangeSensor rightRange;
     //public final DistanceSensor leftDistance;
@@ -32,8 +30,7 @@ public class LifterHardware {
     public final RevBlinkinLedDriver blinkin;
 
     public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo,
-                          Servo rightTurnServo, Servo grabServo, CRServo leftGrabServo,
-                          CRServo rightGrabServo, ColorRangeSensor leftRange,
+                          Servo rightTurnServo, Servo grabServo, ColorRangeSensor leftRange,
                           ColorRangeSensor rightRange, DistanceSensor leftDistance,
                           DistanceSensor rightDistance, DFR304Range leftUltrasonic,
                           DFR304Range rightUltrasonic, DFR304Range midUltrasonic,
@@ -43,8 +40,6 @@ public class LifterHardware {
         this.leftTurnServo = leftTurnServo;
         this.rightTurnServo = rightTurnServo;
         this.grabServo = grabServo;
-        this.leftGrabServo = leftGrabServo;
-        this.rightGrabServo = rightGrabServo;
         //this.leftRange = leftRange;
         //this.rightRange = rightRange;
         //this.leftDistance = leftDistance;
@@ -61,13 +56,10 @@ public class LifterHardware {
         MotorSettings leftMotorSettings = new MotorSettings(MotorSettings.Number.ZERO_B, DcMotorSimple.Direction.FORWARD, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.RunMode.RUN_TO_POSITION, liftHoldPower);
         MotorSettings rightMotorSettings = new MotorSettings(MotorSettings.Number.ONE_B, DcMotorSimple.Direction.REVERSE, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.RunMode.RUN_TO_POSITION, liftHoldPower);
 
-        ServoSettings leftServoSettings = new ServoSettings(ServoSettings.Number.ZERO, Servo.Direction.FORWARD);
-        ServoSettings rightServoSettings = new ServoSettings(ServoSettings.Number.TWO, Servo.Direction.REVERSE);
+        ServoSettings leftServoSettings = new ServoSettings(ServoSettings.Number.ZERO_B, Servo.Direction.FORWARD);
+        ServoSettings rightServoSettings = new ServoSettings(ServoSettings.Number.TWO_B, Servo.Direction.REVERSE);
 
         ServoSettings grabServoSettings = new ServoSettings(ServoSettings.Number.FOUR_B, Servo.Direction.FORWARD);
-        MotorSettings leftGrabServoSettings = new MotorSettings(ServoSettings.Number.ZERO_B, DcMotorSimple.Direction.REVERSE);
-        MotorSettings rightGrabServoSettings = new MotorSettings(ServoSettings.Number.TWO_B, DcMotorSimple.Direction.FORWARD);
-
         //ColorRangeSensor leftRange = hardwareMap.get(ColorRangeSensor.class, "range2");
         //ColorRangeSensor rightRange = hardwareMap.get(ColorRangeSensor.class, "range1");
         //DistanceSensor leftDistance = hardwareMap.get(DistanceSensor.class, "blueWallSensor");
@@ -89,8 +81,8 @@ public class LifterHardware {
                 leftServoSettings.makeServo(hardwareMap),
                 rightServoSettings.makeServo(hardwareMap),
                 grabServoSettings.makeServo(hardwareMap),
-                leftGrabServoSettings.makeCRServo(hardwareMap),
-                rightGrabServoSettings.makeCRServo(hardwareMap),
+                //leftGrabServoSettings.makeCRServo(hardwareMap),
+                //rightGrabServoSettings.makeCRServo(hardwareMap),
                 null,//leftRange,
                 null,//rightRange,
                 null,//leftDistance,

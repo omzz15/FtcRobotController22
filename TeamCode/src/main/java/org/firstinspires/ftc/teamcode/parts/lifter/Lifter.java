@@ -110,12 +110,12 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     public double getCurrentTurnPosition(){
         return getHardware().leftTurnServo.getPosition();
     }
-
+/*
     public void setGrabberPower(double power){
         getHardware().leftGrabServo.setPower(power);
         getHardware().rightGrabServo.setPower(power);
     }
-
+*/
     public void setGrabberClosed(boolean closed){
         getHardware().grabServo.setPosition(closed ? getSettings().grabberServoClosePos : getSettings().grabberServoOpenPos);
     }
@@ -189,7 +189,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     public void onRun(LifterControl control) { //TODO separate keeping lifter motor position from onRun
         liftWithPower(control.lifterPower);
         turnWithPower(control.turningPower);
-        setGrabberPower(control.closePower);
+        //setGrabberPower(control.closePower);
         setGrabberClosed(control.close);
         //doConeRange(control);
     }

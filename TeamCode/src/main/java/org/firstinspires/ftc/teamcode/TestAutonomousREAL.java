@@ -1,40 +1,27 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
-import org.firstinspires.ftc.teamcode.parts.drive.DriveControl;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
-import org.firstinspires.ftc.teamcode.parts.lifter.LifterTeleop;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.SlamraSettings;
 
 import java.text.DecimalFormat;
+
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Vector3;
-import om.self.ezftc.utils.hardware.motor.MotorSettings;
 import om.self.task.core.TaskEx;
-
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 @Autonomous(name="Test Autonomous", group="Test")
 public class TestAutonomousREAL extends LinearOpMode{
 
     double tileSide = 23.5;
-    public Vector3 tilePos(Vector3 p){
+    public Vector3 tileToInch(Vector3 p){
         return new Vector3(p.X * tileSide, p.Y * tileSide, p.Z);
     }
-
-    SlamraSettings slamrasettings =  new SlamraSettings(
-            new Vector3(0,0,0),
-            0.1
-    );
-    Vector3 fieldStartPos = new Vector3(-36,63,-90);
 
     @Override
     public void runOpMode() {
@@ -52,7 +39,8 @@ public class TestAutonomousREAL extends LinearOpMode{
         s.onStart();
 
         // inject initial autonomous field start position
-        s.slamraFieldStart = fieldStartPos;
+        //Vector3 fieldStartPos = new Vector3(-36,63,-90);
+        s.slamraFieldStart = tileToInch(new Vector3(-1.5,2.68,-90));
 
         while (!isStarted()) {
             s.updateSlamraPosition();
@@ -67,33 +55,27 @@ public class TestAutonomousREAL extends LinearOpMode{
         s.setupFieldOffset();
 
         TaskEx moveToPositionTask = new TaskEx("auto task");
-        //positionSolver.addMoveToTaskEx(new Vector3(-36,40,0), moveToPositionTask);
-        positionSolver.addMoveToTaskEx(tilePos(new Vector3(-1.5,2.25,0)), moveToPositionTask);
-        positionSolver.rChannel.setNewTarget(-45,true);
-        positionSolver.addMoveToTaskEx(tilePos(new Vector3(-1.5,.5,-45)), moveToPositionTask);
-        //positionSolver.rChannel.setNewTarget(-45,true);
-        //positionSolver.addMoveToTaskEx(tilePos(new Vector3(-1.5,1.5,0)), moveToPositionTask);
-        /*
-        positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
-        positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
-        positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
-        positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
-        positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
-        positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
-        positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
-        positionSolver.addMoveToTaskEx(tilePos(new Vector3(1.5,2.5,0)), moveToPositionTask);
-        */
+
+        // start position (-1.5,2.68,-90)
+        // cone pos is (-1.5, 0.5, -90)
+        // pole position (not the game) (position to capture) is (-1.25, 0.15, -45) roughly or -1.26 , 0.16
+        positionSolver.addMoveToTaskEx(tileToInch(new Vector3(-1.5,1.5,-90)), moveToPositionTask);
+        positionSolver.addMoveToTaskEx(tileToInch(new Vector3(-1.5,0.5,-90)), moveToPositionTask);
+        positionSolver.addMoveToTaskEx(tileToInch(new Vector3(-1.25,0.5,-90)), moveToPositionTask);
+        positionSolver.addMoveToTaskEx(tileToInch(new Vector3(-1.25,0.5,-90)), moveToPositionTask);
+        positionSolver.addMoveToTaskEx(tileToInch(new Vector3(-1.25,0.15,-45)), moveToPositionTask);
+
 
         while (opModeIsActive()) {
             r.run();
             moveToPositionTask.run();
             //if(gamepad1.y) pt.setAngle(0);
             telemetry.addData("position", pt.getCurrentPosition());
-            telemetry.addData("raw position", s.slamraRawPose);
-            telemetry.addData("tilt position", l.getCurrentTurnPosition());
+            //telemetry.addData("raw position", s.slamraRawPose);
+            //telemetry.addData("tilt position", l.getCurrentTurnPosition());
             //telemetry.addData("is closed", l.isClosed());
-            telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
-            telemetry.addData("lift position:",df.format(l.getLiftPosition()));
+            //telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
+            //telemetry.addData("lift position:",df.format(l.getLiftPosition()));
             telemetry.addData("Ultra [Left : Mid : Right]", "["
                     + df.format(l.getLeftUltra()) + " : "
                     + df.format(l.getMidUltra()) + " : "
