@@ -12,16 +12,12 @@ import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
 import java.text.DecimalFormat;
 
 import om.self.ezftc.core.Robot;
+import om.self.ezftc.utils.Constants;
 import om.self.ezftc.utils.Vector3;
 import om.self.task.core.TaskEx;
 
 @Autonomous(name="Test Autonomous", group="Test")
 public class TestAutonomousREAL extends LinearOpMode{
-
-    double tileSide = 23.5;
-    public Vector3 tileToInch(Vector3 p){
-        return new Vector3(p.X * tileSide, p.Y * tileSide, p.Z);
-    }
 
     @Override
     public void runOpMode() {
@@ -36,11 +32,9 @@ public class TestAutonomousREAL extends LinearOpMode{
 
         DecimalFormat df = new DecimalFormat("#0.0");
         r.init();
-        s.onStart();
 
         // inject initial autonomous field start position
         //Vector3 fieldStartPos = new Vector3(-36,63,-90);
-        s.slamraFieldStart = tileToInch(new Vector3(-1.5,2.68,90));
 
         while (!isStarted()) {
             s.updateSlamraPosition();
@@ -52,7 +46,6 @@ public class TestAutonomousREAL extends LinearOpMode{
         }
 
         r.start();
-        s.setupFieldOffset();
 
         TaskEx moveToPositionTask = new TaskEx("auto task");
 
@@ -79,7 +72,7 @@ public class TestAutonomousREAL extends LinearOpMode{
                 blueTall
         };
         for (Vector3 p : position)
-            positionSolver.addMoveToTaskEx(tileToInch(p), moveToPositionTask);
+            positionSolver.addMoveToTaskEx(Constants.tileToInch(p), moveToPositionTask);
 
         while (opModeIsActive()) {
             r.run();

@@ -42,25 +42,25 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 
 	@Override
 	public void onInit() {
-
-	}
-
-	@Override
-	public void onStart() {
-		//slamra.setPose(parent.getCurrentPosition().toPose2d());
-		//slamra.setPose(new Pose2d(0,0,0));
+		if (slamra == null) {
+			slamra = T265Helper.getCamera(
+					new T265Camera.OdometryInfo(
+							getSettings().robotOffset.toPose2d(),
+							getSettings().encoderCovariance
+					), parent.parent.opMode.hardwareMap.appContext);
+		}
 		if (!slamra.isStarted()) slamra.start();
 	}
 
 	@Override
+	public void onStart() {
+		slamraFieldStart = parent.getCurrentPosition();
+		setupFieldOffset();
+	}
+
+	@Override
 	public void onSettingsUpdate(SlamraSettings settings) {
-		if (slamra == null) {
-			slamra = T265Helper.getCamera(
-					new T265Camera.OdometryInfo(
-							settings.robotOffset.toPose2d(),
-							settings.encoderCovariance
-					), parent.parent.opMode.hardwareMap.appContext);
-		}
+		if(slamra != null) throw new RuntimeException("slamra settings can not be updated after init");
 	}
 
 	@Override

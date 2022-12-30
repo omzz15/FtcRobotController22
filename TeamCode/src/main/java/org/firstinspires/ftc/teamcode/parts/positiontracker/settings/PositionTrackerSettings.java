@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode.parts.positiontracker.settings;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 
+import om.self.ezftc.utils.Constants;
 import om.self.ezftc.utils.Vector3;
 
 public class PositionTrackerSettings {
@@ -25,7 +24,7 @@ public class PositionTrackerSettings {
 				AxesOrder.XYZ,
 				true,
 				30,
-				new Vector3(0, 0, 0)
+				Constants.tileToInch(new Vector3(-1.5,2.68,90))
 		);
 	}
 }
