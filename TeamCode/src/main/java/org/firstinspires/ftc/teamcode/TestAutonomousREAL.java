@@ -40,7 +40,7 @@ public class TestAutonomousREAL extends LinearOpMode{
 
         // inject initial autonomous field start position
         //Vector3 fieldStartPos = new Vector3(-36,63,-90);
-        s.slamraFieldStart = tileToInch(new Vector3(-1.5,2.68,-90));
+        s.slamraFieldStart = tileToInch(new Vector3(-1.5,2.68,90));
 
         while (!isStarted()) {
             s.updateSlamraPosition();
@@ -58,13 +58,28 @@ public class TestAutonomousREAL extends LinearOpMode{
 
         // start position (-1.5,2.68,-90)
         // cone pos is (-1.5, 0.5, -90)
-        // pole position (not the game) (position to capture) is (-1.25, 0.15, -45) roughly or -1.26 , 0.16
-        positionSolver.addMoveToTaskEx(tileToInch(new Vector3(-1.5,1.5,-90)), moveToPositionTask);
-        positionSolver.addMoveToTaskEx(tileToInch(new Vector3(-1.5,0.5,-90)), moveToPositionTask);
-        positionSolver.addMoveToTaskEx(tileToInch(new Vector3(-1.25,0.5,-90)), moveToPositionTask);
-        positionSolver.addMoveToTaskEx(tileToInch(new Vector3(-1.25,0.5,-90)), moveToPositionTask);
-        positionSolver.addMoveToTaskEx(tileToInch(new Vector3(-1.25,0.15,-45)), moveToPositionTask);
-
+        // pole position (not the game) (position to capture) is roughly or -1.26 , 0.16
+        Vector3 blueLoadedPrep = new Vector3(-1.5,.5,90);
+        Vector3 blueTallPrep = new Vector3(-1.5,0.5,180);
+        Vector3 blueTall = new Vector3(-1.25, 0.15, 135);
+        Vector3 blueStack = new Vector3(-2.68,.5,180);
+        //*************************************************
+        // position x and y based on whole tiles
+        // start position (-1.5,2.68,-90)
+        Vector3[] position = {
+                blueLoadedPrep,
+                blueTall,
+                blueTallPrep,
+                blueStack,
+                blueTallPrep,
+                blueTall,
+                blueTallPrep,
+                blueStack,
+                blueTallPrep,
+                blueTall
+        };
+        for (Vector3 p : position)
+            positionSolver.addMoveToTaskEx(tileToInch(p), moveToPositionTask);
 
         while (opModeIsActive()) {
             r.run();
