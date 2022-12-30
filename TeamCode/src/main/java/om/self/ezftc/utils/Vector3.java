@@ -36,9 +36,9 @@ public class Vector3 {
 
 	public double get(int index){
 		switch(index){
-			case 1: return X;
-			case 2: return Y;
-			case 3: return Z;
+			case 0: return X;
+			case 1: return Y;
+			case 2: return Z;
 			default: throw new IndexOutOfBoundsException("the index '" + index + "' is not inside a vector 3");
 		}
 	}
