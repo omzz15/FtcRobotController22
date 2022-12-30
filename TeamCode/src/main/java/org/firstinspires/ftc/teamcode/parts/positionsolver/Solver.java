@@ -107,7 +107,7 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
                 double error = getError(target);
                 pid.updatePID(error);
 
-                if(error <= getSettings().tolerance) {
+                if(Math.abs(error) <= getSettings().tolerance) {
                     timesInTolerance ++;
                     if(timesInTolerance == getSettings().reqTimesInTolerance)
                         triggerEvent(Events.complete);
@@ -122,7 +122,7 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
             double error = getError(target);
             pid.updatePID(error);
 
-            if(error <= getSettings().tolerance) {
+            if(Math.abs(error) <= getSettings().tolerance) {
                 timesInTolerance ++;
                 if(timesInTolerance == getSettings().reqTimesInTolerance)
                     triggerEvent(Events.complete);
