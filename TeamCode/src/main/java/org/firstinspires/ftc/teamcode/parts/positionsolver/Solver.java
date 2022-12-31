@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.parts.positionsolver;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.firstinspires.ftc.teamcode.parts.positionsolver.settings.ChannelSolverSettings;
+import org.firstinspires.ftc.teamcode.parts.positionsolver.settings.SolverSettings;
 
 
 import java.util.function.Consumer;
@@ -11,7 +11,7 @@ import om.self.ezftc.core.part.ControllablePart;
 import om.self.ezftc.core.part.Part;
 import om.self.ezftc.utils.PID;
 
-public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<PARENT, ChannelSolverSettings, ObjectUtils.Null> { //TODO make settings generic
+public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<PARENT, SolverSettings, ObjectUtils.Null> { //TODO make settings generic
     public final class Events{
         public static final String complete = "COMPLETE";
         public static final String timedOut = "TIMEOUT";
@@ -47,8 +47,11 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
     }
 
     @Override
-    public void onSettingsUpdate(ChannelSolverSettings settings) {
+    public void onSettingsUpdate(SolverSettings settings) {
         pid.PIDs = settings.PIDCoefficients;
+        pid.minClamp = -settings.maxSpeed;
+        pid.maxClamp = settings.maxSpeed;
+
         if(settings.alwaysRun)
             getEventManager().detachFromEvent(Events.complete, "stop part");
         else

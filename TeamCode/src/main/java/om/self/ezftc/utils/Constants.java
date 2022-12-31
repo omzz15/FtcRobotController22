@@ -8,6 +8,11 @@ public class Constants{
     public static final float halfField        = 72 * mmPerInch;
     public static final float halfTile         = 12 * mmPerInch;
     public static final float oneAndHalfTile   = 36 * mmPerInch;
+    public static final double tileSide = 23.5;
+
+    public static Vector3 tileToInch(Vector3 p){
+        return VectorMath.multiply(p, tileSide);
+    }
 
     public static float[] inchesToMM(float[] arr){
         float[] out = new float[arr.length];

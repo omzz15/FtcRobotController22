@@ -4,11 +4,11 @@ package org.firstinspires.ftc.teamcode.parts.positionsolver.settings;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 public class PositionSolverSettings {
-    public final ChannelSolverSettings xChannelSettings;
-    public final ChannelSolverSettings yChannelSettings;
-    public final ChannelSolverSettings rChannelSettings;
+    public final SolverSettings xChannelSettings;
+    public final SolverSettings yChannelSettings;
+    public final SolverSettings rChannelSettings;
 
-    public PositionSolverSettings(ChannelSolverSettings xChannelSettings, ChannelSolverSettings yChannelSettings, ChannelSolverSettings rChannelSettings) {
+    public PositionSolverSettings(SolverSettings xChannelSettings, SolverSettings yChannelSettings, SolverSettings rChannelSettings) {
         this.xChannelSettings = xChannelSettings;
         this.yChannelSettings = yChannelSettings;
         this.rChannelSettings = rChannelSettings;
@@ -16,9 +16,9 @@ public class PositionSolverSettings {
 
     public static PositionSolverSettings makeDefault(){
         return new PositionSolverSettings(
-                new ChannelSolverSettings(2, 10, true, 10000, new PIDCoefficients(0.05, 0, 0)),
-                new ChannelSolverSettings(2, 10, true, 10000, new PIDCoefficients(0.05, 0, 0)),
-                new ChannelSolverSettings(5, 10, true, 10000, new PIDCoefficients(0.05, 0, 0))
+                new SolverSettings(0.5, 10, true, 10000, new PIDCoefficients(0.1, 0, 0), 1),
+                new SolverSettings(0.5, 10, true, 10000, new PIDCoefficients(0.1, 0, 0), 1),
+                new SolverSettings(5, 10, true, 10000, new PIDCoefficients(0.05, 0, 0), 1)
         );
     }
 

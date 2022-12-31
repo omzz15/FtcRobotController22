@@ -1,5 +1,7 @@
 package om.self.ezftc.utils;
 
+import org.apache.commons.lang3.NotImplementedException;
+
 public class VectorMath {
     public static Vector3 add(Vector3 v1, Vector3 v2){
         return new Vector3(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
@@ -14,7 +16,7 @@ public class VectorMath {
     }
 
     public static Vector3 multiply(Vector3 v1, Vector3 v2){
-        return new Vector3(); //todo add matrix multiplication
+        throw new NotImplementedException(); //todo add matrix multiplication
     }
 
     public static Vector3 multiply(Vector3 v1, double val){
@@ -23,6 +25,17 @@ public class VectorMath {
 
     public static Vector3 divide(Vector3 v1, double val){
         return new Vector3(v1.X / val, v1.Y / val, v1.Z / val);
+    }
+
+    /**
+     * translates a vector 3 along the x and y axis by treating z like an angle(in degrees)
+     * @return
+     */
+    public static Vector3 translateAsVector2(Vector3 val, double x, double y){
+        double r = Math.toRadians(val.Z);
+        double xOut = val.X + x * Math.cos(r) - y * Math.sin(r);
+        double yOut = val.Y + y * Math.cos(r) + x * Math.sin(r);
+        return new Vector3(xOut, yOut, val.Z);
     }
 
     public static boolean inTolerance(double[] currPos, double[] targetPos, double[] tol){
