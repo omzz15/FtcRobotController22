@@ -34,7 +34,6 @@ public class TestAutonomousREAL extends LinearOpMode{
         r.init();
 
         // inject initial autonomous field start position
-        //Vector3 fieldStartPos = new Vector3(-36,63,-90);
 
         while (!isStarted()) {
             s.updateSlamraPosition();
@@ -79,12 +78,9 @@ public class TestAutonomousREAL extends LinearOpMode{
         };
         //positionSolver.addMoveToTaskEx(tileToInch(new Vector3(-1.5,1.5, 90)), moveToPositionTask);
 
-        for (Vector3 p : position) {
-            positionSolver.addMoveToTaskEx(tileToInch(p), moveToPositionTask);
-            //moveToPositionTask.addStep(() -> {}, () -> gamepad2.dpad_down);
-        }
         for (Vector3 p : position)
             positionSolver.addMoveToTaskEx(Constants.tileToInch(p), moveToPositionTask);
+            //moveToPositionTask.addStep(() -> {}, () -> gamepad2.dpad_down);
 
         while (opModeIsActive()) {
             r.run();
