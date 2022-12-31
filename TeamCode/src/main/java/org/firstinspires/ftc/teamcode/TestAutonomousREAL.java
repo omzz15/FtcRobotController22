@@ -39,7 +39,7 @@ public class TestAutonomousREAL extends LinearOpMode{
         s.onStart();
 
         // inject initial autonomous field start position
-        //Vector3 fieldStartPos = new Vector3(-36,63,-90);
+        //Vector3 fieldStartPos = new Vector3(-36,63,90);
         s.slamraFieldStart = tileToInch(new Vector3(-1.5,2.68,90));
 
         while (!isStarted()) {
@@ -60,9 +60,11 @@ public class TestAutonomousREAL extends LinearOpMode{
         // cone pos is (-1.5, 0.5, -90)
         // pole position (not the game) (position to capture) is roughly or -1.26 , 0.16
         Vector3 blueLoadedPrep = new Vector3(-1.5,.5,90);
-        Vector3 blueTallPrep = new Vector3(-1.5,0.5,180);
-        Vector3 blueTall = new Vector3(-1.25, 0.15, 135);
-        Vector3 blueStack = new Vector3(-2.68,.5,180);
+        Vector3 blueTallPrep = new Vector3(-1.5,0.5,135);
+        Vector3 blueTallPrep180 = new Vector3(-1.5,0.5,180);
+        Vector3 blueTall = new Vector3(-1.2, 0.2, 135);
+        Vector3 blueStack = new Vector3(-2.58,.5,180);
+        Vector3 blueStackPrep = new Vector3(-2.4,.5,180);
         //*************************************************
         // position x and y based on whole tiles
         // start position (-1.5,2.68,-90)
@@ -70,16 +72,24 @@ public class TestAutonomousREAL extends LinearOpMode{
                 blueLoadedPrep,
                 blueTall,
                 blueTallPrep,
+                blueTallPrep180,
+                blueStackPrep,
                 blueStack,
-                blueTallPrep,
+                blueTallPrep180,
                 blueTall,
                 blueTallPrep,
+                blueTallPrep180,
+                blueStackPrep,
                 blueStack,
-                blueTallPrep,
+                blueTallPrep180,
                 blueTall
         };
-        for (Vector3 p : position)
+        //positionSolver.addMoveToTaskEx(tileToInch(new Vector3(-1.5,1.5, 90)), moveToPositionTask);
+
+        for (Vector3 p : position) {
             positionSolver.addMoveToTaskEx(tileToInch(p), moveToPositionTask);
+            //moveToPositionTask.addStep(() -> {}, () -> gamepad2.dpad_down);
+        }
 
         while (opModeIsActive()) {
             r.run();
@@ -87,10 +97,10 @@ public class TestAutonomousREAL extends LinearOpMode{
             //if(gamepad1.y) pt.setAngle(0);
             telemetry.addData("position", pt.getCurrentPosition());
             //telemetry.addData("raw position", s.slamraRawPose);
-            //telemetry.addData("tilt position", l.getCurrentTurnPosition());
+            telemetry.addData("tilt position", l.getCurrentTurnPosition());
             //telemetry.addData("is closed", l.isClosed());
-            //telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
-            //telemetry.addData("lift position:",df.format(l.getLiftPosition()));
+            telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
+            telemetry.addData("lift position:",df.format(l.getLiftPosition()));
             telemetry.addData("Ultra [Left : Mid : Right]", "["
                     + df.format(l.getLeftUltra()) + " : "
                     + df.format(l.getMidUltra()) + " : "
