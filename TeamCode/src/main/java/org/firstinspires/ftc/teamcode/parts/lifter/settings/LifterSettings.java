@@ -38,8 +38,8 @@ public class LifterSettings {
 
     public static LifterSettings makeDefault(){
         return new LifterSettings(
-                0,
-                1,
+                0.064,
+                0.93,
                 0.75,
                 .9,
                 0.834,

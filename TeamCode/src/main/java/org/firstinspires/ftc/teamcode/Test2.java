@@ -43,14 +43,14 @@ public class Test2 extends LinearOpMode {
         return new Vector3(p.X / tileSide, p.Y / tileSide, p.Z);
     }
 
-    Vector3 fieldStartPos = new Vector3(-36,63,-90);
+    Vector3 fieldStartPos = new Vector3(-36,63,90);
 
     @Override
     public void runOpMode() {
         long start;
 
         Robot r = new Robot(this);
-        //new BulkRead(r);
+        new BulkRead(r);
         Drive d = new Drive(r);
         new DriveTeleop(d);
         //new HeaderKeeper(d);
@@ -59,8 +59,8 @@ public class Test2 extends LinearOpMode {
         Slamra s = new Slamra(pt);
         //new EncoderTracker(pt);
 
-        //Lifter l = new Lifter(r);
-        //new LifterTeleop(l);
+        Lifter l = new Lifter(r);
+        new LifterTeleop(l);
 
         DecimalFormat df = new DecimalFormat("#0.0");
 
@@ -87,14 +87,14 @@ public class Test2 extends LinearOpMode {
             //if(gamepad1.y) pt.setAngle(0);
             telemetry.addData("position", pt.getCurrentPosition());
             telemetry.addData("tile position", fieldToTile(pt.getCurrentPosition()));
-//            telemetry.addData("tilt position", l.getCurrentTurnPosition());
+            telemetry.addData("tilt position", l.getCurrentTurnPosition());
 //            //telemetry.addData("is closed", l.isClosed());
-//            telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
+            telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
 //            //telemetry.addData("rightRange", df.format(l.getRightRange()));
 //            //telemetry.addData("leftRange", df.format(l.getLeftRange()));
 //            //telemetry.addData("leftDistance", df.format(l.getLeftDistance()));
 //            //telemetry.addData("rightDistance", df.format(l.getRightDistance()));
-//            telemetry.addData("lift position:",df.format(l.getLiftPosition()));
+            telemetry.addData("lift position:",df.format(l.getLiftPosition()));
 //            telemetry.addData("Ultra [Left : Mid : Right]", "["
 //                    + df.format(l.getLeftUltra()) + " : "
 //                    + df.format(l.getMidUltra()) + " : "

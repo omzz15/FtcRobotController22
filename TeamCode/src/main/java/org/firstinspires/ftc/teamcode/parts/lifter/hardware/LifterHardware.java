@@ -58,7 +58,6 @@ public class LifterHardware {
 
         ServoSettings leftServoSettings = new ServoSettings(ServoSettings.Number.ZERO_B, Servo.Direction.FORWARD);
         ServoSettings rightServoSettings = new ServoSettings(ServoSettings.Number.TWO_B, Servo.Direction.REVERSE);
-
         ServoSettings grabServoSettings = new ServoSettings(ServoSettings.Number.FOUR_B, Servo.Direction.FORWARD);
         //ColorRangeSensor leftRange = hardwareMap.get(ColorRangeSensor.class, "range2");
         //ColorRangeSensor rightRange = hardwareMap.get(ColorRangeSensor.class, "range1");
