@@ -66,6 +66,7 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 	@Override
 	public void onRun() {
 		updateSlamraPosition();
+		parent.setCurrentPosition(slamraFinal);
 	}
 
 	public void updateSlamraPosition() {
@@ -77,7 +78,6 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 		//LK
 		updateSlamraRobotPose();
 		setSlamraFinal();
-		parent.setCurrentPosition(slamraFinal);
 	}
 
 	public void setupFieldOffset() {

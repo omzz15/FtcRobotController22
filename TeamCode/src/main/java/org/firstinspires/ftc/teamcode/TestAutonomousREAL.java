@@ -14,7 +14,7 @@ import java.text.DecimalFormat;
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Constants;
 import om.self.ezftc.utils.Vector3;
-import om.self.task.core.TaskEx;
+import om.self.task.other.TimedTask;
 
 @Autonomous(name="Test Autonomous", group="Test")
 public class TestAutonomousREAL extends LinearOpMode{
@@ -34,6 +34,7 @@ public class TestAutonomousREAL extends LinearOpMode{
         r.init();
 
         // inject initial autonomous field start position
+        //Vector3 fieldStartPos = new Vector3(-36,63,-90);
 
         while (!isStarted()) {
             s.updateSlamraPosition();
@@ -46,17 +47,20 @@ public class TestAutonomousREAL extends LinearOpMode{
 
         r.start();
 
-        TaskEx moveToPositionTask = new TaskEx("auto task");
+        TimedTask container = new TimedTask("container");
+        TimedTask autoTask = new TimedTask("auto task");
+
+        container.addTimedStep(autoTask::run, 25000);
+        container.addStep(() -> System.out.println("done!!"));
+
 
         // start position (-1.5,2.68,-90)
         // cone pos is (-1.5, 0.5, -90)
         // pole position (not the game) (position to capture) is roughly or -1.26 , 0.16
         Vector3 blueLoadedPrep = new Vector3(-1.5,.5,90);
-        Vector3 blueTallPrep = new Vector3(-1.5,0.5,135);
-        Vector3 blueTallPrep180 = new Vector3(-1.5,0.5,180);
-        Vector3 blueTall = new Vector3(-1.2, 0.2, 135);
-        Vector3 blueStack = new Vector3(-2.58,.5,180);
-        Vector3 blueStackPrep = new Vector3(-2.4,.5,180);
+        Vector3 blueTallPrep = new Vector3(-1.5,0.5,180);
+        Vector3 blueTall = new Vector3(-1.25, 0.15, 135);
+        Vector3 blueStack = new Vector3(-2.68,.5,180);
         //*************************************************
         // position x and y based on whole tiles
         // start position (-1.5,2.68,-90)
@@ -64,34 +68,33 @@ public class TestAutonomousREAL extends LinearOpMode{
                 blueLoadedPrep,
                 blueTall,
                 blueTallPrep,
-                blueTallPrep180,
-                blueStackPrep,
                 blueStack,
-                blueTallPrep180,
+                blueTallPrep,
                 blueTall,
                 blueTallPrep,
-                blueTallPrep180,
-                blueStackPrep,
                 blueStack,
-                blueTallPrep180,
+                blueTallPrep,
                 blueTall
         };
-        //positionSolver.addMoveToTaskEx(tileToInch(new Vector3(-1.5,1.5, 90)), moveToPositionTask);
+
+        l.addAutoGrabToTask(autoTask, 0);
+        positionSolver.addMoveToTaskEx(blueLoadedPrep, autoTask);
+        l.addAutoDropPre(autoTask, 2060);
 
         for (Vector3 p : position)
-            positionSolver.addMoveToTaskEx(Constants.tileToInch(p), moveToPositionTask);
-            //moveToPositionTask.addStep(() -> {}, () -> gamepad2.dpad_down);
+            positionSolver.addMoveToTaskEx(Constants.tileToInch(p), autoTask);
 
         while (opModeIsActive()) {
             r.run();
-            moveToPositionTask.run();
+            container.run();
+
             //if(gamepad1.y) pt.setAngle(0);
             telemetry.addData("position", pt.getCurrentPosition());
             //telemetry.addData("raw position", s.slamraRawPose);
-            telemetry.addData("tilt position", l.getCurrentTurnPosition());
+            //telemetry.addData("tilt position", l.getCurrentTurnPosition());
             //telemetry.addData("is closed", l.isClosed());
-            telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
-            telemetry.addData("lift position:",df.format(l.getLiftPosition()));
+            //telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
+            //telemetry.addData("lift position:",df.format(l.getLiftPosition()));
             telemetry.addData("Ultra [Left : Mid : Right]", "["
                     + df.format(l.getLeftUltra()) + " : "
                     + df.format(l.getMidUltra()) + " : "

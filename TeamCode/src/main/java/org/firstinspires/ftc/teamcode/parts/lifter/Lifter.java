@@ -7,6 +7,8 @@ import org.firstinspires.ftc.teamcode.parts.drive.DriveControl;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 
+import java.sql.Time;
+
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.ControllablePart;
 import om.self.task.core.Group;
@@ -116,23 +118,66 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         getHardware().rightGrabServo.setPower(power);
     }
 */
-    public void setGrabberClosed(boolean closed){
-        getHardware().grabServo.setPosition(closed ? getSettings().grabberServoClosePos : getSettings().grabberServoOpenPos);
+    public void setGrabberClosed(){
+        getHardware().grabServo.setPosition(getSettings().grabberServoClosePos);
+    }
+
+    public void setGrabberOpen(boolean wideOpen){
+        getHardware().grabServo.setPosition(wideOpen ? getSettings().grabberServoWideOpenPos : getSettings().grabberServoOpenPos);
     }
 
     //public boolean isClosed(){
     //    return closed;
     //}
 
+    public void addAutoDropPre(TimedTask task, int height){
+        task.addStep(()->setLiftPosition(height));
+       // height should be 2060 for high, (-200 for clearance)
+        task.addStep(()->setTurnPosition(.286));
+        task.addDelay(500);
+        task.addStep(this::isLiftInTolerance);
+    }
+
+    /**
+     * MUST RUN addAutoDropPre before
+     */
+    public void addAutoDrop(TimedTask task){
+        task.addStep(()->setLiftPosition(getLiftPosition()-200));
+        task.addStep(this::isLiftInTolerance);
+        task.addStep(()->setGrabberOpen(false));
+    }
+
+    public void addDockToTask(TimedTask task){
+        task.addStep(this::setGrabberClosed);
+        task.addStep(()->setTurnPosition(.95));
+        task.addStep(()->setLiftPosition(0));
+        task.addDelay(500);
+        task.addStep(this::isLiftInTolerance);
+        task.addStep(()->setGrabberOpen(true));
+    }
+
     public void constructAutoGrab(){
-        autoGrabTask.addStep(() -> setGrabberClosed(true));
+        autoGrabTask.addStep(() -> setGrabberClosed());
         autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
         autoGrabTask.addStep(() -> setTurnPosition(0.95));
         autoGrabTask.addDelay(500);
-        autoGrabTask.addStep(() -> setGrabberClosed(false));
+        autoGrabTask.addStep(() -> setGrabberOpen(false));
         autoGrabTask.addStep(this::isLiftInTolerance);
         autoGrabTask.addStep(() -> setLiftPosition(conePos));
-        autoGrabTask.addStep(() -> setGrabberClosed(true));
+        autoGrabTask.addStep(() -> setGrabberClosed());
+        autoGrabTask.addDelay(100);
+        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
+    }
+
+    public void addAutoGrabToTask(TimedTask autoGrabTask, int conePos){
+        autoGrabTask.addStep(() -> setGrabberClosed());
+        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
+        autoGrabTask.addStep(() -> setTurnPosition(0.95));
+        autoGrabTask.addDelay(500);
+        autoGrabTask.addStep(() -> setGrabberOpen(false));
+        autoGrabTask.addStep(this::isLiftInTolerance);
+        autoGrabTask.addStep(() -> setLiftPosition(conePos));
+        autoGrabTask.addStep(() -> setGrabberClosed());
         autoGrabTask.addDelay(100);
         autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
     }
@@ -190,7 +235,10 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         liftWithPower(control.lifterPower);
         turnWithPower(control.turningPower);
         //setGrabberPower(control.closePower);
-        setGrabberClosed(control.close);
+        if(control.close)
+            setGrabberClosed();
+        else
+            setGrabberOpen(false);
         //doConeRange(control);
     }
 
