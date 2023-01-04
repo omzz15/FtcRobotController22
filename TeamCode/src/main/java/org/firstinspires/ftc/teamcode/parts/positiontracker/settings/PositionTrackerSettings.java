@@ -24,7 +24,7 @@ public class PositionTrackerSettings {
 				AxesOrder.XYZ,
 				true,
 				30,
-				Constants.tileToInch(new Vector3(-1.5,2.68,90))
+				new Vector3(-1.5 * Constants.tileSide,62,90)
 		);
 	}
 }

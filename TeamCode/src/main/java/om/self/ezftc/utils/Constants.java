@@ -11,7 +11,7 @@ public class Constants{
     public static final double tileSide = 23.5;
 
     public static Vector3 tileToInch(Vector3 p){
-        return VectorMath.multiply(p, tileSide);
+        return VectorMath.multiplyAsVector2(p, tileSide);
     }
 
     public static float[] inchesToMM(float[] arr){

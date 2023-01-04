@@ -14,7 +14,7 @@ import java.text.DecimalFormat;
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Constants;
 import om.self.ezftc.utils.Vector3;
-import om.self.task.core.TaskEx;
+import om.self.task.other.TimedTask;
 
 @Autonomous(name="Test Autonomous", group="Test")
 public class TestAutonomousREAL extends LinearOpMode{
@@ -47,7 +47,12 @@ public class TestAutonomousREAL extends LinearOpMode{
 
         r.start();
 
-        TaskEx moveToPositionTask = new TaskEx("auto task");
+        TimedTask container = new TimedTask("container");
+        TimedTask autoTask = new TimedTask("auto task");
+
+        container.addTimedStep(autoTask::run, 25000);
+        container.addStep(() -> System.out.println("done!!"));
+
 
         // start position (-1.5,2.68,-90)
         // cone pos is (-1.5, 0.5, -90)
@@ -71,12 +76,18 @@ public class TestAutonomousREAL extends LinearOpMode{
                 blueTallPrep,
                 blueTall
         };
+
+        l.addAutoGrabToTask(autoTask, 0);
+        positionSolver.addMoveToTaskEx(blueLoadedPrep, autoTask);
+        l.addAutoDropPre(autoTask, 2060);
+
         for (Vector3 p : position)
-            positionSolver.addMoveToTaskEx(Constants.tileToInch(p), moveToPositionTask);
+            positionSolver.addMoveToTaskEx(Constants.tileToInch(p), autoTask);
 
         while (opModeIsActive()) {
             r.run();
-            moveToPositionTask.run();
+            container.run();
+
             //if(gamepad1.y) pt.setAngle(0);
             telemetry.addData("position", pt.getCurrentPosition());
             //telemetry.addData("raw position", s.slamraRawPose);

@@ -50,7 +50,7 @@ dependencies {
 
 //    custom stuff
     implementation 'io.github.omzz15:supplier:1.0.0-FTCRELEASE'
-    implementation 'io.github.omzz15:task:4.1.0-FTCRELEASE'
+    implementation 'io.github.omzz15:task:4.2.2-FTCRELEASE'
     implementation 'io.github.omzz15:beans:2.1.2-FTCRELEASE'
 
 

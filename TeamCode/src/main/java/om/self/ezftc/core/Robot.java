@@ -8,9 +8,9 @@ import java.util.function.Supplier;
 
 import om.self.beans.core.BeanManager;
 import om.self.ezftc.core.part.PartParent;
-import om.self.task.core.EventManager;
 import om.self.task.core.Group;
 import om.self.task.core.OrderedGroup;
+import om.self.task.event.EventManager;
 
 /**
  * Sets up the framework by configuring base events, adding all the core beans(ex: OpMode), and generating other bean from classes

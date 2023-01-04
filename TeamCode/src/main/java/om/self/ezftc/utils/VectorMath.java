@@ -23,6 +23,10 @@ public class VectorMath {
         return new Vector3(v1.X * val, v1.Y * val, v1.Z * val);
     }
 
+    public static Vector3 multiplyAsVector2(Vector3 v1, double val){
+        return new Vector3(v1.X * val, v1.Y * val, v1.Z);
+    }
+
     public static Vector3 divide(Vector3 v1, double val){
         return new Vector3(v1.X / val, v1.Y / val, v1.Z / val);
     }
