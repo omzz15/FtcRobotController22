@@ -7,12 +7,14 @@ import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
 
 import java.text.DecimalFormat;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Constants;
+import om.self.ezftc.utils.Vector;
 import om.self.ezftc.utils.Vector3;
 import om.self.task.other.TimedTask;
 
@@ -76,17 +78,24 @@ public class TestAutonomousREAL extends LinearOpMode{
                 blueTallPrep,
                 blueTall
         };
-
+        // so the robot doesnt move to 0,0
+// One cycle
+        positionSolver.setNewTarget(pt.getCurrentPosition(), true);
         l.addAutoGrabToTask(autoTask, 0);
-        positionSolver.addMoveToTaskEx(blueLoadedPrep, autoTask);
-        l.addAutoDropPre(autoTask, 2060);
+        // positionSolver.addMoveToTaskEx(blueLoadedPrep, autoTask);
+        // positionSolver.addMoveToTaskEx(blueTall, autoTask);
+        // positionSolver.addMoveToTaskEx(blueTallPrep, autoTask);
+        //l.addAutoDropPre(autoTask, 2060);
+        //l.addAutoDrop(autoTask);
+        // positionSolver.addMoveToTaskEx(blueStack, autoTask);
 
-        for (Vector3 p : position)
-            positionSolver.addMoveToTaskEx(Constants.tileToInch(p), autoTask);
+//        for (Vector3 p : position)
+//            positionSolver.addMoveToTaskEx(Constants.tileToInch(p), autoTask);
 
         while (opModeIsActive()) {
             r.run();
-            container.run();
+            //container.run();
+            autoTask.run();
 
             //if(gamepad1.y) pt.setAngle(0);
             telemetry.addData("position", pt.getCurrentPosition());
@@ -95,10 +104,10 @@ public class TestAutonomousREAL extends LinearOpMode{
             //telemetry.addData("is closed", l.isClosed());
             //telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
             //telemetry.addData("lift position:",df.format(l.getLiftPosition()));
-            telemetry.addData("Ultra [Left : Mid : Right]", "["
-                    + df.format(l.getLeftUltra()) + " : "
-                    + df.format(l.getMidUltra()) + " : "
-                    + df.format(l.getRightUltra()) +"]");
+            //telemetry.addData("Ultra [Left : Mid : Right]", "["
+            //        + df.format(l.getLeftUltra()) + " : "
+            //        + df.format(l.getMidUltra()) + " : "
+            //        + df.format(l.getRightUltra()) +"]");
 
 //            if(gamepad2.dpad_left){
 //                l.getSettings().rightTurnServoOffset -= 0.0001;

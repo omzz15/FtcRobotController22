@@ -67,7 +67,9 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
     }
 
     @Override
-    public void onStart() {}
+    public void onStart() {
+
+    }
 
     @Override
     public void onSettingsUpdate(PositionTrackerSettings positionTrackerSettings) {

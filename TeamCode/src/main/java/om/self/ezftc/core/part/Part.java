@@ -134,6 +134,9 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
 
     public abstract void onBeanLoad();
 
+    /**
+     * WARNING: beans may not be loaded onInit, please use onStart for beans
+     */
     public abstract void onInit();
 
     public void onSettingsUpdate(SETTINGS settings){}
