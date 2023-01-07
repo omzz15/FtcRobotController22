@@ -19,6 +19,8 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
 //        public static final String done = "DONE";
 //    } //TODO add done event
 
+    private boolean t;
+
     protected PositionTracker positionTracker;
 
     public final ChannelSolver xChannel = new ChannelSolver(this, "x channel") {
@@ -106,13 +108,14 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
     }
 
     @Override
-    public void onInit() {
-
-    }
+    public void onInit() {}
 
     @Override
     public void onStart() {
-
+//        if(!t) {
+//            setNewTarget(positionTracker.getCurrentPosition(), true);
+//            t = true;
+//        }
     }
 
     @Override

@@ -173,12 +173,14 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoGrabTask.addStep(() -> setGrabberClosed());
         autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
         autoGrabTask.addStep(() -> setTurnPosition(0.95));
-        autoGrabTask.addDelay(500);
+        autoGrabTask.addDelay(1500);
         autoGrabTask.addStep(() -> setGrabberOpen(false));
         autoGrabTask.addStep(this::isLiftInTolerance);
         autoGrabTask.addStep(() -> setLiftPosition(conePos));
+        autoGrabTask.addDelay(1500);
+        autoGrabTask.addStep(this::isLiftInTolerance);
         autoGrabTask.addStep(() -> setGrabberClosed());
-        autoGrabTask.addDelay(100);
+        autoGrabTask.addDelay(1500);
         autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
     }
 
