@@ -57,7 +57,7 @@ public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, O
 
     @Override
     public void onRun() {
-        if(settings.goToBottomSupplier.get()) parent.getTaskManager().runKeyedCommand(Lifter.TaskNames.autoDrop, Group.Command.START);//parent.setLiftToBottom();
+        if(settings.goToBottomSupplier.get()) parent.setLiftToBottom(); //parent.getTaskManager().runKeyedCommand(Lifter.TaskNames.autoDrop, Group.Command.START);//parent.setLiftToBottom();
         else if(settings.autoGrabSupplier.get()) parent.getTaskManager().runKeyedCommand(Lifter.TaskNames.autoGrab, Group.Command.START);
     }
 

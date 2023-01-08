@@ -15,10 +15,19 @@ import om.self.task.core.Group;
 import om.self.task.other.TimedTask;
 
 public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardware, LifterControl>{
-    public static final class TaskNames{
-        public final static String autoGrab = "auto grab";
-        public static String autoDrop;
-        public final static String coneMeasureRanges = "measure cone range";
+    public void addAutoGrabToTask(TimedTask autoGrabTask, int conePos){
+        autoGrabTask.addStep(() -> setGrabberClosed());
+        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
+        autoGrabTask.addStep(() -> setTurnPosition(0.95));
+        autoGrabTask.addDelay(5000);
+        autoGrabTask.addStep(() -> setGrabberOpen(false));
+        autoGrabTask.addStep(this::isLiftInTolerance);
+        autoGrabTask.addStep(() -> setLiftPosition(conePos));
+        autoGrabTask.addDelay(5000);
+        autoGrabTask.addStep(this::isLiftInTolerance);
+        autoGrabTask.addStep(() -> setGrabberClosed());
+        autoGrabTask.addDelay(5000);
+        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
     }
 
     public static final class Contollers{
@@ -169,19 +178,10 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
     }
 
-    public void addAutoGrabToTask(TimedTask autoGrabTask, int conePos){
-        autoGrabTask.addStep(() -> setGrabberClosed());
-        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
-        autoGrabTask.addStep(() -> setTurnPosition(0.95));
-        autoGrabTask.addDelay(1500);
-        autoGrabTask.addStep(() -> setGrabberOpen(false));
-        autoGrabTask.addStep(this::isLiftInTolerance);
-        autoGrabTask.addStep(() -> setLiftPosition(conePos));
-        autoGrabTask.addDelay(1500);
-        autoGrabTask.addStep(this::isLiftInTolerance);
-        autoGrabTask.addStep(() -> setGrabberClosed());
-        autoGrabTask.addDelay(1500);
-        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
+    public static final class TaskNames{
+        public final static String autoGrab = "auto grab";
+        public static String autoDrop = "auto drop";
+        public final static String coneMeasureRanges = "measure cone range";
     }
 
     public void constructConeRanging(){

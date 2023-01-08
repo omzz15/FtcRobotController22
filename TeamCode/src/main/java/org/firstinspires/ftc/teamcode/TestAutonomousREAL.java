@@ -35,9 +35,6 @@ public class TestAutonomousREAL extends LinearOpMode{
         DecimalFormat df = new DecimalFormat("#0.0");
         r.init();
 
-        // inject initial autonomous field start position
-        //Vector3 fieldStartPos = new Vector3(-36,63,-90);
-
         while (!isStarted()) {
             s.updateSlamraPosition();
             telemetry.addData("position", pt.getCurrentPosition());
@@ -46,7 +43,6 @@ public class TestAutonomousREAL extends LinearOpMode{
             r.opMode.telemetry.update();
             sleep(50);
         }
-
         r.start();
 
         TimedTask container = new TimedTask("container");
@@ -55,31 +51,7 @@ public class TestAutonomousREAL extends LinearOpMode{
         container.addTimedStep(autoTask::run, 25000);
         container.addStep(() -> System.out.println("done!!"));
 
-
-        // start position (-1.5,2.68,-90)
-        // cone pos is (-1.5, 0.5, -90)
-        // pole position (not the game) (position to capture) is roughly or -1.26 , 0.16
-        Vector3 blueLoadedPrep = new Vector3(-1.5,.5,90);
-        Vector3 blueTallPrep = new Vector3(-1.5,0.5,180);
-        Vector3 blueTall = new Vector3(-1.25, 0.15, 135);
-        Vector3 blueStack = new Vector3(-2.68,.5,180);
         //*************************************************
-        // position x and y based on whole tiles
-        // start position (-1.5,2.68,-90)
-        Vector3[] position = {
-                blueLoadedPrep,
-                blueTall,
-                blueTallPrep,
-                blueStack,
-                blueTallPrep,
-                blueTall,
-                blueTallPrep,
-                blueStack,
-                blueTallPrep,
-                blueTall
-        };
-        // so the robot doesnt move to 0,0
-// One cycle
         positionSolver.setNewTarget(pt.getCurrentPosition(), true);
         l.addAutoGrabToTask(autoTask, 0);
         // positionSolver.addMoveToTaskEx(blueLoadedPrep, autoTask);
@@ -89,9 +61,27 @@ public class TestAutonomousREAL extends LinearOpMode{
         //l.addAutoDrop(autoTask);
         // positionSolver.addMoveToTaskEx(blueStack, autoTask);
 
-//        for (Vector3 p : position)
-//            positionSolver.addMoveToTaskEx(Constants.tileToInch(p), autoTask);
+        //**************** Movement *************
+        // position x and y based on whole tiles
+        // start position (-1.5,2.68,90)
+        //***************************************
+/*
+        Vector3 blueLoadedPrep = new Vector3(-1.5,.5,90);
+        Vector3 blueTallPrep = new Vector3(-1.5,0.5,180);
+        Vector3 blueTall = new Vector3(-1.25, 0.15, 135);
+        Vector3 blueStack = new Vector3(-2.68,.5,180);
 
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(blueLoadedPrep), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(blueTall), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(blueTallPrep), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(blueStack), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(blueTallPrep), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(blueTall), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(blueTallPrep), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(blueStack), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(blueTallPrep), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(blueTall), autoTask);
+*/
         while (opModeIsActive()) {
             r.run();
             //container.run();
