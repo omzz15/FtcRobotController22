@@ -2,7 +2,7 @@ package om.self.ezftc.core.part;
 
 import om.self.beans.core.BeanManager;
 import om.self.task.core.Group;
-import om.self.task.event.EventManager;
+import om.self.task.core.EventManager;
 
 public interface PartParent {
     String getName();
