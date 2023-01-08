@@ -3,7 +3,7 @@ package om.self.ezftc.core.part;
 import om.self.beans.core.BeanManager;
 import om.self.ezftc.core.Robot;
 import om.self.task.core.Group;
-import om.self.task.event.EventManager;
+import om.self.task.core.EventManager;
 
 /**
  * Provides a simple configuration of events, beans, and tasks that allow you to make extensions(ex: robot parts or telemetry).
