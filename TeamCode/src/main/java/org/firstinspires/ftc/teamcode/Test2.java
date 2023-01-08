@@ -85,6 +85,7 @@ public class Test2 extends LinearOpMode {
             start = System.currentTimeMillis();
             r.run();
             //if(gamepad1.y) pt.setAngle(0);
+            if(gamepad1.y) l.setLiftPosition(2000);
             telemetry.addData("position", pt.getCurrentPosition());
             telemetry.addData("tile position", fieldToTile(pt.getCurrentPosition()));
             telemetry.addData("tilt position", l.getCurrentTurnPosition());
