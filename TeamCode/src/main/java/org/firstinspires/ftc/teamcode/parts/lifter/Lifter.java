@@ -15,20 +15,6 @@ import om.self.task.core.Group;
 import om.self.task.other.TimedTask;
 
 public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardware, LifterControl>{
-    public void addAutoGrabToTask(TimedTask autoGrabTask, int conePos){
-        autoGrabTask.addStep(() -> setGrabberClosed());
-        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
-        autoGrabTask.addStep(() -> setTurnPosition(0.95));
-        autoGrabTask.addDelay(5000);
-        autoGrabTask.addStep(() -> setGrabberOpen(false));
-        autoGrabTask.addStep(this::isLiftInTolerance);
-        autoGrabTask.addStep(() -> setLiftPosition(conePos));
-        autoGrabTask.addDelay(5000);
-        autoGrabTask.addStep(this::isLiftInTolerance);
-        autoGrabTask.addStep(() -> setGrabberClosed());
-        autoGrabTask.addDelay(5000);
-        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
-    }
 
     public static final class Contollers{
         public static final String distanceContoller = "distance contoller"; //TODO make better
@@ -142,7 +128,8 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     public void addAutoDropPre(TimedTask task, int height){
         task.addStep(()->setLiftPosition(height));
        // height should be 2060 for high, (-200 for clearance)
-        task.addStep(()->setTurnPosition(.286));
+        //changed turn pos from .286 to .141 because couldn't open all the way without hititng
+        task.addStep(()->setTurnPosition(.141));
         task.addDelay(500);
         task.addStep(this::isLiftInTolerance);
     }
@@ -176,6 +163,34 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoGrabTask.addStep(() -> setGrabberClosed());
         autoGrabTask.addDelay(100);
         autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
+    }
+    public void addAutoGrabPre(TimedTask task, int conePos){
+        task.addStep(()-> setGrabberClosed());
+        task.addStep(()-> setLiftPosition(conePos + 400));
+        task.addStep(this::isLiftInTolerance);
+        task.addStep(()->setTurnPosition(.95));
+//        task.addStep(() -> setGrabberOpen(true));
+    }
+
+    public void addAutoOpenGrabber(TimedTask task){
+        task.addStep(()-> setGrabberOpen(false));
+    }
+
+    public void addAutoGrabToTask(TimedTask task, int conePos){
+        task.addStep(() -> setGrabberClosed());
+        task.addStep(() -> setLiftPosition(conePos + 400));
+        task.addStep(this::isLiftInTolerance);
+        task.addStep(() -> setTurnPosition(0.95));
+        task.addDelay(2000);
+//
+//        task.addStep(() -> setGrabberOpen(true));
+//
+        task.addStep(() -> setLiftPosition(conePos));
+        task.addStep(this::isLiftInTolerance);
+        task.addDelay(2000);
+        task.addStep(() -> setGrabberClosed());
+        task.addStep(() -> setLiftPosition(conePos + 400));
+        task.addStep(this::isLiftInTolerance);
     }
 
     public static final class TaskNames{
@@ -262,13 +277,14 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     @Override
     public void onInit() {
         //powerEdgeDetector.setOnFall(() -> se);
-        constructAutoGrab();
+        //constructAutoGrab();
         constructConeRanging();
     }
 
     @Override
     public void onStart() {
-        setTurnPosition(getSettings().turnServoStartPosition);
+        //taking out setturnpos to see if it messes up other steps in autograb
+        // setTurnPosition(getSettings().turnServoStartPosition);
         //drive.addController(Contollers.distanceContoller, (control) -> doConeRange(control));
     }
 

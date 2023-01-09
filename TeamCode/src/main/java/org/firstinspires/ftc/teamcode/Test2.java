@@ -3,20 +3,20 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+//import org.firstinspires.ftc.teamcode.parts.apriltags.Tag;
 import org.firstinspires.ftc.teamcode.parts.bulkread.BulkRead;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.drive.DriveTeleop;
-import org.firstinspires.ftc.teamcode.parts.drive.headerkeeper.HeaderKeeper;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
 import org.firstinspires.ftc.teamcode.parts.lifter.LifterTeleop;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
 
 import java.text.DecimalFormat;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Vector3;
+import om.self.task.other.TimedTask;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -62,7 +62,12 @@ public class Test2 extends LinearOpMode {
         Lifter l = new Lifter(r);
         new LifterTeleop(l);
 
+        //Tag t = new Tag(r);
+
         DecimalFormat df = new DecimalFormat("#0.0");
+        TimedTask autoTask = new TimedTask("auto task");
+        TimedTask getConeTask = new TimedTask("get cone");
+        TimedTask deliverConeTask = new TimedTask("deliver cone");
 
         r.init();
         s.onStart();
@@ -81,11 +86,18 @@ public class Test2 extends LinearOpMode {
         r.start();
         s.setupFieldOffset();
 
+        l.addAutoDropPre(deliverConeTask,2060);
+        l.addAutoDrop(deliverConeTask);
+
+        l.addAutoGrabPre(getConeTask,0);
+        l.addAutoGrabToTask(getConeTask,0);
+
         while (opModeIsActive()) {
             start = System.currentTimeMillis();
             r.run();
-            //if(gamepad1.y) pt.setAngle(0);
-            if(gamepad1.y) l.setLiftPosition(2000);
+
+            if(gamepad1.y) getConeTask.run();
+            if(gamepad1.b) deliverConeTask.run();
             telemetry.addData("position", pt.getCurrentPosition());
             telemetry.addData("tile position", fieldToTile(pt.getCurrentPosition()));
             telemetry.addData("tilt position", l.getCurrentTurnPosition());
@@ -110,6 +122,7 @@ public class Test2 extends LinearOpMode {
 
             if(gamepad1.dpad_down) telemetry.addData("tasks", r.getTaskManager());
             if(gamepad1.dpad_down) telemetry.addData("events", r.getEventManager());
+            //telemetry.addLine(String.format("\nDetected tag ID=%d", t.detectedID));
             r.opMode.telemetry.addData("time", System.currentTimeMillis() - start);
 
             telemetry.update();

@@ -51,24 +51,25 @@ public class TestAutonomousREAL extends LinearOpMode{
         container.addTimedStep(autoTask::run, 25000);
         container.addStep(() -> System.out.println("done!!"));
 
-        //*************************************************
         positionSolver.setNewTarget(pt.getCurrentPosition(), true);
+//        l.addAutoGrabPre(autoTask, 0);
+//        l.addAutoOpenGrabber(autoTask);
         l.addAutoGrabToTask(autoTask, 0);
-        // positionSolver.addMoveToTaskEx(blueLoadedPrep, autoTask);
-        // positionSolver.addMoveToTaskEx(blueTall, autoTask);
-        // positionSolver.addMoveToTaskEx(blueTallPrep, autoTask);
-        //l.addAutoDropPre(autoTask, 2060);
-        //l.addAutoDrop(autoTask);
-        // positionSolver.addMoveToTaskEx(blueStack, autoTask);
+//         positionSolver.addMoveToTaskEx(blueLoadedPrep, autoTask);
+//         positionSolver.addMoveToTaskEx(blueTall, autoTask);
+//         positionSolver.addMoveToTaskEx(blueTallPrep, autoTask);
+        // l.addAutoDropPre(autoTask, 2060);
+        // l.addAutoDrop(autoTask);
+//         positionSolver.addMoveToTaskEx(blueStack, autoTask);
 
         //**************** Movement *************
         // position x and y based on whole tiles
         // start position (-1.5,2.68,90)
         //***************************************
-/*
+        /*
         Vector3 blueLoadedPrep = new Vector3(-1.5,.5,90);
         Vector3 blueTallPrep = new Vector3(-1.5,0.5,180);
-        Vector3 blueTall = new Vector3(-1.25, 0.15, 135);
+        Vector3 blueTall = new Vector3(-1.25, 0.25, 135);
         Vector3 blueStack = new Vector3(-2.68,.5,180);
 
         positionSolver.addMoveToTaskEx(Constants.tileToInch(blueLoadedPrep), autoTask);

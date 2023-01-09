@@ -36,6 +36,8 @@ public class LifterSettings {
         this.useOldGrabber = useOldGrabber;
     }
 
+    //changed grabberservo open pos from .9 to .86 (wouldn't open all the way during autonomous test)
+
     public static LifterSettings makeDefault(){
         return new LifterSettings(
                 0.064,
