@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.parts.lifter.hardware;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -28,13 +29,14 @@ public class LifterHardware {
     public final DFR304Range rightUltrasonic;
     public final DFR304Range midUltrasonic;
     public final RevBlinkinLedDriver blinkin;
+    public final DigitalChannel limitSwitch;
 
     public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo,
                           Servo rightTurnServo, Servo grabServo, ColorRangeSensor leftRange,
                           ColorRangeSensor rightRange, DistanceSensor leftDistance,
                           DistanceSensor rightDistance, DFR304Range leftUltrasonic,
                           DFR304Range rightUltrasonic, DFR304Range midUltrasonic,
-                          RevBlinkinLedDriver blinkin) {
+                          RevBlinkinLedDriver blinkin, DigitalChannel limitSwitch) {
         this.leftLiftMotor = leftLiftMotor;
         this.rightLiftMotor = rightLiftMotor;
         this.leftTurnServo = leftTurnServo;
@@ -48,6 +50,7 @@ public class LifterHardware {
         this.rightUltrasonic = rightUltrasonic;
         this.midUltrasonic = midUltrasonic;
         this.blinkin = blinkin;
+        this.limitSwitch = limitSwitch;
     }
 
     public static LifterHardware makeDefault(HardwareMap hardwareMap){
@@ -74,6 +77,8 @@ public class LifterHardware {
         rightUltraDist.initialize(parameters);
         midUltraDist.initialize(parameters);
 
+        DigitalChannel limit = null; //hardwareMap.get(DigitalChannel.class, "digital0");
+
         return new LifterHardware(
                 leftMotorSettings.makeMotor(hardwareMap),
                 rightMotorSettings.makeMotor(hardwareMap),
@@ -89,7 +94,8 @@ public class LifterHardware {
                 leftUltraDist,//leftUltraDist
                 rightUltraDist, //rightUltraDist
                 midUltraDist,
-                blinkin
+                blinkin,
+                limit
         );
     }
 }

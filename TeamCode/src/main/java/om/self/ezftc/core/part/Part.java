@@ -96,6 +96,7 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
         eventManager.triggerEventRecursively(event);
     }
 
+    @Deprecated
     public void triggerEvent(Enum event){
         eventManager.triggerEventRecursively(event);
     }

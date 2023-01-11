@@ -7,32 +7,64 @@ import org.firstinspires.ftc.teamcode.parts.drive.DriveControl;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 
-import java.sql.Time;
-
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.ControllablePart;
-import om.self.task.core.Group;
+import om.self.task.core.TaskEx;
+import om.self.task.event.EventContainer;
 import om.self.task.other.TimedTask;
 
 public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardware, LifterControl>{
-
-    public static final class Contollers{
-        public static final String distanceContoller = "distance contoller"; //TODO make better
-    }
+    //private boolean closed = false;
+    private final TimedTask autoDockTask = new TimedTask(TaskNames.autoDock, getTaskManager());
+    private final TimedTask autoPreDropTask = new TimedTask(TaskNames.preAutoDrop, getTaskManager());
+    private final TimedTask autoDropTask = new TimedTask(TaskNames.autoDrop, getTaskManager());
 
     private Drive drive;
-
-    //private boolean closed = false;
-    private int liftTargetPosition = 0;
-
+    private final int[] coneToPos = {0,0,0,0,0}; //TODO move to settings
     private final TimedTask autoGrabTask = new TimedTask(TaskNames.autoGrab, getTaskManager());
+    private final int[] poleToPos = {0,0,1000,1500}; //TODO move to settings
+    /**
+     * the current cone of the stack(useful for autonomous)
+     */
+    public int cone;
+    /**
+     * the pole height(0 - terminal, 1 - low, 2 - mid, 3 - high)
+     */
+    public int pole;
+    //other
+    private int liftTargetPosition;
+
+    private void constructAutoPreDrop(){
+        autoPreDropTask.autoStart = false;
+
+        autoPreDropTask.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
+        autoPreDropTask.addStep(()->setLiftPosition(poleToPos[pole]));
+       // height should be 2060 for high, (-200 for clearance)
+        //changed turn pos from .286 to .141 because couldn't open all the way without hititng
+        autoPreDropTask.addStep(()->setTurnPosition(.141));
+        autoPreDropTask.addDelay(500);
+        autoPreDropTask.addStep(this::isLiftInTolerance);
+        autoPreDropTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
+        autoPreDropTask.addStep(() -> triggerEvent(Events.preDropComplete));
+    }
+
+    public void addAutoPreDropToTask(TaskEx task){
+        task.addStep(autoPreDropTask::restart);
+        task.waitForEvent(eventManager.getContainer(Events.preDropComplete));
+    }
+
     private final TimedTask coneRangeingTask = new TimedTask(TaskNames.coneMeasureRanges, getTaskManager());
-    private int conePos = 0;//how high the cone is based on lifter position
+
     private int ultraRangeModule = 0; // keeps track of measuring ranges
 
     private double leftDist;
     private double rightDist;
     private double midDist;
+
+    public void addAutoPreDropToTask(TaskEx task, int pole){
+        task.addStep(() -> this.pole = pole);
+        addAutoPreDropToTask(task);
+    }
 
     public Lifter(Robot parent) {
         super(parent, "lifter", () -> new LifterControl(0,0,true));
@@ -125,79 +157,128 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     //    return closed;
     //}
 
-    public void addAutoDropPre(TimedTask task, int height){
-        task.addStep(()->setLiftPosition(height));
-       // height should be 2060 for high, (-200 for clearance)
-        //changed turn pos from .286 to .141 because couldn't open all the way without hititng
-        task.addStep(()->setTurnPosition(.141));
-        task.addDelay(500);
-        task.addStep(this::isLiftInTolerance);
+    /**
+     * MUST RUN autoDropPre before
+     */
+    private void constructAutoDrop(){
+        autoDropTask.autoStart = false;
+
+        autoDropTask.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
+        autoDropTask.addStep(()->setLiftPosition(poleToPos[pole] - 200));
+        autoDropTask.addStep(this::isLiftInTolerance);
+        autoDropTask.addStep(()->setGrabberOpen(false));
+        autoDropTask.addDelay(500);
+        autoDropTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
+        autoDropTask.addStep(() -> triggerEvent(Events.dropComplete));
+    }
+
+    public void addAutoDropToTask(TaskEx task){
+        task.addStep(autoDropTask::restart);
+        task.waitForEvent(eventManager.getContainer(Events.dropComplete));
+    }
+
+    private void constructAutoDock(){
+        autoDockTask.autoStart = false;
+
+        autoDockTask.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
+        autoDockTask.addStep(this::setGrabberClosed);
+        autoDockTask.addStep(()->setTurnPosition(.95));
+        autoDockTask.addStep(()->setGrabberOpen(false));
+        autoDockTask.addStep(()->setLiftPosition(coneToPos[cone]));
+        autoDockTask.addDelay(500);
+        autoDockTask.addStep(this::isLiftInTolerance);
+        autoDockTask.addStep(()-> {if (cone == 0) setGrabberOpen(true);});
+        autoDockTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
+        autoDockTask.addStep(() -> triggerEvent(Events.dockComplete));
+    }
+
+    public void addAutoDockToTask(TaskEx task){
+        task.addStep(autoDockTask::restart);
+        task.waitForEvent(eventManager.getContainer(Events.dockComplete));
+    }
+
+    public void addAutoDockToTask(TaskEx task, int cone){
+        task.addStep(() -> this.cone = cone);
+        addAutoDockToTask(task);
     }
 
     /**
-     * MUST RUN addAutoDropPre before
+     * MUST RUN autoDock before
      */
-    public void addAutoDrop(TimedTask task){
-        task.addStep(()->setLiftPosition(getLiftPosition()-200));
-        task.addStep(this::isLiftInTolerance);
-        task.addStep(()->setGrabberOpen(false));
-    }
+    private void constructAutoGrab(){
+        autoGrabTask.autoStart = false;
 
-    public void addDockToTask(TimedTask task){
-        task.addStep(this::setGrabberClosed);
-        task.addStep(()->setTurnPosition(.95));
-        task.addStep(()->setLiftPosition(0));
-        task.addDelay(500);
-        task.addStep(this::isLiftInTolerance);
-        task.addStep(()->setGrabberOpen(true));
-    }
-
-    public void constructAutoGrab(){
+        //autoGrabTask.addDelay(2000);
         autoGrabTask.addStep(() -> setGrabberClosed());
-        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
-        autoGrabTask.addStep(() -> setTurnPosition(0.95));
-        autoGrabTask.addDelay(500);
-        autoGrabTask.addStep(() -> setGrabberOpen(false));
+        autoGrabTask.addDelay(500); // needed to let grabber open
+        autoGrabTask.addStep(() -> setLiftPosition(coneToPos[cone] + 400));
         autoGrabTask.addStep(this::isLiftInTolerance);
-        autoGrabTask.addStep(() -> setLiftPosition(conePos));
-        autoGrabTask.addStep(() -> setGrabberClosed());
-        autoGrabTask.addDelay(100);
-        autoGrabTask.addStep(() -> setLiftPosition(conePos + 400));
-    }
-    public void addAutoGrabPre(TimedTask task, int conePos){
-        task.addStep(()-> setGrabberClosed());
-        task.addStep(()-> setLiftPosition(conePos + 400));
-        task.addStep(this::isLiftInTolerance);
-        task.addStep(()->setTurnPosition(.95));
-//        task.addStep(() -> setGrabberOpen(true));
+        autoGrabTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
+        autoGrabTask.addStep(() -> triggerEvent(Events.grabComplete));
     }
 
-    public void addAutoOpenGrabber(TimedTask task){
-        task.addStep(()-> setGrabberOpen(false));
+    public void addAutoGrabToTask(TaskEx task){
+        task.addStep(autoGrabTask::restart);
+        task.waitForEvent(eventManager.getContainer(Events.grabComplete));
     }
 
-    public void addAutoGrabToTask(TimedTask task, int conePos){
-        task.addStep(() -> setGrabberClosed());
-        task.addStep(() -> setLiftPosition(conePos + 400));
-        task.addStep(this::isLiftInTolerance);
-        task.addStep(() -> setTurnPosition(0.95));
-        task.addDelay(2000);
-//
-//        task.addStep(() -> setGrabberOpen(true));
-//
-        task.addStep(() -> setLiftPosition(conePos));
-        task.addStep(this::isLiftInTolerance);
-        task.addDelay(2000);
-        task.addStep(() -> setGrabberClosed());
-        task.addStep(() -> setLiftPosition(conePos + 400));
-        task.addStep(this::isLiftInTolerance);
+    @Override
+    public void onInit() {
+        //powerEdgeDetector.setOnFall(() -> se);
+        constructAutoGrab();
+        constructAutoDock();
+        constructAutoDrop();
+        constructAutoPreDrop();
+        constructConeRanging();
+
+        //add events
+        eventManager.attachToEvent(Events.grabComplete, "decrement cone", () -> {if(cone > 0) cone--;});
+    }
+
+    public static final class ContollerNames {
+        public static final String distanceContoller = "distance contoller"; //TODO make better
     }
 
     public static final class TaskNames{
+        public final static String autoDock = "auto dock";
         public final static String autoGrab = "auto grab";
-        public static String autoDrop = "auto drop";
+        public final static String preAutoDrop = "pre auto drop";
         public final static String coneMeasureRanges = "measure cone range";
+        public static String autoDrop = "auto drop";
     }
+
+//    public void addAutoGrabPre(TimedTask task, int conePos){
+//        task.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
+//        task.addStep(()-> setGrabberClosed());
+//        task.addStep(()-> setLiftPosition(conePos + 400));
+//        task.addStep(this::isLiftInTolerance);
+//        task.addStep(()->setTurnPosition(.95));
+////        task.addStep(() -> setGrabberOpen(true));
+//        task.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
+//    }
+
+//    public void addAutoOpenGrabber(TimedTask task){
+//        task.addStep(()-> setGrabberOpen(false));
+//    }
+
+//    public void addAutoGrabToTask(TimedTask task, int conePos){
+//        task.addStep(() -> triggerEvent(Events.stopControllers));
+//        task.addStep(() -> setGrabberClosed());
+//        task.addStep(() -> setLiftPosition(conePos + 400));
+//        task.addStep(this::isLiftInTolerance);
+//        task.addStep(() -> setTurnPosition(0.95));
+//        //task.addDelay(2000);
+//        task.addStep(() -> setGrabberOpen(false));
+//        task.addDelay(500); // needed to let grabber open
+//        task.addStep(() -> setLiftPosition(conePos));
+//        task.addStep(this::isLiftInTolerance);
+//        //task.addDelay(2000);
+//        task.addStep(() -> setGrabberClosed());
+//        task.addDelay(500); // needed to let grabber close
+//        task.addStep(() -> setLiftPosition(conePos + 400));
+//        task.addStep(this::isLiftInTolerance);
+//        task.addStep(() -> triggerEvent(Events.startControllers));
+//    }
 
     public void constructConeRanging(){
         coneRangeingTask.addStep(() -> {
@@ -274,11 +355,11 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 
     }
 
-    @Override
-    public void onInit() {
-        //powerEdgeDetector.setOnFall(() -> se);
-        //constructAutoGrab();
-        constructConeRanging();
+    public static final class Events {
+        public static final String dockComplete = "DOCK_COMPLETE";
+        public static final String grabComplete = "GRAB_COMPLETE";
+        public static final String preDropComplete = "PRE_DROP_COMPLETE";
+        public static final String dropComplete = "DROP_COMPlETE";
     }
 
     @Override

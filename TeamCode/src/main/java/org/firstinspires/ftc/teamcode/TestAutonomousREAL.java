@@ -16,6 +16,7 @@ import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Constants;
 import om.self.ezftc.utils.Vector;
 import om.self.ezftc.utils.Vector3;
+import om.self.task.core.Group;
 import om.self.task.other.TimedTask;
 
 @Autonomous(name="Test Autonomous", group="Test")
@@ -45,16 +46,24 @@ public class TestAutonomousREAL extends LinearOpMode{
         }
         r.start();
 
-        TimedTask container = new TimedTask("container");
-        TimedTask autoTask = new TimedTask("auto task");
+        Group container = new Group("container");
+        TimedTask autoTask = new TimedTask("auto task", container);
 
-        container.addTimedStep(autoTask::run, 25000);
-        container.addStep(() -> System.out.println("done!!"));
+//        container.addTimedStep(autoTask::run, 25000);
+//        container.addTimedStepep(() -> System.out.println("done!!"));
 
         positionSolver.setNewTarget(pt.getCurrentPosition(), true);
 //        l.addAutoGrabPre(autoTask, 0);
 //        l.addAutoOpenGrabber(autoTask);
-        l.addAutoGrabToTask(autoTask, 0);
+        l.addAutoDockToTask(autoTask, 0);
+        autoTask.addDelay(2000);
+        l.addAutoGrabToTask(autoTask);
+        autoTask.addDelay(2000);
+        l.addAutoPreDropToTask(autoTask, 2);
+        autoTask.addDelay(2000);
+        l.addAutoDropToTask(autoTask);
+
+
 //         positionSolver.addMoveToTaskEx(blueLoadedPrep, autoTask);
 //         positionSolver.addMoveToTaskEx(blueTall, autoTask);
 //         positionSolver.addMoveToTaskEx(blueTallPrep, autoTask);
@@ -86,7 +95,7 @@ public class TestAutonomousREAL extends LinearOpMode{
         while (opModeIsActive()) {
             r.run();
             //container.run();
-            autoTask.run();
+            container.run();
 
             //if(gamepad1.y) pt.setAngle(0);
             telemetry.addData("position", pt.getCurrentPosition());

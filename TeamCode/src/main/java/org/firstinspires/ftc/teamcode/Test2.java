@@ -86,11 +86,11 @@ public class Test2 extends LinearOpMode {
         r.start();
         s.setupFieldOffset();
 
-        l.addAutoDropPre(deliverConeTask,2060);
-        l.addAutoDrop(deliverConeTask);
-
-        l.addAutoGrabPre(getConeTask,0);
-        l.addAutoGrabToTask(getConeTask,0);
+//        l.addAutoDropPre(deliverConeTask,2060);
+//        l.addAutoDrop(deliverConeTask);
+//
+//        l.addAutoGrabPre(getConeTask,0);
+//        l.addAutoGrabToTask(getConeTask,0);
 
         while (opModeIsActive()) {
             start = System.currentTimeMillis();
