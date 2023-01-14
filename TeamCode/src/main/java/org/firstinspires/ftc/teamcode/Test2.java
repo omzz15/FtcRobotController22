@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.parts.apriltags.Tag;
 import org.firstinspires.ftc.teamcode.parts.bulkread.BulkRead;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.drive.DriveTeleop;
-import org.firstinspires.ftc.teamcode.parts.led.Led;
+//import org.firstinspires.ftc.teamcode.parts.led.Led;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
 import org.firstinspires.ftc.teamcode.parts.lifter.LifterTeleop;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
@@ -61,7 +61,7 @@ public class Test2 extends LinearOpMode {
         Lifter l = new Lifter(r);
         new LifterTeleop(l);
         Tag t = new Tag(r);
-        Led statLed = new Led(r);
+        //Led statLed = new Led(r);
 
         DecimalFormat df = new DecimalFormat("#0.0");
         TimedTask autoTask = new TimedTask("auto task");
