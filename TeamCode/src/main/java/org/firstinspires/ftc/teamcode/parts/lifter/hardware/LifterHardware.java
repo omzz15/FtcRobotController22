@@ -77,7 +77,7 @@ public class LifterHardware {
         rightUltraDist.initialize(parameters);
         midUltraDist.initialize(parameters);
 
-        DigitalChannel limit = null; //hardwareMap.get(DigitalChannel.class, "digital0");
+        DigitalChannel limit = null;  //hardwareMap.get(DigitalChannel.class, "digital0");
 
         return new LifterHardware(
                 leftMotorSettings.makeMotor(hardwareMap),

@@ -15,24 +15,31 @@ import om.self.task.other.TimedTask;
 
 public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardware, LifterControl>{
     //private boolean closed = false;
-    private final TimedTask autoDockTask = new TimedTask(TaskNames.autoDock, getTaskManager());
+    public final TimedTask autoDockTask = new TimedTask(TaskNames.autoDock, getTaskManager());
     private final TimedTask autoPreDropTask = new TimedTask(TaskNames.preAutoDrop, getTaskManager());
     private final TimedTask autoDropTask = new TimedTask(TaskNames.autoDrop, getTaskManager());
 
     private Drive drive;
-    private final int[] coneToPos = {0,0,0,0,0}; //TODO move to settings
+    private final int[] coneToPos = {40,160,270,390,500}; //TODO move to settings
     private final TimedTask autoGrabTask = new TimedTask(TaskNames.autoGrab, getTaskManager());
-    private final int[] poleToPos = {0,0,1000,1500}; //TODO move to settings
-    /**
-     * the current cone of the stack(useful for autonomous)
-     */
-    public int cone;
-    /**
-     * the pole height(0 - terminal, 1 - low, 2 - mid, 3 - high)
-     */
-    public int pole;
-    //other
+    private final int[] poleToPos = {0,850,1650,2560}; //TODO move to settings
+    public int cone; //the current cone of the stack(useful for autonomous)
+    public int pole; //the pole height(0 - terminal, 1 - low, 2 - mid, 3 - high)
     private int liftTargetPosition;
+
+    //***** Constructors *****
+    public Lifter(Robot parent) {
+        super(parent, "lifter", () -> new LifterControl(0,0,true));
+        setConfig(
+                LifterSettings.makeDefault(),
+                LifterHardware.makeDefault(parent.opMode.hardwareMap)
+        );
+    }
+
+    public Lifter(Robot parent, LifterSettings settings, LifterHardware hardware){
+        super(parent, "lifter", () -> new LifterControl(0,0,true));
+        setConfig(settings, hardware);
+    }
 
     private void constructAutoPreDrop(){
         autoPreDropTask.autoStart = false;
@@ -41,9 +48,9 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoPreDropTask.addStep(()->setLiftPosition(poleToPos[pole]));
        // height should be 2060 for high, (-200 for clearance)
         //changed turn pos from .286 to .141 because couldn't open all the way without hititng
-        autoPreDropTask.addStep(()->setTurnPosition(.141));
-        autoPreDropTask.addDelay(500);
+        autoPreDropTask.addStep(()->setTurnPosition(.444));
         autoPreDropTask.addStep(this::isLiftInTolerance);
+        autoPreDropTask.addDelay(500);
         autoPreDropTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
         autoPreDropTask.addStep(() -> triggerEvent(Events.preDropComplete));
     }
@@ -64,19 +71,6 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     public void addAutoPreDropToTask(TaskEx task, int pole){
         task.addStep(() -> this.pole = pole);
         addAutoPreDropToTask(task);
-    }
-
-    public Lifter(Robot parent) {
-        super(parent, "lifter", () -> new LifterControl(0,0,true));
-        setConfig(
-                LifterSettings.makeDefault(),
-                LifterHardware.makeDefault(parent.opMode.hardwareMap)
-        );
-    }
-
-    public Lifter(Robot parent, LifterSettings settings, LifterHardware hardware){
-        super(parent, "lifter", () -> new LifterControl(0,0,true));
-        setConfig(settings, hardware);
     }
 
     public void liftWithPower(double power){
@@ -164,10 +158,11 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoDropTask.autoStart = false;
 
         autoDropTask.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
+        autoDropTask.addStep(()->setTurnPosition(.141));
         autoDropTask.addStep(()->setLiftPosition(poleToPos[pole] - 200));
         autoDropTask.addStep(this::isLiftInTolerance);
-        autoDropTask.addStep(()->setGrabberOpen(false));
         autoDropTask.addDelay(500);
+        autoDropTask.addStep(()->setGrabberOpen(false));
         autoDropTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
         autoDropTask.addStep(() -> triggerEvent(Events.dropComplete));
     }
@@ -183,6 +178,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoDockTask.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
         autoDockTask.addStep(this::setGrabberClosed);
         autoDockTask.addStep(()->setTurnPosition(.95));
+        autoDockTask.addDelay(1000);
         autoDockTask.addStep(()->setGrabberOpen(false));
         autoDockTask.addStep(()->setLiftPosition(coneToPos[cone]));
         autoDockTask.addDelay(500);
