@@ -91,34 +91,31 @@ public class Test2 extends LinearOpMode {
 //        l.addAutoGrabPre(getConeTask,0);
 //        l.addAutoGrabToTask(getConeTask,0);
 
-        l.addAutoDockToTask(autoTask, 0);
+        /*l.addAutoDockToTask(autoTask, 0);
         autoTask.addDelay(2000);
         l.addAutoGrabToTask(autoTask);
         autoTask.addDelay(2000);
         l.addAutoPreDropToTask(autoTask, 2);
         autoTask.addDelay(2000);
         l.addAutoDropToTask(autoTask);
+        */
+        l.autoDockTask.restart();
 
         while (opModeIsActive()) {
             start = System.currentTimeMillis();
             r.run();
-
             //if(gamepad1.y) getConeTask.run();
-            if(gamepad1.b) l.autoDockTask.run();
+            //if(gamepad1.b) l.autoDockTask.run();
             telemetry.addData("position", pt.getCurrentPosition());
             telemetry.addData("tile position", fieldToTile(pt.getCurrentPosition()));
             telemetry.addData("tilt position", l.getCurrentTurnPosition());
 //            //telemetry.addData("is closed", l.isClosed());
-            telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
-//            //telemetry.addData("rightRange", df.format(l.getRightRange()));
-//            //telemetry.addData("leftRange", df.format(l.getLeftRange()));
-//            //telemetry.addData("leftDistance", df.format(l.getLeftDistance()));
-//            //telemetry.addData("rightDistance", df.format(l.getRightDistance()));
+            telemetry.addData("right servo offset", df.format(l.getSettings().rightTurnServoOffset));
             telemetry.addData("lift position:",df.format(l.getLiftPosition()));
-//            telemetry.addData("Ultra [Left : Mid : Right]", "["
-//                    + df.format(l.getLeftUltra()) + " : "
-//                    + df.format(l.getMidUltra()) + " : "
-//                    + df.format(l.getRightUltra()) +"]");
+            telemetry.addData("Ultra [Left : Mid : Right]", "["
+                    + df.format(l.getLeftUltra()) + " : "
+                    + df.format(l.getMidUltra()) + " : "
+                    + df.format(l.getRightUltra()) +"]");
 
 //            if(gamepad2.dpad_left){
 //                l.getSettings().rightTurnServoOffset -= 0.0001;
@@ -126,7 +123,6 @@ public class Test2 extends LinearOpMode {
 //            if(gamepad2.dpad_right){
 //                l.getSettings().rightTurnServoOffset += 0.0001;
 //            }
-
             if(gamepad1.dpad_down) telemetry.addData("tasks", r.getTaskManager());
             if(gamepad1.dpad_down) telemetry.addData("events", r.getEventManager());
             telemetry.addLine(String.format("\nDetected tag ID=%s", t.detectedID));
