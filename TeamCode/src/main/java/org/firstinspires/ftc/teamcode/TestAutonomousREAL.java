@@ -95,10 +95,10 @@ public class TestAutonomousREAL extends LinearOpMode{
             //telemetry.addData("is closed", l.isClosed());
             //telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
             //telemetry.addData("lift position:",df.format(l.getLiftPosition()));
-            //telemetry.addData("Ultra [Left : Mid : Right]", "["
-            //        + df.format(l.getLeftUltra()) + " : "
-            //        + df.format(l.getMidUltra()) + " : "
-            //        + df.format(l.getRightUltra()) +"]");
+            telemetry.addData("Ultra [Left : Mid : Right]", "["
+                    + df.format(l.getLeftUltra()) + " : "
+                    + df.format(l.getMidUltra()) + " : "
+                    + df.format(l.getRightUltra()) +"]");
 
 //            if(gamepad2.dpad_left){
 //                l.getSettings().rightTurnServoOffset -= 0.0001;

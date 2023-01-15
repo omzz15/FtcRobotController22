@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.spartronics4915.lib.T265Camera;
@@ -8,6 +9,7 @@ import com.spartronics4915.lib.T265Helper;
 
 import om.self.ezftc.utils.Vector3;
 
+@Disabled
 @TeleOp(name="Test slamra", group="Test")
 public class TestAutonomous extends LinearOpMode {
     volatile T265Camera slamra;

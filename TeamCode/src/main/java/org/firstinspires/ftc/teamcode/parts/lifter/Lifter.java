@@ -110,14 +110,9 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         return getHardware().leftLiftMotor.getCurrentPosition();
     }
 
-    //public double getLeftRange(){return getHardware().leftRange.getDistance(DistanceUnit.CM);}
-    //public double getRightRange(){return getHardware().rightRange.getDistance(DistanceUnit.CM);}
-    //public double getLeftDistance(){return getHardware().leftDistance.getDistance(DistanceUnit.CM);}
-    //public double getRightDistance(){return getHardware().rightDistance.getDistance(DistanceUnit.CM);}
     public double getRightUltra(){return rightDist;}
     public double getLeftUltra(){return leftDist;}
     public double getMidUltra(){return midDist;}
-
 
     public void turnWithPower(double power){
         setTurnPosition(getCurrentTurnPosition() + power);
@@ -146,10 +141,6 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     public void setGrabberOpen(boolean wideOpen){
         getHardware().grabServo.setPosition(wideOpen ? getSettings().grabberServoWideOpenPos : getSettings().grabberServoOpenPos);
     }
-
-    //public boolean isClosed(){
-    //    return closed;
-    //}
 
     /**
      * MUST RUN autoDropPre before
@@ -197,7 +188,6 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         task.addStep(() -> this.cone = cone);
         addAutoDockToTask(task);
     }
-
     /**
      * MUST RUN autoDock before
      */
@@ -299,6 +289,33 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         coneRangeingTask.autoStart = true;
     }
 
+    // Line - shaped sensors
+    public void doConeRange(DriveControl control) {
+        int startDist = 25;
+        int finalDist = 15;
+        int tolerance = 2;
+
+        if (getLiftPosition() > 400 && (getLeftUltra() < startDist || getMidUltra() < startDist || getRightUltra() < startDist)) {
+            // looking for middle side to side
+            if (getMidUltra() < getRightUltra() && getMidUltra() < getLeftUltra()){
+                /* lined up left and right */
+            } else if (getLeftUltra() < getMidUltra()) { // pole to the left
+                control.power = control.power.addX(0.15); // move to right
+            } else if (getRightUltra() < getMidUltra()) { // pole to the right
+                control.power = control.power.addX(-0.15); // move to left
+            }
+            // setting in/out range
+            if (getMidUltra() - tolerance > finalDist) {
+                control.power = control.power.addY(-0.11);
+            } else if (getMidUltra() + tolerance < finalDist) {
+                control.power = control.power.addY(0.11);
+            } else { /* lined up in/out */ }
+
+        } else { /*Not in close enough to polish position yet */}
+    }
+
+    // U - shaped sensor arrangement
+    /*
     public void doConeRange(DriveControl control) {
         if (Math.abs(getRightUltra() - getLeftUltra()) <= 2 && getLeftUltra() < 20) {
             if (getMidUltra() < 6) {
@@ -323,7 +340,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
             getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
         }
     }
-
+    */
     @Override
     public void onRun(LifterControl control) { //TODO separate keeping lifter motor position from onRun
         liftWithPower(control.lifterPower);
@@ -333,7 +350,6 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
             setGrabberClosed();
         else
             setGrabberOpen(false);
-        //doConeRange(control);
     }
 
     @Override
@@ -362,11 +378,11 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     public void onStart() {
         //taking out setturnpos to see if it messes up other steps in autograb
         // setTurnPosition(getSettings().turnServoStartPosition);
-        //drive.addController(Contollers.distanceContoller, (control) -> doConeRange(control));
+        drive.addController(ContollerNames.distanceContoller, (control) -> doConeRange(control));
     }
 
     @Override
     public void onStop() {
-        //drive.removeController(Contollers.distanceContoller);
+        drive.removeController(ContollerNames.distanceContoller);
     }
 }
