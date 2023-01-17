@@ -23,8 +23,8 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     private final int[] coneToPos = {40,160,270,390,500}; //TODO move to settings
     private final TimedTask autoGrabTask = new TimedTask(TaskNames.autoGrab, getTaskManager());
     private final int[] poleToPos = {0,850,1650,2560}; //TODO move to settings
-    public int cone; //the current cone of the stack(useful for autonomous)
-    public int pole; //the pole height(0 - terminal, 1 - low, 2 - mid, 3 - high)
+    private int cone; //the current cone of the stack(useful for autonomous)
+    private int pole; //the pole height(0 - terminal, 1 - low, 2 - mid, 3 - high)
     private int liftTargetPosition;
 
     //***** Constructors *****
@@ -142,6 +142,26 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         getHardware().grabServo.setPosition(wideOpen ? getSettings().grabberServoWideOpenPos : getSettings().grabberServoOpenPos);
     }
 
+    public int getCone() {
+        return cone;
+    }
+
+    public void setCone(int cone) {
+        if(cone > getSettings().maxCones) cone = getSettings().maxCones;
+        else if(cone < 0) cone = 0;
+        this.cone = cone;
+    }
+
+    public int getPole() {
+        return pole;
+    }
+
+    public void setPole(int pole) {
+        if(pole > getSettings().maxPoles) pole = getSettings().maxPoles;
+        else if(pole < 0) pole = 0;
+        this.pole = pole;
+    }
+
     /**
      * MUST RUN autoDropPre before
      */
@@ -218,7 +238,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         constructConeRanging();
 
         //add events
-        eventManager.attachToEvent(Events.grabComplete, "decrement cone", () -> {if(cone > 0) cone--;});
+        eventManager.attachToEvent(Events.grabComplete, "decrement cone", () -> {setCone(cone--);});
     }
 
     public static final class ContollerNames {
@@ -295,7 +315,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         int finalDist = 15;
         int tolerance = 2;
 
-        if (getLiftPosition() > 400 && (getLeftUltra() < startDist || getMidUltra() < startDist || getRightUltra() < startDist)) {
+        if (getLiftPosition() > 1000 && (getLeftUltra() < startDist || getMidUltra() < startDist || getRightUltra() < startDist) && getCurrentTurnPosition() > 0.35) {
             // looking for middle side to side
             if (getMidUltra() < getRightUltra() && getMidUltra() < getLeftUltra()){
                 /* lined up left and right */
@@ -350,6 +370,9 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
             setGrabberClosed();
         else
             setGrabberOpen(false);
+
+        parent.opMode.telemetry.addData("Liffer height", getLiftPosition());
+        parent.opMode.telemetry.addData("Liffter turn", getCurrentTurnPosition());
     }
 
     @Override

@@ -3,52 +3,63 @@ package org.firstinspires.ftc.teamcode.parts.lifter.settings;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import java.util.function.Supplier;
 import om.self.ezftc.core.Robot;
+import om.self.supplier.modifiers.EdgeModifier;
+import om.self.supplier.modifiers.LatchedModifier;
+import om.self.supplier.suppliers.EdgeSupplier;
+import om.self.supplier.suppliers.LatchedSupplier;
 
 public class LifterTeleopSettings {
     public final Supplier<Float> heightSpeedSupplier;
     public final Supplier<Float> turnSpeedSupplier;
     public final double turnSpeedMultiplier;
     public final Supplier<Boolean> grabberCloseSupplier;
-    public final Supplier<Double> grabberMoveSupplier;
-    public final Supplier<Boolean> goToBottomSupplier;
     public final Supplier<Boolean> autoGrabSupplier;
     public final Supplier<Boolean> autoDockSupplier;
     public final Supplier<Boolean> autoDropSupplier;
-    
-    public LifterTeleopSettings(Supplier<Float> heightSpeedSupplier, 
-                                Supplier<Float> turnSpeedSupplier, 
-                                double turnSpeedMultiplier, 
-                                Supplier<Boolean> grabberCloseSupplier, 
-                                Supplier<Double> grabberMoveSupplier, 
-                                Supplier<Boolean> goToBottomSupplier, 
-                                Supplier<Boolean> autoGrabSupplier, 
-                                Supplier<Boolean> autoDockSupplier,
-                                Supplier<Boolean> autoDropSupplier
-                                ) {
+
+    public final Supplier<Integer> preDropSupplier;
+    public final Supplier<Integer> coneChangeSupplier; //change the height level of the cone
+
+    public LifterTeleopSettings(Supplier<Float> heightSpeedSupplier, Supplier<Float> turnSpeedSupplier, double turnSpeedMultiplier, Supplier<Boolean> grabberCloseSupplier, Supplier<Boolean> autoGrabSupplier, Supplier<Boolean> autoDockSupplier, Supplier<Boolean> autoDropSupplier, Supplier<Integer> preDropSupplier, Supplier<Integer> coneChangeSupplier) {
         this.heightSpeedSupplier = heightSpeedSupplier;
         this.turnSpeedSupplier = turnSpeedSupplier;
         this.turnSpeedMultiplier = turnSpeedMultiplier;
         this.grabberCloseSupplier = grabberCloseSupplier;
-        this.grabberMoveSupplier = grabberMoveSupplier;
-        this.goToBottomSupplier = goToBottomSupplier;
         this.autoGrabSupplier = autoGrabSupplier;
         this.autoDockSupplier = autoDockSupplier;
         this.autoDropSupplier = autoDropSupplier;
+        this.preDropSupplier = preDropSupplier;
+        this.coneChangeSupplier = coneChangeSupplier;
     }
 
     public static LifterTeleopSettings makeDefault(Robot robot){
-        Gamepad gamepad2 = robot.opMode.gamepad2;
+        Gamepad gamepad = robot.opMode.gamepad2;
+
+        EdgeSupplier downSupplier = new EdgeSupplier();
+        downSupplier.setBase(() -> gamepad.left_bumper);
+
+        EdgeSupplier upSupplier = new EdgeSupplier();
+        upSupplier.setBase(() -> gamepad.right_bumper);
+
+        EdgeSupplier autoDock = new EdgeSupplier();
+        autoDock.setBase(() -> gamepad.x);
+        EdgeSupplier autoDrop = new EdgeSupplier();
+        autoDrop.setBase(() -> gamepad.b);
+        EdgeSupplier autoGrab = new EdgeSupplier();
+        autoGrab.setBase(() -> gamepad.y);
+
+//        LatchedSupplier close = new LatchedSupplier(true);
+//        close.setBase(() -> gamepad.a);
 
         return new LifterTeleopSettings(
-                () -> gamepad2.right_trigger - gamepad2.left_trigger, // height Speed
-                () -> -gamepad2.left_stick_y, // turnSpeed
-                0.005, // turnSpeedMultiplieer
-                () -> !gamepad2.a, // grabber close/open
-                () -> gamepad2.a ? 0.5 : gamepad2.x ? -0.5 : 0, //grabberMove
-                () -> gamepad2.b, // autoToBottom
-                () -> gamepad2.y, // autoGrab
-                () -> gamepad2.right_bumper, // autoDock
-                () -> gamepad2.dpad_up // autoDrop
+                () -> gamepad.right_trigger - gamepad.left_trigger,
+                () -> gamepad.left_stick_y, 0.05,
+                () -> !gamepad.a,
+                autoGrab::isRisingEdge,
+                autoDock::isRisingEdge,
+                autoDrop::isRisingEdge,
+                () -> gamepad.dpad_right ? 0 : gamepad.dpad_down ? 1 : gamepad.dpad_left ? 2 : gamepad.dpad_up ? 3 : -1,
+                () -> downSupplier.isRisingEdge() ? -1 : upSupplier.isRisingEdge() ? 1 : 0
         );
     }
 }
