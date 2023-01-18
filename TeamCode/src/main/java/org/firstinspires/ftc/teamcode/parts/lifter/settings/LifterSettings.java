@@ -21,15 +21,8 @@ public class LifterSettings {
     public final int maxCones;
     public final int maxPoles;
 
-    public LifterSettings(
-            double turnServoMinPosition, double turnServoMaxPosition,
-            double turnServoStartPosition, double rightTurnServoOffset,
-            double grabberServoOpenPos, double grabberServoWideOpenPos,
-            double grabberServoClosePos, double minRegisterVal,
-            int maxDownLiftSpeed, int maxUpLiftSpeed,
-            int minLiftPosition, int maxLiftPosition,
-            int tolerance,
-            int maxCones, int maxPoles) {
+
+    public LifterSettings(double turnServoMinPosition, double turnServoMaxPosition, double turnServoStartPosition, double rightTurnServoOffset, double grabberServoOpenPos, double grabberServoWideOpenPos, double grabberServoClosePos, double minRegisterVal, int maxDownLiftSpeed, int maxUpLiftSpeed, int minLiftPosition, int maxLiftPosition, int tolerance, int maxCones, int maxPoles) {
         this.turnServoMinPosition = turnServoMinPosition;
         this.turnServoMaxPosition = turnServoMaxPosition;
         this.turnServoStartPosition = turnServoStartPosition;
@@ -53,10 +46,10 @@ public class LifterSettings {
         return new LifterSettings(
                 0.064,
                 0.93,
-                0.75,
+                0.95,
                 0,
                 .7,
-                0.65,
+                0.67,
                 1,
                 0.05,
                 150,

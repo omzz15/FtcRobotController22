@@ -99,7 +99,7 @@ public class Test2 extends LinearOpMode {
         autoTask.addDelay(2000);
         l.addAutoDropToTask(autoTask);
         */
-        l.autoDockTask.restart();
+//        l.autoDockTask.restart();
 
         while (opModeIsActive()) {
             start = System.currentTimeMillis();
@@ -109,7 +109,7 @@ public class Test2 extends LinearOpMode {
             telemetry.addData("position", pt.getCurrentPosition());
             telemetry.addData("tile position", fieldToTile(pt.getCurrentPosition()));
             telemetry.addData("tilt position", l.getCurrentTurnPosition());
-//            //telemetry.addData("is closed", l.isClosed());
+//            //telemetry.addData("is closed", l.isGrabberClosed());
             telemetry.addData("right servo offset", df.format(l.getSettings().rightTurnServoOffset));
             telemetry.addData("lift position:",df.format(l.getLiftPosition()));
             telemetry.addData("Ultra [Left : Mid : Right]", "["

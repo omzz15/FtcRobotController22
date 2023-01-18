@@ -92,7 +92,7 @@ public class TestAutonomousREAL extends LinearOpMode{
             telemetry.addData("position", pt.getCurrentPosition());
             //telemetry.addData("raw position", s.slamraRawPose);
             //telemetry.addData("tilt position", l.getCurrentTurnPosition());
-            //telemetry.addData("is closed", l.isClosed());
+            //telemetry.addData("is closed", l.isGrabberClosed());
             //telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
             //telemetry.addData("lift position:",df.format(l.getLiftPosition()));
             telemetry.addData("Ultra [Left : Mid : Right]", "["
