@@ -338,7 +338,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         int finalDist = 11;
         int tolerance = 2;
 
-        if (getLiftPosition() > 1000 && (getLeftUltra() < startDist || getMidUltra() < startDist || getRightUltra() < startDist) && getCurrentTurnPosition() > 0.35) {
+        if (getLiftPosition() > 700 && (getLeftUltra() < startDist || getMidUltra() < startDist || getRightUltra() < startDist) && getCurrentTurnPosition() > 0.35) {
             // looking for middle side to side
             if (getMidUltra() < getRightUltra() && getMidUltra() < getLeftUltra()){
                 /* lined up left and right */
@@ -357,33 +357,6 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         } else { /*Not in close enough to polish position yet */}
     }
 
-    // U - shaped sensor arrangement
-    /*
-    public void doConeRange(DriveControl control) {
-        if (Math.abs(getRightUltra() - getLeftUltra()) <= 2 && getLeftUltra() < 20) {
-            if (getMidUltra() < 6) {
-                control.power = control.power.addY(-0.11);
-                getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-            }
-            else if (getMidUltra() > 9) {
-                control.power = control.power.addY(0.11);
-                getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-            } else {
-                getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-            }
-//        } else if(getRightUltra() + getLeftUltra() < 40){
-//            getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-        } else if (getRightUltra() < getLeftUltra() && getRightUltra() <= 10){  //closer to right
-            getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-            control.power = control.power.addX(0.15);
-        } else if (getLeftUltra() < getRightUltra() && getLeftUltra() <= 10){  //closer to left
-            getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
-            control.power = control.power.addX(-0.15);
-        } else {
-            getHardware().blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-        }
-    }
-    */
     @Override
     public void onRun(LifterControl control) { //TODO separate keeping lifter motor position from onRun
         liftWithPower(control.lifterPower);

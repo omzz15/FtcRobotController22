@@ -7,7 +7,6 @@ import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
 
 import java.text.DecimalFormat;
@@ -36,11 +35,15 @@ public class TestAutonomousREAL extends LinearOpMode{
         DecimalFormat df = new DecimalFormat("#0.0");
         r.init();
 
+        s.updateSlamraPosition();
+        Vector3 startupPose = s.slamraRawPose;
+
         while (!isStarted()) {
             s.updateSlamraPosition();
-            telemetry.addData("position", pt.getCurrentPosition());
+            //telemetry.addData("position", pt.getCurrentPosition());
             telemetry.addData("raw position", s.slamraRawPose);
-            telemetry.addData("final position", s.slamraFinal);
+            if(!startupPose.equals(s.slamraRawPose)) telemetry.addLine("***** SLAMRA READY *****");
+            //telemetry.addData("final position", s.slamraFinal);
             r.opMode.telemetry.update();
             sleep(50);
         }
@@ -69,11 +72,57 @@ public class TestAutonomousREAL extends LinearOpMode{
         // start position (-1.5,2.68,90)
         //***************************************
 
+        // dangerous tall pole
         Vector3 rightLoadedPrep = new Vector3(-1.5,.5,90);
         Vector3 rightTallPrep = new Vector3(-1.5,0.5,180);
         Vector3 rightTall = new Vector3(-1.25, 0.25, 135);
         Vector3 rightStack = new Vector3(-2.68,.5,180);
 
+        // alliance side tall pole
+        Vector3 start = new Vector3(-1.5,2.68,90);
+        Vector3 through1T = new Vector3(-0.5,2.5,90);
+        Vector3 through2T = new Vector3(-0.5,2,90);
+        Vector3 preloadDepositT = new Vector3(-0.55,1.25,135);
+        Vector3 through3T = new Vector3(-0.5,1.5,135);
+        Vector3 poleStopT = new Vector3(-0.5,0.5,180);
+        Vector3 wallStop = new Vector3(-1.5,0.5,180);
+        Vector3 wall = new Vector3(2.68,0.5,180);
+        Vector3 poleT = new Vector3(-0.55,0.75,225);
+
+
+        // alliance side mid pole
+        //start position
+        Vector3 through1M = new Vector3(-1.5,1.5,90);
+        Vector3 through2M = new Vector3(-1.5,1.5,135);
+        Vector3 preloadDepositM = new Vector3(-1.23,1.25,135);
+        //through2M
+        Vector3 through3M = new Vector3(-1.5,1.5,180);
+        //wallStop
+        //wall
+        Vector3 poleM = new Vector3(-1.23,0.75,225);
+
+
+        // alliance side tall pole
+        autoTask.addStep(()->l.setGrabberClosed());
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(through1T), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(through2T), autoTask);
+        l.addAutoPreDropToTask(autoTask, 3);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(preloadDepositT), autoTask);
+        l.addAutoDropToTask(autoTask);
+        //dock while moving
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(through3T), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(poleStopT), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(wallStop), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(wall), autoTask);
+        //grab
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(poleStopT), autoTask);
+        l.addAutoPreDropToTask(autoTask, 3);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(poleT), autoTask);
+        l.addAutoDropToTask(autoTask);
+        //dock while moving
+        //repeat
+
+        //  dangerous tall pole path
         autoTask.addStep(()->l.setGrabberClosed());
         l.addAutoPreDropToTask(autoTask, 3);
         positionSolver.addMoveToTaskEx(Constants.tileToInch(rightLoadedPrep), autoTask);

@@ -73,11 +73,15 @@ public class Test2 extends LinearOpMode {
         // inject initial autonomous field start position
         s.slamraFieldStart = fieldStartPos;
 
+        s.updateSlamraPosition();
+        Vector3 startupPose = s.slamraRawPose;
+
         while (!isStarted()) {
             s.updateSlamraPosition();
-            telemetry.addData("pt position", pt.getCurrentPosition());
+            //telemetry.addData("pt position", pt.getCurrentPosition());
             telemetry.addData("raw position", s.slamraRawPose);
-            telemetry.addData("final position", s.slamraFinal);
+            if(!startupPose.equals(s.slamraRawPose)) telemetry.addLine("***** SLAMRA READY *****");
+            //telemetry.addData("final position", s.slamraFinal);
             r.opMode.telemetry.update();
             sleep(50);
         }
