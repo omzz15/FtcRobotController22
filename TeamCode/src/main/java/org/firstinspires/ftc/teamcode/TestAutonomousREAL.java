@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.parts.apriltags.Tag;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
@@ -31,6 +32,7 @@ public class TestAutonomousREAL extends LinearOpMode{
         //new EncoderTracker(pt);
         Lifter l = new Lifter(r);
         PositionSolver positionSolver = new PositionSolver(d);
+        Tag aprilTag = new Tag(r);
 
         DecimalFormat df = new DecimalFormat("#0.0");
         r.init();
@@ -72,6 +74,11 @@ public class TestAutonomousREAL extends LinearOpMode{
         // start position (-1.5,2.68,90)
         //***************************************
 
+        //Parking locations (for bottom left start):
+        Vector3 locOne = new Vector3(-1, .5, 90);
+        Vector3 locTwo = new Vector3(-2, .5, 90);
+        Vector3 locThree = new Vector3(-3, .5, 90);
+
         // dangerous tall pole
         Vector3 rightLoadedPrep = new Vector3(-1.5,.5,90);
         Vector3 rightTallPrep = new Vector3(-1.5,0.5,180);
@@ -100,37 +107,42 @@ public class TestAutonomousREAL extends LinearOpMode{
         //wallStop
         //wall
         Vector3 poleM = new Vector3(-1.23,0.75,225);
+        //Detect aprilTag and store location to be used at the end
+        double parkId = aprilTag.detectedID;
 
+//        // alliance side tall pole
+//        autoTask.addStep(()->l.setGrabberClosed());
+//        positionSolver.addMoveToTaskEx(Constants.tileToInch(through1T), autoTask);
+//        positionSolver.addMoveToTaskEx(Constants.tileToInch(through2T), autoTask);
+//        l.addAutoPreDropToTask(autoTask, 3);
+//        positionSolver.addMoveToTaskEx(Constants.tileToInch(preloadDepositT), autoTask);
+//        l.addAutoDropToTask(autoTask);
+//        //dock while moving
+//        positionSolver.addMoveToTaskEx(Constants.tileToInch(through3T), autoTask);
+//        positionSolver.addMoveToTaskEx(Constants.tileToInch(poleStopT), autoTask);
+//        positionSolver.addMoveToTaskEx(Constants.tileToInch(wallStop), autoTask);
+//        positionSolver.addMoveToTaskEx(Constants.tileToInch(wall), autoTask);
+//        //grab
+//        positionSolver.addMoveToTaskEx(Constants.tileToInch(poleStopT), autoTask);
+//        l.addAutoPreDropToTask(autoTask, 3);
+//        positionSolver.addMoveToTaskEx(Constants.tileToInch(poleT), autoTask);
+//        l.addAutoDropToTask(autoTask);
+//        //dock while moving
+//        //repeat
+//
+//        //  dangerous tall pole path
+//        autoTask.addStep(()->l.setGrabberClosed());
+//        l.addAutoPreDropToTask(autoTask, 3);
+//        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightLoadedPrep), autoTask);
+//        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTall), autoTask);
+//        l.addAutoDropToTask(autoTask);
+//     //   positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTallPrep), autoTask);
+//     //   l.addAutoDockToTask(autoTask, 4);
+//     //   positionSolver.addMoveToTaskEx(Constants.tileToInch(rightStack), autoTask);
 
-        // alliance side tall pole
-        autoTask.addStep(()->l.setGrabberClosed());
-        positionSolver.addMoveToTaskEx(Constants.tileToInch(through1T), autoTask);
-        positionSolver.addMoveToTaskEx(Constants.tileToInch(through2T), autoTask);
-        l.addAutoPreDropToTask(autoTask, 3);
-        positionSolver.addMoveToTaskEx(Constants.tileToInch(preloadDepositT), autoTask);
-        l.addAutoDropToTask(autoTask);
-        //dock while moving
-        positionSolver.addMoveToTaskEx(Constants.tileToInch(through3T), autoTask);
-        positionSolver.addMoveToTaskEx(Constants.tileToInch(poleStopT), autoTask);
-        positionSolver.addMoveToTaskEx(Constants.tileToInch(wallStop), autoTask);
-        positionSolver.addMoveToTaskEx(Constants.tileToInch(wall), autoTask);
-        //grab
-        positionSolver.addMoveToTaskEx(Constants.tileToInch(poleStopT), autoTask);
-        l.addAutoPreDropToTask(autoTask, 3);
-        positionSolver.addMoveToTaskEx(Constants.tileToInch(poleT), autoTask);
-        l.addAutoDropToTask(autoTask);
-        //dock while moving
-        //repeat
-
-        //  dangerous tall pole path
-        autoTask.addStep(()->l.setGrabberClosed());
-        l.addAutoPreDropToTask(autoTask, 3);
+        //Parking task
         positionSolver.addMoveToTaskEx(Constants.tileToInch(rightLoadedPrep), autoTask);
-        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTall), autoTask);
-        l.addAutoDropToTask(autoTask);
-     //   positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTallPrep), autoTask);
-     //   l.addAutoDockToTask(autoTask, 4);
-     //   positionSolver.addMoveToTaskEx(Constants.tileToInch(rightStack), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(parkId == 6 ? locOne : parkId == 25 ? locTwo : locThree), autoTask);
 
         while (opModeIsActive()) {
             r.run();
@@ -148,6 +160,8 @@ public class TestAutonomousREAL extends LinearOpMode{
                     + df.format(l.getLeftUltra()) + " : "
                     + df.format(l.getMidUltra()) + " : "
                     + df.format(l.getRightUltra()) +"]");
+
+            //condition ? run if true : condition ? run if true : condition ? run if true : throw new RuntimeError("im dead :(");
 
 //            if(gamepad2.dpad_left){
 //                l.getSettings().rightTurnServoOffset -= 0.0001;
