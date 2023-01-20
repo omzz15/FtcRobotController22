@@ -30,6 +30,7 @@ public class LifterHardware {
     public final DFR304Range midUltrasonic;
     public final RevBlinkinLedDriver blinkin;
     public final DigitalChannel limitSwitch;
+    public static final double liftHoldPower = 0.7;//TODO make not static
 
     public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo,
                           Servo rightTurnServo, Servo grabServo, ColorRangeSensor leftRange,
@@ -54,8 +55,6 @@ public class LifterHardware {
     }
 
     public static LifterHardware makeDefault(HardwareMap hardwareMap){
-        final double liftHoldPower = 0.7;
-
         MotorSettings leftMotorSettings = new MotorSettings(MotorSettings.Number.ZERO_B, DcMotorSimple.Direction.FORWARD, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.RunMode.RUN_TO_POSITION, liftHoldPower);
         MotorSettings rightMotorSettings = new MotorSettings(MotorSettings.Number.ONE_B, DcMotorSimple.Direction.REVERSE, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.RunMode.RUN_TO_POSITION, liftHoldPower);
 
@@ -77,7 +76,8 @@ public class LifterHardware {
         rightUltraDist.initialize(parameters);
         midUltraDist.initialize(parameters);
 
-        DigitalChannel limit = null;  //hardwareMap.get(DigitalChannel.class, "digital0");
+        DigitalChannel limit = hardwareMap.get(DigitalChannel.class, "digital0B");
+        limit.setMode(DigitalChannel.Mode.INPUT);
 
         return new LifterHardware(
                 leftMotorSettings.makeMotor(hardwareMap),

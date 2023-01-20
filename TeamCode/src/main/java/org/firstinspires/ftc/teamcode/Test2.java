@@ -17,6 +17,7 @@ import java.text.DecimalFormat;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Vector3;
+import om.self.task.core.TaskEx;
 import om.self.task.other.TimedTask;
 
 /**
@@ -89,6 +90,9 @@ public class Test2 extends LinearOpMode {
         r.start();
         s.setupFieldOffset();
 
+//        ((TaskEx) l.getTaskManager().getChild(Lifter.TaskNames.autoHome)).restart();
+        l.startAutoHome();
+
 //        l.addAutoDropPre(deliverConeTask,2060);
 //        l.addAutoDrop(deliverConeTask);
 //
@@ -110,6 +114,7 @@ public class Test2 extends LinearOpMode {
             r.run();
             //if(gamepad1.y) getConeTask.run();
             //if(gamepad1.b) l.autoDockTask.run();
+            telemetry.addData("limit hit", !l.getHardware().limitSwitch.getState());
             telemetry.addData("position", pt.getCurrentPosition());
             telemetry.addData("tile position", fieldToTile(pt.getCurrentPosition()));
             telemetry.addData("tilt position", l.getCurrentTurnPosition());

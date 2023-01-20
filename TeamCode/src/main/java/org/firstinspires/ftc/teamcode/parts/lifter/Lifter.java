@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.parts.lifter;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.drive.DriveControl;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
@@ -7,15 +10,24 @@ import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.ControllablePart;
+import om.self.supplier.consumer.EdgeConsumer;
+import om.self.supplier.suppliers.EdgeSupplier;
+import om.self.task.core.Group;
 import om.self.task.core.TaskEx;
 import om.self.task.other.TimedTask;
 
 public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardware, LifterControl>{
     private boolean grabberClosed = false;
-    public final TimedTask autoDockTask = new TimedTask(TaskNames.autoDock, getTaskManager());
-    private final TimedTask autoPreDropTask = new TimedTask(TaskNames.preAutoDrop, getTaskManager());
-    private final TimedTask autoDropTask = new TimedTask(TaskNames.autoDrop, getTaskManager());
-    private final TimedTask autoPreDrop2Task = new TimedTask(TaskNames.autoDrop + "2", getTaskManager());
+
+    private final Group movementTask = new Group("auto movement",getTaskManager());
+    private final TimedTask autoDockTask = new TimedTask(TaskNames.autoDock, getTaskManager());
+
+    private final TimedTask autoPreDropTask = new TimedTask(TaskNames.preAutoDrop, movementTask);
+    private final TimedTask autoDropTask = new TimedTask(TaskNames.autoDrop, movementTask);
+    private final TimedTask autoPreDrop2Task = new TimedTask(TaskNames.autoDrop + "2", movementTask);
+
+    private final TimedTask autoHomeTask = new TimedTask(TaskNames.autoHome, getTaskManager());
+
 
     private Drive drive;
     private final int[] coneToPos = {0,160,270,390,500}; //TODO move to settings
@@ -24,6 +36,8 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     private int cone; //the current cone of the stack(useful for autonomous)
     private int pole; //the pole height(0 - terminal, 1 - low, 2 - mid, 3 - high)
     private int liftTargetPosition;
+
+    private final EdgeConsumer homingEdge = new EdgeConsumer();
 
     //***** Constructors *****
     public Lifter(Robot parent) {
@@ -51,6 +65,10 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoPreDropTask.addDelay(500);
         autoPreDropTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
         autoPreDropTask.addStep(() -> triggerEvent(Events.preDropComplete));
+    }
+
+    public void startAutoPreDrop(){
+        autoPreDropTask.restart();
     }
 
     public void addAutoPreDropToTask(TaskEx task){
@@ -182,6 +200,10 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoDropTask.addStep(() -> triggerEvent(Events.dropComplete));
     }
 
+    public void startAutoDrop(){
+        autoDropTask.restart();
+    }
+
     private void constructAutoDrop2(){
         autoPreDrop2Task.autoStart = false;
 
@@ -193,6 +215,10 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoPreDrop2Task.addStep(()->setGrabberOpen(false));
         autoPreDrop2Task.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
         autoPreDrop2Task.addStep(() -> triggerEvent(Events.dropComplete));
+    }
+
+    public void startAutoDrop2(){
+        autoPreDrop2Task.restart();
     }
 
     public void addAutoDropToTask(TaskEx task){
@@ -209,10 +235,15 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         //autoDockTask.addDelay(1000);
         autoDockTask.addStep(()->setLiftPosition(coneToPos[cone]));
         autoDockTask.addDelay(500);
+        autoDockTask.addStep(()-> setGrabberOpen(false));
         autoDockTask.addStep(this::isLiftInTolerance);
         autoDockTask.addStep(()-> {if (cone == 0) LifterControl.open2 = true;});
         autoDockTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
         autoDockTask.addStep(() -> triggerEvent(Events.dockComplete));
+    }
+
+    public void startAutoDock(){
+        autoDockTask.restart();
     }
 
     public void addAutoDockToTask(TaskEx task){
@@ -242,9 +273,47 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoGrabTask.addStep(() -> triggerEvent(Events.grabComplete));
     }
 
+    public void startAutoGrab(){
+        autoGrabTask.restart();
+    }
+
     public void addAutoGrabToTask(TaskEx task){
         task.addStep(autoGrabTask::restart);
         task.waitForEvent(eventManager.getContainer(Events.grabComplete));
+    }
+
+    public void constructAutoHome(){
+        autoHomeTask.autoStart = false;
+
+        double power = -0.125;
+
+        autoHomeTask.addStep(() -> {
+            getHardware().leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            getHardware().leftLiftMotor.setPower(power);
+            getHardware().rightLiftMotor.setPower(power);
+        });
+        autoHomeTask.addTimedStep(() -> {
+            parent.opMode.telemetry.addData("homing", ")");
+        }, () -> !getHardware().limitSwitch.getState(), 5000);
+        autoHomeTask.addStep(() -> {
+            getHardware().leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            getHardware().rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            getHardware().leftLiftMotor.setTargetPosition(0);
+            getHardware().leftLiftMotor.setPower(LifterHardware.liftHoldPower);
+
+            getHardware().rightLiftMotor.setTargetPosition(0);
+            getHardware().rightLiftMotor.setPower(LifterHardware.liftHoldPower);
+
+            getHardware().leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        });
+    }
+
+    public void startAutoHome(){
+        autoHomeTask.restart();
     }
 
     @Override
@@ -256,12 +325,35 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         constructAutoDrop2();
         constructAutoPreDrop();
         constructConeRanging();
+        constructAutoHome();
 
         //add events
         eventManager.attachToEvent(Events.grabComplete, "decrement cone", () -> {setCone(cone--);});
 
+        //set start position
         setTurnPosition(getSettings().turnServoStartPosition);
         setGrabberClosed();
+
+        //homing
+        homingEdge.setOnRise(() -> {
+            getHardware().leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            getHardware().leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            getHardware().rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        });
+
+        //configure movement
+        movementTask.forceActiveRunnablesDefault = false;
+        movementTask.setMaxActiveRunnables(1);
+    }
+
+    public void emergencyStop(){
+        movementTask.runCommand(Group.Command.PAUSE);
+        movementTask.getActiveRunnables().clear();
+
+        getHardware().leftLiftMotor.setTargetPosition(getHardware().leftLiftMotor.getCurrentPosition());
+        getHardware().rightLiftMotor.setTargetPosition(getHardware().rightLiftMotor.getCurrentPosition());
     }
 
     public static final class ContollerNames {
@@ -274,6 +366,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         public final static String preAutoDrop = "pre auto drop";
         public final static String coneMeasureRanges = "measure cone range";
         public static String autoDrop = "auto drop";
+        public static String autoHome = "auto home";
     }
 
 //    public void addAutoGrabPre(TimedTask task, int conePos){
@@ -371,6 +464,8 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
             setGrabberClosed();
         else
             setGrabberOpen(false);
+
+        homingEdge.accept(!getHardware().limitSwitch.getState());
 
         parent.opMode.telemetry.addData("Liffer height", getLiftPosition());
         parent.opMode.telemetry.addData("Liffter turn", getCurrentTurnPosition());

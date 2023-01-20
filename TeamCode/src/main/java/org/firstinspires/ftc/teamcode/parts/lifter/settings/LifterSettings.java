@@ -46,7 +46,7 @@ public class LifterSettings {
         return new LifterSettings(
                 0.064,
                 0.93,
-                0.95,
+                0.93,
                 0,
                 .7,
                 0.67,
