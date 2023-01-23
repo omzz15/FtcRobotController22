@@ -17,12 +17,16 @@ import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Constants;
 import om.self.ezftc.utils.Vector3;
 import om.self.task.core.Group;
+import om.self.task.core.TaskEx;
 import om.self.task.other.TimedTask;
 
 @Autonomous(name="Test Autonomous", group="Test")
 public class TestAutonomousREAL extends LinearOpMode{
     Lifter l;
     PositionSolver positionSolver;
+    Tag aprilTag;
+
+
 
     @Override
     public void runOpMode() {
@@ -32,7 +36,7 @@ public class TestAutonomousREAL extends LinearOpMode{
         Slamra s = new Slamra(pt);
         l = new Lifter(r);
         positionSolver = new PositionSolver(d);
-        Tag aprilTag = new Tag(r);
+        aprilTag = new Tag(r);
 
         DecimalFormat df = new DecimalFormat("#0.0");
         r.init();
@@ -53,26 +57,24 @@ public class TestAutonomousREAL extends LinearOpMode{
 
         Group container = new Group("container");
         TimedTask autoTask = new TimedTask("auto task", container);
+        TimedTask killer = new TimedTask("killer", container);
         positionSolver.setNewTarget(pt.getCurrentPosition(), true);
 
-// Running container in background, at end of 25 sec go to park no matter what maybe
-//        container.addTimedStep(autoTask::run, 25000);
-//        container.addTimedStepep(() -> System.out.println("done!!"));
+//        // AFTER 27 SECONDS, PARK!
+//        killer.addDelay(27000);
+//        killer.addStep(() -> autoTask.runCommand(Group.Command.PAUSE));
+//        park(killer);
+
 
         /******** Autonomous Setup ****************
          start position (-1.5,2.68,90)
          Various autonomous paths setup at bottom
         ******************************************/
+        //IMPORTANT!! Need to go to parki3ng safe position at the end of all tasks
 
-        //Parking locations (for bottom left start):
-        Vector3 locOne = new Vector3(-0.5, .5, 90);
-        Vector3 locTwo = new Vector3(-1.5, .5, 90);
-        Vector3 locThree = new Vector3(-2.5, .5, 90);
-        //Detect aprilTag and store location to be used at the end
-        double parkId = aprilTag.parkID;
-        //Parking task
-        positionSolver.addMoveToTaskEx(Constants.tileToInch(new Vector3(-1.5,.5,90)), autoTask);
-        positionSolver.addMoveToTaskEx(Constants.tileToInch(parkId == 1 ? locOne : parkId == 2 ? locTwo : locThree), autoTask);
+        l.setCone(4);
+        autoTask.addStep(()->l.setGrabberClosed());
+        sideDangerousCycle(autoTask);
 
         while (opModeIsActive()) {
             r.run();
@@ -89,7 +91,18 @@ public class TestAutonomousREAL extends LinearOpMode{
         r.stop();
     }
 
-    private void setup_side_tall(TimedTask autoTask){
+    private void park(TaskEx autoTask){
+        //Parking locations (for bottom left start):
+        Vector3 locOne = new Vector3(-0.5, .5, 90);
+        Vector3 locTwo = new Vector3(-1.5, .5, 90);
+        Vector3 locThree = new Vector3(-2.5, .5, 90);
+        int parkId = aprilTag.parkID;
+        //Parking task
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(new Vector3(-1.5, .5, 90)), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(parkId == 1 ? locOne : parkId == 2 ? locTwo : locThree), autoTask);
+    }
+
+    private void sideTallCycle(TimedTask autoTask){
         // alliance side tall pole
         Vector3 start = new Vector3(-1.5,2.68,90);
         Vector3 through1T = new Vector3(-0.5,2.5,90);
@@ -98,7 +111,7 @@ public class TestAutonomousREAL extends LinearOpMode{
         Vector3 through3T = new Vector3(-0.5,1.5,135);
         Vector3 poleStopT = new Vector3(-0.5,0.5,180);
         Vector3 wallStop = new Vector3(-1.5,0.5,180);
-        Vector3 wall = new Vector3(2.68,0.5,180);
+        Vector3 wall = new Vector3(-2.68,0.5,180);
         Vector3 poleT = new Vector3(-0.55,0.75,225);
 
         // alliance side tall pole
@@ -110,10 +123,22 @@ public class TestAutonomousREAL extends LinearOpMode{
         l.addAutoDropToTask(autoTask);
         //dock while moving
         positionSolver.addMoveToTaskEx(Constants.tileToInch(through3T), autoTask);
+        l.addAutoDockToTask(autoTask);
         positionSolver.addMoveToTaskEx(Constants.tileToInch(poleStopT), autoTask);
         positionSolver.addMoveToTaskEx(Constants.tileToInch(wallStop), autoTask);
         positionSolver.addMoveToTaskEx(Constants.tileToInch(wall), autoTask);
         //grab
+        l.addAutoGrabToTask(autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(poleStopT), autoTask);
+        l.addAutoPreDropToTask(autoTask, 3);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(poleT), autoTask);
+        l.addAutoDropToTask(autoTask);
+        l.addAutoDockToTask(autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(poleStopT), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(wallStop), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(wall), autoTask);
+        //grab
+        l.addAutoGrabToTask(autoTask);
         positionSolver.addMoveToTaskEx(Constants.tileToInch(poleStopT), autoTask);
         l.addAutoPreDropToTask(autoTask, 3);
         positionSolver.addMoveToTaskEx(Constants.tileToInch(poleT), autoTask);
@@ -122,7 +147,7 @@ public class TestAutonomousREAL extends LinearOpMode{
         //repeat
     }
 
-    private void setup_side_mid(TimedTask autoTask){
+    private void setupSideMid(TimedTask autoTask){
         // alliance side mid pole
         //start position
         Vector3 through1M = new Vector3(-1.5,1.5,90);
@@ -135,25 +160,36 @@ public class TestAutonomousREAL extends LinearOpMode{
         Vector3 poleM = new Vector3(-1.23,0.75,225);
     }
 
-    private void setup_side_dangerous(TimedTask autoTask){
+    private void  sideDangerousCycle(TimedTask autoTask){
+        setupSideDangerous(autoTask);
+        setupSideDangerous(autoTask);
+        setupSideDangerous(autoTask);
+        setupSideDangerous(autoTask);
+        setupSideDangerous(autoTask);
+    }
+
+    private void setupSideDangerous(TimedTask autoTask){
         // dangerous tall pole
         Vector3 rightLoadedPrep = new Vector3(-1.5,.5,90);
         Vector3 rightTallPrep = new Vector3(-1.5,0.5,180);
         Vector3 rightTall = new Vector3(-1.25, 0.25, 135);
-        Vector3 rightStack = new Vector3(-2.68,.5,180);
+        Vector3 rightStack = new Vector3(-2.55,.5,180);
 
         //  dangerous tall pole path
-        autoTask.addStep(()->l.setGrabberClosed());
         l.addAutoPreDropToTask(autoTask, 3);
         positionSolver.addMoveToTaskEx(Constants.tileToInch(rightLoadedPrep), autoTask);
         positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTall), autoTask);
+        autoTask.addDelay(2000);
+//        positionSolver.triggerEvent(Robot.Events.STOP);
         l.addAutoDropToTask(autoTask);
-     //   positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTallPrep), autoTask);
-     //   l.addAutoDockToTask(autoTask, 4);
-     //   positionSolver.addMoveToTaskEx(Constants.tileToInch(rightStack), autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTallPrep), autoTask);
+        l.addAutoDockToTask(autoTask);
+        autoTask.addDelay(500);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightStack), autoTask);
+        l.addAutoGrabToTask(autoTask);
+        //pull away from stack after lifiting!!!
     }
 }
-
 
 
 /***************************************************************************************************

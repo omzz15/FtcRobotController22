@@ -5,7 +5,7 @@ public class LifterControl {
     public double turningPower;
     public boolean close;
 
-    public static boolean open2; //TODO make non static
+    public static int flipOpen; //TODO make non static
 
     public LifterControl(double lifterPower, double turningPower, boolean close) {
         this.lifterPower = lifterPower;

@@ -49,8 +49,8 @@ public class Tag extends LoopedPartImpl<Robot, ObjectUtils.Null, ObjectUtils.Nul
     final float DECIMATION_LOW = 2;
     final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
     final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
-    public double detectedID = 0;
-    public double parkID = 0;
+    public int detectedID = 0;
+    public int parkID = 0;
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
     ArrayList<AprilTagDetection> detections;

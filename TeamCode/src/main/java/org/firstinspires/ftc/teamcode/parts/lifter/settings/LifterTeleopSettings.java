@@ -54,7 +54,7 @@ public class LifterTeleopSettings {
         return new LifterTeleopSettings(
                 () -> gamepad.right_trigger - gamepad.left_trigger,
                 () -> gamepad.left_stick_y, 0.05,
-                () -> !gamepad.a,
+                () -> !(gamepad.a || robot.opMode.gamepad1.y),
                 autoGrab::isRisingEdge,
                 autoDock::isRisingEdge,
                 autoDrop::isRisingEdge,

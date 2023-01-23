@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.parts.lifter;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.drive.DriveControl;
@@ -11,7 +10,6 @@ import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.ControllablePart;
 import om.self.supplier.consumer.EdgeConsumer;
-import om.self.supplier.suppliers.EdgeSupplier;
 import om.self.task.core.Group;
 import om.self.task.core.TaskEx;
 import om.self.task.other.TimedTask;
@@ -57,12 +55,18 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoPreDropTask.autoStart = false;
 
         autoPreDropTask.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
-        autoPreDropTask.addStep(()->setLiftPosition(poleToPos[pole]));
        // height should be 2060 for high, (-200 for clearance)
         //changed turn pos from .286 to .141 because couldn't open all the way without hititng
-        autoPreDropTask.addStep(()->setTurnPosition(.444));
+        autoPreDropTask.addStep(()->{
+            if(pole == 0)
+                setTurnPosition(0.34);
+            else
+                setTurnPosition(.444);
+        });
+        autoPreDropTask.addDelay(100);
+        autoPreDropTask.addStep(()->setLiftPosition(poleToPos[pole]));
+        autoPreDropTask.addDelay(400);
         autoPreDropTask.addStep(this::isLiftInTolerance);
-        autoPreDropTask.addDelay(500);
         autoPreDropTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
         autoPreDropTask.addStep(() -> triggerEvent(Events.preDropComplete));
     }
@@ -194,8 +198,8 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoDropTask.addStep(()->setTurnPosition(.238));
         autoDropTask.addStep(()->setLiftPosition(poleToPos[pole] - 150));
         autoDropTask.addStep(this::isLiftInTolerance);
-        autoDropTask.addDelay(500);
         autoDropTask.addStep(()->setGrabberOpen(false));
+        autoDropTask.addDelay(2000); //TODO tune to less
         autoDropTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
         autoDropTask.addStep(() -> triggerEvent(Events.dropComplete));
     }
@@ -209,10 +213,10 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 
         autoPreDrop2Task.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
         autoPreDrop2Task.addStep(()->setTurnPosition(.238));
-        autoPreDrop2Task.addStep(()->setLiftPosition(poleToPos[pole]));
-        autoPreDrop2Task.addStep(this::isLiftInTolerance);
-        autoPreDrop2Task.addDelay(500);
-        autoPreDrop2Task.addStep(()->setGrabberOpen(false));
+        //autoPreDrop2Task.addStep(()->setLiftPosition(poleToPos[pole]));
+        //autoPreDrop2Task.addStep(this::isLiftInTolerance);
+        //autoPreDrop2Task.addDelay(500);
+        //autoPreDrop2Task.addStep(()->setGrabberOpen(false));
         autoPreDrop2Task.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
         autoPreDrop2Task.addStep(() -> triggerEvent(Events.dropComplete));
     }
@@ -223,23 +227,35 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 
     public void addAutoDropToTask(TaskEx task){
         task.addStep(autoDropTask::restart);
-        task.waitForEvent(eventManager.getContainer(Events.dropComplete));
+        task.waitForEvent(Events.dropComplete, eventManager, () -> {});
     }
 
     private void constructAutoDock(){
         autoDockTask.autoStart = false;
 
         autoDockTask.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
-        autoDockTask.addStep(this::setGrabberClosed);
+        autoDockTask.addStep(() -> {
+            if(isLiftTurnSafe())
+                setGrabberOpen(false);
+            else
+                setGrabberClosed();
+        });
         autoDockTask.addStep(()->setTurnPosition(.95));
-        //autoDockTask.addDelay(1000);
+        autoDockTask.addDelay(100);
         autoDockTask.addStep(()->setLiftPosition(coneToPos[cone]));
         autoDockTask.addDelay(500);
         autoDockTask.addStep(()-> setGrabberOpen(false));
         autoDockTask.addStep(this::isLiftInTolerance);
-        autoDockTask.addStep(()-> {if (cone == 0) LifterControl.open2 = true;});
+        autoDockTask.addStep(()-> {LifterControl.flipOpen = (cone == 0 ? 2 : 1);});
         autoDockTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
         autoDockTask.addStep(() -> triggerEvent(Events.dockComplete));
+    }
+
+    /**
+     * is the lifter turn in a position where it can move to the front without closing grabber
+     */
+    public boolean isLiftTurnSafe(){
+        return getCurrentTurnPosition() > 0.7;
     }
 
     public void startAutoDock(){
@@ -263,7 +279,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 
         //autoGrabTask.addDelay(2000);
         autoGrabTask.addStep(() -> {
-            LifterControl.open2 = false;
+            LifterControl.flipOpen = 0;
             setGrabberClosed();
         });
         autoGrabTask.addDelay(500); // needed to let grabber open
@@ -428,8 +444,8 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     // Line - shaped sensors
     public void doConeRange(DriveControl control) {
         int startDist = 25;
-        int finalDist = 11;
-        int tolerance = 2;
+        int finalDist = 12;
+        int tolerance = 1;
 
         if (getLiftPosition() > 700 && (getLeftUltra() < startDist || getMidUltra() < startDist || getRightUltra() < startDist) && getCurrentTurnPosition() > 0.35) {
             // looking for middle side to side
@@ -455,15 +471,18 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         liftWithPower(control.lifterPower);
         turnWithPower(control.turningPower);
         //setGrabberPower(control.closePower);
-        if(LifterControl.open2) //TODO fix this crazy logic
+        if(LifterControl.flipOpen == 0) //TODO fix this crazy logic
+        {
             if(control.close)
-                setGrabberOpen(true);
+                setGrabberClosed();
+            else
+                setGrabberOpen(false);
+        } else {
+            if (control.close)
+                setGrabberOpen(LifterControl.flipOpen == 2);
             else
                 setGrabberClosed();
-        else if(control.close)
-            setGrabberClosed();
-        else
-            setGrabberOpen(false);
+        }
 
         homingEdge.accept(!getHardware().limitSwitch.getState());
 
