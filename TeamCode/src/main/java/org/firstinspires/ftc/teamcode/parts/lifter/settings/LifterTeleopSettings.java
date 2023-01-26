@@ -43,6 +43,7 @@ public class LifterTeleopSettings {
 
         EdgeSupplier autoDock = new EdgeSupplier();
         autoDock.setBase(() -> gamepad.x);
+
         EdgeSupplier autoDrop = new EdgeSupplier();
         autoDrop.setBase(() -> gamepad.b);
         EdgeSupplier autoGrab = new EdgeSupplier();
@@ -54,7 +55,7 @@ public class LifterTeleopSettings {
         return new LifterTeleopSettings(
                 () -> gamepad.right_trigger - gamepad.left_trigger,
                 () -> gamepad.left_stick_y, 0.05,
-                () -> !(gamepad.a || robot.opMode.gamepad1.y),
+                () -> !(robot.opMode.gamepad1.a),
                 autoGrab::isRisingEdge,
                 autoDock::isRisingEdge,
                 autoDrop::isRisingEdge,

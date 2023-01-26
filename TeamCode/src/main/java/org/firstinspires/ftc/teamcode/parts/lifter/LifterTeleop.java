@@ -14,7 +14,7 @@ public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, O
 
     private EdgeSupplier preDropEdge = new EdgeSupplier();
 
-    Supplier<Boolean> magic = new EdgeSupplier(() -> parent.parent.opMode.gamepad2.right_stick_button).getRisingEdgeSupplier();
+    Supplier<Boolean> magic = new EdgeSupplier(() -> parent.parent.opMode.gamepad2.a).getRisingEdgeSupplier();
 
     public LifterTeleop(Lifter parent) {
         super(parent, "lifter teleop");
@@ -67,10 +67,10 @@ public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, O
             parent.startAutoDrop2();
 
         if(magic.get()){
-            parent.setLiftPosition(parent.getLiftPosition() - 150);
+            parent.setLiftPosition(parent.getLiftPosition() - 200);
         }
 
-        if(parent.parent.opMode.gamepad2.start){
+        if(parent.parent.opMode.gamepad2.start || parent.parent.opMode.gamepad1.start){
             parent.emergencyStop();
         }
 

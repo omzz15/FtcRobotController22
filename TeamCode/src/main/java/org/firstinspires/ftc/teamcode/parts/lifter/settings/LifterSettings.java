@@ -50,7 +50,7 @@ public class LifterSettings {
                 0,
                 .7,
                 0.67,
-                1,
+                0.8,
                 0.05,
                 150,
                 150,

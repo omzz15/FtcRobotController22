@@ -198,6 +198,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoDropTask.addStep(()->setTurnPosition(.238));
         autoDropTask.addStep(()->setLiftPosition(poleToPos[pole] - 150));
         autoDropTask.addStep(this::isLiftInTolerance);
+        autoDropTask.addDelay(500); // reduce this delay as needed for tuning
         autoDropTask.addStep(()->setGrabberOpen(false));
         autoDropTask.addDelay(2000); //TODO tune to less
         autoDropTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
@@ -238,6 +239,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
             if(isLiftTurnSafe())
                 setGrabberOpen(false);
             else
+                LifterControl.flipOpen = 0;
                 setGrabberClosed();
         });
         autoDockTask.addStep(()->setTurnPosition(.95));

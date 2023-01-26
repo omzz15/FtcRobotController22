@@ -3,9 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.parts.apriltags.Tag;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
+import org.firstinspires.ftc.teamcode.parts.lifter.LifterControl;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.Solver;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
@@ -42,7 +44,7 @@ public class TestAutonomousREAL extends LinearOpMode{
         r.init();
         s.updateSlamraPosition();
         Vector3 startupPose = s.slamraRawPose;
-
+        Vector3 pushSignal = new Vector3(-1.5, 0, 90);
         while (!isStarted()) {
             s.updateSlamraPosition();
             aprilTag.onRun();
@@ -71,9 +73,12 @@ public class TestAutonomousREAL extends LinearOpMode{
          Various autonomous paths setup at bottom
         ******************************************/
         //IMPORTANT!! Need to go to parki3ng safe position at the end of all tasks
-
-        l.setCone(4);
-        autoTask.addStep(()->l.setGrabberClosed());
+l.setCone(4);
+        autoTask.addStep(() -> {
+            LifterControl.flipOpen = 0;
+            l.setGrabberClosed();
+        });
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(pushSignal), autoTask);
         sideDangerousCycle(autoTask);
 
         while (opModeIsActive()) {
@@ -172,7 +177,7 @@ public class TestAutonomousREAL extends LinearOpMode{
         // dangerous tall pole
         Vector3 rightLoadedPrep = new Vector3(-1.5,.5,90);
         Vector3 rightTallPrep = new Vector3(-1.5,0.5,180);
-        Vector3 rightTall = new Vector3(-1.25, 0.25, 135);
+        Vector3 rightTall = new Vector3(-1.21, 0.21, 135);
         Vector3 rightStack = new Vector3(-2.55,.5,180);
 
         //  dangerous tall pole path
@@ -187,6 +192,8 @@ public class TestAutonomousREAL extends LinearOpMode{
         autoTask.addDelay(500);
         positionSolver.addMoveToTaskEx(Constants.tileToInch(rightStack), autoTask);
         l.addAutoGrabToTask(autoTask);
+        autoTask.addDelay(1000);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightLoadedPrep),autoTask);
         //pull away from stack after lifiting!!!
     }
 }
