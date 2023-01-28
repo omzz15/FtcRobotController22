@@ -20,7 +20,10 @@ public class LifterTeleopSettings {
     public final Supplier<Integer> preDropSupplier;
     public final Supplier<Integer> coneChangeSupplier; //change the height level of the cone
 
-    public LifterTeleopSettings(Supplier<Float> heightSpeedSupplier, Supplier<Float> turnSpeedSupplier, double turnSpeedMultiplier, Supplier<Boolean> grabberCloseSupplier, Supplier<Boolean> autoGrabSupplier, Supplier<Boolean> autoDockSupplier, Supplier<Boolean> autoDropSupplier, Supplier<Integer> preDropSupplier, Supplier<Integer> coneChangeSupplier) {
+    public final Supplier<Boolean> autoHomeSupplier;
+    public final Supplier<Boolean> forceOpenSupplier;
+
+    public LifterTeleopSettings(Supplier<Float> heightSpeedSupplier, Supplier<Float> turnSpeedSupplier, double turnSpeedMultiplier, Supplier<Boolean> grabberCloseSupplier, Supplier<Boolean> autoGrabSupplier, Supplier<Boolean> autoDockSupplier, Supplier<Boolean> autoDropSupplier, Supplier<Integer> preDropSupplier, Supplier<Integer> coneChangeSupplier, Supplier<Boolean> autoHomeSupplier, Supplier<Boolean> forceOpenSupplier) {
         this.heightSpeedSupplier = heightSpeedSupplier;
         this.turnSpeedSupplier = turnSpeedSupplier;
         this.turnSpeedMultiplier = turnSpeedMultiplier;
@@ -30,6 +33,8 @@ public class LifterTeleopSettings {
         this.autoDropSupplier = autoDropSupplier;
         this.preDropSupplier = preDropSupplier;
         this.coneChangeSupplier = coneChangeSupplier;
+        this.autoHomeSupplier = autoHomeSupplier;
+        this.forceOpenSupplier = forceOpenSupplier;
     }
 
     public static LifterTeleopSettings makeDefault(Robot robot){
@@ -54,13 +59,15 @@ public class LifterTeleopSettings {
 
         return new LifterTeleopSettings(
                 () -> gamepad.right_trigger - gamepad.left_trigger,
-                () -> gamepad.left_stick_y, 0.05,
+                () -> gamepad.left_stick_y, 0.025,
                 () -> !(robot.opMode.gamepad1.a),
                 autoGrab::isRisingEdge,
                 autoDock::isRisingEdge,
                 autoDrop::isRisingEdge,
                 () -> gamepad.dpad_right ? 0 : gamepad.dpad_down ? 1 : gamepad.dpad_left ? 2 : gamepad.dpad_up ? 3 : -1,
-                () -> downSupplier.isRisingEdge() ? -1 : upSupplier.isRisingEdge() ? 1 : 0
+                () -> downSupplier.isRisingEdge() ? -1 : upSupplier.isRisingEdge() ? 1 : 0,
+                new EdgeSupplier(() -> robot.opMode.gamepad1.x).getRisingEdgeSupplier(),
+                () -> robot.opMode.gamepad1.y
         );
     }
 }

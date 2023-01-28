@@ -53,9 +53,14 @@ public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, O
 
     @Override
     public void onRun() {
-        parent.setCone(settings.coneChangeSupplier.get() + parent.getCone());
+        int cone = settings.coneChangeSupplier.get();
 
-        if(preDropEdge.isRisingEdge() && parent.isGrabberClosed()){
+        if(cone != 0){
+            parent.setCone(parent.getCone() + cone);
+            parent.startAutoDock();
+        }
+
+        if(preDropEdge.isRisingEdge()){ //&& parent.isGrabberClosed()){
             parent.setPole(settings.preDropSupplier.get());
             parent.startAutoPreDrop();
         }
@@ -63,7 +68,7 @@ public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, O
             parent.startAutoGrab();
         else if(settings.autoDockSupplier.get())
             parent.startAutoDock();
-        else if(settings.autoDropSupplier.get() && parent.isGrabberClosed())
+        else if(settings.autoDropSupplier.get())// && parent.isGrabberClosed())
             parent.startAutoDrop2();
 
         if(magic.get()){
@@ -72,6 +77,14 @@ public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, O
 
         if(parent.parent.opMode.gamepad2.start || parent.parent.opMode.gamepad1.start){
             parent.emergencyStop();
+        }
+
+        if(settings.autoHomeSupplier.get())
+            parent.startAutoHome();
+
+        if(settings.forceOpenSupplier.get()){
+            LifterControl.flipOpen = 0;
+            parent.setGrabberClosed();
         }
 
         parent.parent.opMode.telemetry.addData("cone", parent.getCone());

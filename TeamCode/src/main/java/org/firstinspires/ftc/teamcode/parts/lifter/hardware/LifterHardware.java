@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.parts.lifter.hardware;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
@@ -30,6 +31,7 @@ public class LifterHardware {
     public final DFR304Range midUltrasonic;
     public final RevBlinkinLedDriver blinkin;
     public final DigitalChannel limitSwitch;
+    public final RevColorSensorV3 coneSensor;
     public static final double liftHoldPower = 0.7;//TODO make not static
 
     public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo,
@@ -37,7 +39,8 @@ public class LifterHardware {
                           ColorRangeSensor rightRange, DistanceSensor leftDistance,
                           DistanceSensor rightDistance, DFR304Range leftUltrasonic,
                           DFR304Range rightUltrasonic, DFR304Range midUltrasonic,
-                          RevBlinkinLedDriver blinkin, DigitalChannel limitSwitch) {
+                          RevBlinkinLedDriver blinkin, DigitalChannel limitSwitch,
+                          RevColorSensorV3 coneSensor) {
         this.leftLiftMotor = leftLiftMotor;
         this.rightLiftMotor = rightLiftMotor;
         this.leftTurnServo = leftTurnServo;
@@ -52,6 +55,7 @@ public class LifterHardware {
         this.midUltrasonic = midUltrasonic;
         this.blinkin = blinkin;
         this.limitSwitch = limitSwitch;
+        this.coneSensor = coneSensor;
     }
 
     public static LifterHardware makeDefault(HardwareMap hardwareMap){
@@ -79,6 +83,8 @@ public class LifterHardware {
         DigitalChannel limit = hardwareMap.get(DigitalChannel.class, "digital0B");
         limit.setMode(DigitalChannel.Mode.INPUT);
 
+        RevColorSensorV3 cone = hardwareMap.get(RevColorSensorV3.class, "cone dist");
+
         return new LifterHardware(
                 leftMotorSettings.makeMotor(hardwareMap),
                 rightMotorSettings.makeMotor(hardwareMap),
@@ -95,7 +101,8 @@ public class LifterHardware {
                 rightUltraDist, //rightUltraDist
                 midUltraDist,
                 blinkin,
-                limit
+                limit,
+                cone
         );
     }
 }

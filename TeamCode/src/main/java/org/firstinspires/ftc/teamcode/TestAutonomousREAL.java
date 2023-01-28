@@ -17,6 +17,7 @@ import java.text.DecimalFormat;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Constants;
+import om.self.ezftc.utils.Vector;
 import om.self.ezftc.utils.Vector3;
 import om.self.task.core.Group;
 import om.self.task.core.TaskEx;
@@ -79,7 +80,7 @@ l.setCone(4);
             l.setGrabberClosed();
         });
         positionSolver.addMoveToTaskEx(Constants.tileToInch(pushSignal), autoTask);
-        sideDangerousCycle(autoTask);
+        setupSideDangerous(autoTask);
 
         while (opModeIsActive()) {
             r.run();
@@ -107,7 +108,7 @@ l.setCone(4);
         positionSolver.addMoveToTaskEx(Constants.tileToInch(parkId == 1 ? locOne : parkId == 2 ? locTwo : locThree), autoTask);
     }
 
-    private void sideTallCycle(TimedTask autoTask){
+    private void sideTallSetup(TimedTask autoTask){
         // alliance side tall pole
         Vector3 start = new Vector3(-1.5,2.68,90);
         Vector3 through1T = new Vector3(-0.5,2.5,90);
@@ -120,7 +121,6 @@ l.setCone(4);
         Vector3 poleT = new Vector3(-0.55,0.75,225);
 
         // alliance side tall pole
-        autoTask.addStep(()->l.setGrabberClosed());
         positionSolver.addMoveToTaskEx(Constants.tileToInch(through1T), autoTask);
         positionSolver.addMoveToTaskEx(Constants.tileToInch(through2T), autoTask);
         l.addAutoPreDropToTask(autoTask, 3);
@@ -165,17 +165,10 @@ l.setCone(4);
         Vector3 poleM = new Vector3(-1.23,0.75,225);
     }
 
-    private void  sideDangerousCycle(TimedTask autoTask){
-        setupSideDangerous(autoTask);
-        setupSideDangerous(autoTask);
-        setupSideDangerous(autoTask);
-        setupSideDangerous(autoTask);
-        setupSideDangerous(autoTask);
-    }
-
     private void setupSideDangerous(TimedTask autoTask){
         // dangerous tall pole
         Vector3 rightLoadedPrep = new Vector3(-1.5,.5,90);
+        Vector3 afterStackPrep = new Vector3(-1.5, .5, 180);
         Vector3 rightTallPrep = new Vector3(-1.5,0.5,180);
         Vector3 rightTall = new Vector3(-1.21, 0.21, 135);
         Vector3 rightStack = new Vector3(-2.55,.5,180);
@@ -193,7 +186,63 @@ l.setCone(4);
         positionSolver.addMoveToTaskEx(Constants.tileToInch(rightStack), autoTask);
         l.addAutoGrabToTask(autoTask);
         autoTask.addDelay(1000);
-        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightLoadedPrep),autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(afterStackPrep),autoTask);
+        l.addAutoPreDropToTask(autoTask, 3);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTall), autoTask);
+        autoTask.addDelay(2000);
+//        positionSolver.triggerEvent(Robot.Events.STOP);
+        l.addAutoDropToTask(autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTallPrep), autoTask);
+        l.addAutoDockToTask(autoTask);
+        autoTask.addDelay(500);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightStack), autoTask);
+        l.addAutoGrabToTask(autoTask);
+        autoTask.addDelay(1000);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(afterStackPrep),autoTask);
+        l.addAutoPreDropToTask(autoTask, 3);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTall), autoTask);
+        autoTask.addDelay(2000);
+//        positionSolver.triggerEvent(Robot.Events.STOP);
+        l.addAutoDropToTask(autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTallPrep), autoTask);
+        l.addAutoDockToTask(autoTask);
+        autoTask.addDelay(500);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightStack), autoTask);
+        l.addAutoGrabToTask(autoTask);
+        autoTask.addDelay(1000);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(afterStackPrep),autoTask);
+        l.addAutoPreDropToTask(autoTask, 3);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTall), autoTask);
+        autoTask.addDelay(2000);
+//        positionSolver.triggerEvent(Robot.Events.STOP);
+        l.addAutoDropToTask(autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTallPrep), autoTask);
+        l.addAutoDockToTask(autoTask);
+        autoTask.addDelay(500);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightStack), autoTask);
+        l.addAutoGrabToTask(autoTask);
+        autoTask.addDelay(1000);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(afterStackPrep),autoTask);
+        l.addAutoPreDropToTask(autoTask, 3);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTall), autoTask);
+        autoTask.addDelay(2000);
+//        positionSolver.triggerEvent(Robot.Events.STOP);
+        l.addAutoDropToTask(autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTallPrep), autoTask);
+        l.addAutoDockToTask(autoTask);
+        autoTask.addDelay(500);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightStack), autoTask);
+        l.addAutoGrabToTask(autoTask);
+        autoTask.addDelay(1000);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(afterStackPrep),autoTask);
+        l.addAutoPreDropToTask(autoTask, 3);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTall), autoTask);
+        autoTask.addDelay(2000);
+//        positionSolver.triggerEvent(Robot.Events.STOP);
+        l.addAutoDropToTask(autoTask);
+        positionSolver.addMoveToTaskEx(Constants.tileToInch(rightTallPrep), autoTask);
+        l.addAutoDockToTask(autoTask);
+        autoTask.addDelay(500);
         //pull away from stack after lifiting!!!
     }
 }

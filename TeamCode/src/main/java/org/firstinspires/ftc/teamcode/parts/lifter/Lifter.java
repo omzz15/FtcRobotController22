@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.parts.lifter;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.drive.DriveControl;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
@@ -24,7 +25,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     private final TimedTask autoDropTask = new TimedTask(TaskNames.autoDrop, movementTask);
     private final TimedTask autoPreDrop2Task = new TimedTask(TaskNames.autoDrop + "2", movementTask);
 
-    private final TimedTask autoHomeTask = new TimedTask(TaskNames.autoHome, getTaskManager());
+    private final TimedTask autoHomeTask = new TimedTask(TaskNames.autoHome, movementTask);
 
 
     private Drive drive;
@@ -51,10 +52,18 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         setConfig(settings, hardware);
     }
 
+    private void preAutoMove(){
+        triggerEvent(ControllablePart.Events.stopControllers);
+        setGrabberClosed();
+    }
+    private void postAutoMove(){
+        triggerEvent(ControllablePart.Events.startControllers);
+    }
+
     private void constructAutoPreDrop(){
         autoPreDropTask.autoStart = false;
 
-        autoPreDropTask.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
+        autoPreDropTask.addStep(this::preAutoMove);
        // height should be 2060 for high, (-200 for clearance)
         //changed turn pos from .286 to .141 because couldn't open all the way without hititng
         autoPreDropTask.addStep(()->{
@@ -67,7 +76,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoPreDropTask.addStep(()->setLiftPosition(poleToPos[pole]));
         autoPreDropTask.addDelay(400);
         autoPreDropTask.addStep(this::isLiftInTolerance);
-        autoPreDropTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
+        autoPreDropTask.addStep(this::postAutoMove);
         autoPreDropTask.addStep(() -> triggerEvent(Events.preDropComplete));
     }
 
@@ -105,7 +114,10 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     }
 
     public void setLiftPosition(int position){
-        position = Math.min(getSettings().maxLiftPosition, Math.max(getSettings().minLiftPosition, position));
+        setLiftPositionUnsafe(Math.min(getSettings().maxLiftPosition, Math.max(getSettings().minLiftPosition, position)));
+    }
+
+    private void setLiftPositionUnsafe(int position){
         int diff = getHardware().rightLiftMotor.getCurrentPosition() - getHardware().leftLiftMotor.getCurrentPosition();
 
         liftTargetPosition = position;
@@ -194,14 +206,14 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     private void constructAutoDrop(){
         autoDropTask.autoStart = false;
 
-        autoDropTask.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
+        autoDropTask.addStep(this::preAutoMove);
         autoDropTask.addStep(()->setTurnPosition(.238));
         autoDropTask.addStep(()->setLiftPosition(poleToPos[pole] - 150));
         autoDropTask.addStep(this::isLiftInTolerance);
         autoDropTask.addDelay(500); // reduce this delay as needed for tuning
         autoDropTask.addStep(()->setGrabberOpen(false));
         autoDropTask.addDelay(2000); //TODO tune to less
-        autoDropTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
+        autoDropTask.addStep(this::postAutoMove);
         autoDropTask.addStep(() -> triggerEvent(Events.dropComplete));
     }
 
@@ -212,13 +224,13 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     private void constructAutoDrop2(){
         autoPreDrop2Task.autoStart = false;
 
-        autoPreDrop2Task.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
+        autoPreDrop2Task.addStep(this::preAutoMove);
         autoPreDrop2Task.addStep(()->setTurnPosition(.238));
         //autoPreDrop2Task.addStep(()->setLiftPosition(poleToPos[pole]));
         //autoPreDrop2Task.addStep(this::isLiftInTolerance);
         //autoPreDrop2Task.addDelay(500);
         //autoPreDrop2Task.addStep(()->setGrabberOpen(false));
-        autoPreDrop2Task.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
+        autoPreDrop2Task.addStep(this::postAutoMove);
         autoPreDrop2Task.addStep(() -> triggerEvent(Events.dropComplete));
     }
 
@@ -234,7 +246,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     private void constructAutoDock(){
         autoDockTask.autoStart = false;
 
-        autoDockTask.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
+        autoDockTask.addStep(this::preAutoMove);
         autoDockTask.addStep(() -> {
             if(isLiftTurnSafe())
                 setGrabberOpen(false);
@@ -249,7 +261,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoDockTask.addStep(()-> setGrabberOpen(false));
         autoDockTask.addStep(this::isLiftInTolerance);
         autoDockTask.addStep(()-> {LifterControl.flipOpen = (cone == 0 ? 2 : 1);});
-        autoDockTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
+        autoDockTask.addStep(this::postAutoMove);
         autoDockTask.addStep(() -> triggerEvent(Events.dockComplete));
     }
 
@@ -279,6 +291,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     private void constructAutoGrab(){
         autoGrabTask.autoStart = false;
 
+        autoGrabTask.addStep(this::preAutoMove);
         //autoGrabTask.addDelay(2000);
         autoGrabTask.addStep(() -> {
             LifterControl.flipOpen = 0;
@@ -287,7 +300,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoGrabTask.addDelay(500); // needed to let grabber open
         autoGrabTask.addStep(() -> setLiftPosition(coneToPos[cone] + 400));
         autoGrabTask.addStep(this::isLiftInTolerance);
-        autoGrabTask.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
+        autoGrabTask.addStep(this::postAutoMove);
         autoGrabTask.addStep(() -> triggerEvent(Events.grabComplete));
     }
 
@@ -300,17 +313,28 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         task.waitForEvent(eventManager.getContainer(Events.grabComplete));
     }
 
+    private void setMotorsToHomeConfig(){
+        double power = -0.125;
+
+        getHardware().leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        getHardware().leftLiftMotor.setPower(power);
+        getHardware().rightLiftMotor.setPower(power);
+    }
+    private void setMotorsToRunConfig(){
+        getHardware().leftLiftMotor.setPower(LifterHardware.liftHoldPower);
+        getHardware().rightLiftMotor.setPower(LifterHardware.liftHoldPower);
+
+        getHardware().leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
     public void constructAutoHome(){
         autoHomeTask.autoStart = false;
 
-        double power = -0.125;
-
         autoHomeTask.addStep(() -> {
-            getHardware().leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            getHardware().leftLiftMotor.setPower(power);
-            getHardware().rightLiftMotor.setPower(power);
+            setMotorsToHomeConfig();
         });
         autoHomeTask.addTimedStep(() -> {
             parent.opMode.telemetry.addData("homing", ")");
@@ -320,13 +344,9 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
             getHardware().rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             getHardware().leftLiftMotor.setTargetPosition(0);
-            getHardware().leftLiftMotor.setPower(LifterHardware.liftHoldPower);
-
             getHardware().rightLiftMotor.setTargetPosition(0);
-            getHardware().rightLiftMotor.setPower(LifterHardware.liftHoldPower);
 
-            getHardware().leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            setMotorsToRunConfig();
         });
     }
 
@@ -346,7 +366,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         constructAutoHome();
 
         //add events
-        eventManager.attachToEvent(Events.grabComplete, "decrement cone", () -> {setCone(cone--);});
+        eventManager.attachToEvent(Events.grabComplete, "decrement cone", () -> {setCone(cone - 1);});
 
         //set start position
         setTurnPosition(getSettings().turnServoStartPosition);
@@ -370,8 +390,11 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         movementTask.runCommand(Group.Command.PAUSE);
         movementTask.getActiveRunnables().clear();
 
-        getHardware().leftLiftMotor.setTargetPosition(getHardware().leftLiftMotor.getCurrentPosition());
-        getHardware().rightLiftMotor.setTargetPosition(getHardware().rightLiftMotor.getCurrentPosition());
+        setMotorsToRunConfig();
+
+        setLiftPositionUnsafe(getLiftPosition());
+
+        triggerEvent(ControllablePart.Events.startControllers); //TODO make better
     }
 
     public static final class ContollerNames {
@@ -490,6 +513,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 
         parent.opMode.telemetry.addData("Liffer height", getLiftPosition());
         parent.opMode.telemetry.addData("Liffter turn", getCurrentTurnPosition());
+        parent.opMode.telemetry.addData("cone sensor", getHardware().coneSensor.getDistance(DistanceUnit.CM));
     }
 
     @Override
