@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.parts.lifter.hardware;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -28,13 +30,17 @@ public class LifterHardware {
     public final DFR304Range rightUltrasonic;
     public final DFR304Range midUltrasonic;
     public final RevBlinkinLedDriver blinkin;
+    public final DigitalChannel limitSwitch;
+    public final RevColorSensorV3 coneSensor;
+    public static final double liftHoldPower = 0.7;//TODO make not static
 
     public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo,
                           Servo rightTurnServo, Servo grabServo, ColorRangeSensor leftRange,
                           ColorRangeSensor rightRange, DistanceSensor leftDistance,
                           DistanceSensor rightDistance, DFR304Range leftUltrasonic,
                           DFR304Range rightUltrasonic, DFR304Range midUltrasonic,
-                          RevBlinkinLedDriver blinkin) {
+                          RevBlinkinLedDriver blinkin, DigitalChannel limitSwitch,
+                          RevColorSensorV3 coneSensor) {
         this.leftLiftMotor = leftLiftMotor;
         this.rightLiftMotor = rightLiftMotor;
         this.leftTurnServo = leftTurnServo;
@@ -48,11 +54,11 @@ public class LifterHardware {
         this.rightUltrasonic = rightUltrasonic;
         this.midUltrasonic = midUltrasonic;
         this.blinkin = blinkin;
+        this.limitSwitch = limitSwitch;
+        this.coneSensor = coneSensor;
     }
 
     public static LifterHardware makeDefault(HardwareMap hardwareMap){
-        final double liftHoldPower = 0.7;
-
         MotorSettings leftMotorSettings = new MotorSettings(MotorSettings.Number.ZERO_B, DcMotorSimple.Direction.FORWARD, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.RunMode.RUN_TO_POSITION, liftHoldPower);
         MotorSettings rightMotorSettings = new MotorSettings(MotorSettings.Number.ONE_B, DcMotorSimple.Direction.REVERSE, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.RunMode.RUN_TO_POSITION, liftHoldPower);
 
@@ -74,6 +80,11 @@ public class LifterHardware {
         rightUltraDist.initialize(parameters);
         midUltraDist.initialize(parameters);
 
+        DigitalChannel limit = hardwareMap.get(DigitalChannel.class, "digital0B");
+        limit.setMode(DigitalChannel.Mode.INPUT);
+
+        RevColorSensorV3 cone = hardwareMap.get(RevColorSensorV3.class, "cone dist");
+
         return new LifterHardware(
                 leftMotorSettings.makeMotor(hardwareMap),
                 rightMotorSettings.makeMotor(hardwareMap),
@@ -89,7 +100,9 @@ public class LifterHardware {
                 leftUltraDist,//leftUltraDist
                 rightUltraDist, //rightUltraDist
                 midUltraDist,
-                blinkin
+                blinkin,
+                limit,
+                cone
         );
     }
 }

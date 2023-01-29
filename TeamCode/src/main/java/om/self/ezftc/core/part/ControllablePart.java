@@ -2,6 +2,7 @@ package om.self.ezftc.core.part;
 
 
 import java.util.LinkedList;
+import java.util.SimpleTimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
@@ -23,11 +24,12 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
 
     //controls
     private Supplier<CONTROL> baseController;
+    private final Supplier<CONTROL> defaultController;
     private ConcurrentLinkedQueue<Consumer<CONTROL>> controllers = new ConcurrentLinkedQueue<>();
     private ConcurrentHashMap<String, Consumer<CONTROL>> controllerNameMapping = new ConcurrentHashMap<>();
 
-    private LinkedList<Consumer<CONTROL>> controllersBackup = new LinkedList<>();
-    private ConcurrentHashMap<String, Consumer<CONTROL>> controllerNameMappingBackup = new ConcurrentHashMap<>();
+//    private LinkedList<Consumer<CONTROL>> controllersBackup = new LinkedList<>();
+//    private ConcurrentHashMap<String, Consumer<CONTROL>> controllerNameMappingBackup = new ConcurrentHashMap<>();
 
     /**
      * base constructor
@@ -39,6 +41,7 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
         super(parent, name);
         constructControllable();
         setBaseController(baseController, true);
+        defaultController = baseController;
     }
 
     /**
@@ -52,23 +55,33 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
         super(parent, name, taskManager);
         constructControllable();
         setBaseController(baseController, true);
+        defaultController = baseController;
     }
 
     /**
      * constructor that doesn't set the base controller
      * @param parent the parent of this part
      * @param name the name of the part(used to register an event manager and task manager so it must be unique)
-     * @deprecated please use {@link ControllablePart#ControllablePart(PARENT, String, Supplier<CONTROL>)} because this will not ensure that {@link ControllablePart#onRun(Object)} and controllers will be run
+     * @deprecated please use {@link ControllablePart#ControllablePart(PARENT, String, Supplier<CONTROL>)} because this will not ensure that {@link ControllablePart#onRun(Object)} and controllers will be run plus default controller will be null
      */
     @Deprecated
     public ControllablePart(PARENT parent, String name) {
         super(parent, name);
         constructControllable();
+        defaultController = null;
     }
 
+    /**
+     * constructor that doesn't set the base controller
+     * @param parent the parent of this part
+     * @param name the name of the part(used to register an event manager and task manager so it must be unique)
+     * @deprecated please use {@link ControllablePart#ControllablePart(PARENT, String, Supplier<CONTROL>)} because this will not ensure that {@link ControllablePart#onRun(Object)} and controllers will be run plus default controller will be null
+     */
+    @Deprecated
     public ControllablePart(PARENT parent, String name, Group taskManager) {
         super(parent, name, taskManager);
         constructControllable();
+        defaultController = null;
     }
 
     void constructControllable(){
@@ -97,6 +110,10 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
         this.baseController = baseController;
         if(start)
             getTaskManager().runKeyedCommand(Tasks.mainControlLoop, Group.Command.START);
+    }
+
+    public void setBaseControllerToDefault(boolean start){
+        setBaseController(defaultController, start);
     }
 
     public ConcurrentLinkedQueue<Consumer<CONTROL>> getControllers() {

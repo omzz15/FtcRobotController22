@@ -5,7 +5,7 @@ public class LifterSettings {
     public final double turnServoMinPosition;
     public final double turnServoMaxPosition;
     public final double turnServoStartPosition;
-    public double rightTurnServoOffset; //TODO return to final
+    public final double rightTurnServoOffset; //TODO return to final
     //grabber servo
     public final double grabberServoOpenPos;
     public final double grabberServoWideOpenPos;
@@ -18,12 +18,15 @@ public class LifterSettings {
     public final int maxLiftPosition;
     public final int tolerance;
 
-    public final boolean useOldGrabber;
+    public final int maxCones;
+    public final int maxPoles;
 
-    public LifterSettings(double turnServoMinPosition, double turnServoMaxPosition, double turnServoStartPosition, double grabberServoOpenPos, double grabberServoWideOpenPos, double grabberServoClosePos, double minRegisterVal, int maxDownLiftSpeed, int maxUpLiftSpeed, int minLiftPosition, int maxLiftPosition, int tolerance, boolean useOldGrabber) {
+
+    public LifterSettings(double turnServoMinPosition, double turnServoMaxPosition, double turnServoStartPosition, double rightTurnServoOffset, double grabberServoOpenPos, double grabberServoWideOpenPos, double grabberServoClosePos, double minRegisterVal, int maxDownLiftSpeed, int maxUpLiftSpeed, int minLiftPosition, int maxLiftPosition, int tolerance, int maxCones, int maxPoles) {
         this.turnServoMinPosition = turnServoMinPosition;
         this.turnServoMaxPosition = turnServoMaxPosition;
         this.turnServoStartPosition = turnServoStartPosition;
+        this.rightTurnServoOffset = rightTurnServoOffset;
         this.grabberServoOpenPos = grabberServoOpenPos;
         this.grabberServoWideOpenPos = grabberServoWideOpenPos;
         this.grabberServoClosePos = grabberServoClosePos;
@@ -33,24 +36,29 @@ public class LifterSettings {
         this.minLiftPosition = minLiftPosition;
         this.maxLiftPosition = maxLiftPosition;
         this.tolerance = tolerance;
-        this.useOldGrabber = useOldGrabber;
+        this.maxCones = maxCones;
+        this.maxPoles = maxPoles;
     }
+
+    //changed grabberservo open pos from .9 to .86 (wouldn't open all the way during autonomous test)
 
     public static LifterSettings makeDefault(){
         return new LifterSettings(
                 0.064,
                 0.93,
-                0.75,
-                .9,
-                0.834,
-                1,
+                0.93,
+                0,
+                .7,
+                0.67,
+                0.85,
                 0.05,
                 150,
                 150,
                 0,
                 3200,
                 20,
-                true
+                4,
+                3
         );
     }
 }

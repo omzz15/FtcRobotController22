@@ -3,11 +3,18 @@ package org.firstinspires.ftc.teamcode.parts.lifter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterTeleopSettings;
 
+import java.util.function.Supplier;
+
 import om.self.ezftc.core.part.LoopedPartImpl;
-import om.self.task.core.Group;
+import om.self.supplier.suppliers.EdgeSupplier;
+import om.self.task.core.TaskEx;
 
 public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, ObjectUtils.Null> {
     private LifterTeleopSettings settings;
+
+    private EdgeSupplier preDropEdge = new EdgeSupplier();
+
+    Supplier<Boolean> magic = new EdgeSupplier(() -> parent.parent.opMode.gamepad2.a).getRisingEdgeSupplier();
 
     public LifterTeleop(Lifter parent) {
         super(parent, "lifter teleop");
@@ -28,40 +35,63 @@ public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, O
     }
 
     @Override
-    public void onBeanLoad() {
-
-    }
+    public void onBeanLoad() {}
 
     @Override
     public void onInit() {
-
+        preDropEdge.setBase(() -> settings.preDropSupplier.get() > -1);
     }
 
     @Override
     public void onStart() {
-        if(parent.getSettings().useOldGrabber){
-            parent.setBaseController(() -> new LifterControl(
-                    (double) settings.heightSpeedSupplier.get(),
-                    (double) settings.turnSpeedSupplier.get() * settings.turnSpeedMultiplier,
-                    settings.grabberCloseSupplier.get()
-            ), true);
-        }
-        else {
-            parent.setBaseController(() -> new LifterControl(
-                    (double) settings.heightSpeedSupplier.get(),
-                    (double) settings.turnSpeedSupplier.get() * settings.turnSpeedMultiplier,
-                    settings.grabberMoveSupplier.get()
-            ), true);
-        }
+        parent.setBaseController(() -> new LifterControl(
+                (double) settings.heightSpeedSupplier.get(),
+                (double) settings.turnSpeedSupplier.get() * settings.turnSpeedMultiplier,
+                settings.grabberCloseSupplier.get()
+        ), true);
     }
 
     @Override
     public void onRun() {
-        if(settings.goToBottomSupplier.get()) parent.setLiftToBottom(); //parent.getTaskManager().runKeyedCommand(Lifter.TaskNames.autoDrop, Group.Command.START);//parent.setLiftToBottom();
-        else if(settings.autoGrabSupplier.get()) parent.getTaskManager().runKeyedCommand(Lifter.TaskNames.autoGrab, Group.Command.START);
+        int cone = settings.coneChangeSupplier.get();
+
+        if(cone != 0){
+            parent.setCone(parent.getCone() + cone);
+            parent.startAutoDock();
+        }
+
+        if(preDropEdge.isRisingEdge()){ //&& parent.isGrabberClosed()){
+            parent.setPole(settings.preDropSupplier.get());
+            parent.startAutoPreDrop();
+        }
+        else if(settings.autoGrabSupplier.get())
+            parent.startAutoGrab();
+        else if(settings.autoDockSupplier.get())
+            parent.startAutoDock();
+        else if(settings.autoDropSupplier.get())// && parent.isGrabberClosed())
+            parent.startAutoDrop2();
+
+        if(magic.get()){
+            parent.setLiftPosition(parent.getLiftPosition() - 200);
+        }
+
+        if(parent.parent.opMode.gamepad2.start || parent.parent.opMode.gamepad1.start){
+            parent.emergencyStop();
+        }
+
+        if(settings.autoHomeSupplier.get())
+            parent.startAutoHome();
+
+        if(settings.forceOpenSupplier.get()){
+            LifterControl.flipOpen = 0;
+            parent.setGrabberClosed();
+        }
+
+        parent.parent.opMode.telemetry.addData("cone", parent.getCone());
     }
 
     @Override
     public void onStop() {
+        parent.setBaseControllerToDefault(parent.isControlActive());
     }
 }
