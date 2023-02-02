@@ -27,4 +27,8 @@ public class PositionTrackerSettings {
 				new Vector3(-1.5 * Constants.tileSide,62,90)
 		);
 	}
+
+	public PositionTrackerSettings withPosition(Vector3 position){
+		return new PositionTrackerSettings(axesOrder, flipAngle, stalePosTime, position);
+	}
 }
