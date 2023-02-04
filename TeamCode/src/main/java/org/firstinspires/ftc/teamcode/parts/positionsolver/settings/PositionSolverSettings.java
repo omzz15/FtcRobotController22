@@ -18,7 +18,7 @@ public class PositionSolverSettings {
         return new PositionSolverSettings(
                 new SolverSettings(2, 10, true, 10000, new PIDCoefficients(0.05, 0, 0), 1),
                 new SolverSettings(2, 10, true, 10000, new PIDCoefficients(0.05, 0, 0), 1),
-                new SolverSettings(5, 10, true, 10000, new PIDCoefficients(0.05, 0, 0), 1)
+                new SolverSettings(5, 10, true, 10000, new PIDCoefficients(0.025, 0, 0), 1)
         );
     }
 
