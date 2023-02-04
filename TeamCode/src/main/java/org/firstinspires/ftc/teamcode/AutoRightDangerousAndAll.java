@@ -29,6 +29,7 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
     public boolean isRight;
     public int targetPole;
     public boolean parkOnly;
+    public Vector3 customStartPos;
 
     Lifter l;
     PositionSolver positionSolver;
@@ -53,7 +54,7 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
 
         PositionTrackerSettings pts = PositionTrackerSettings.makeDefault();
 //        pts.withPosition(transformFunc.apply(pts.startPosition));
-        pts = pts.withPosition(transformFunc.apply(pts.startPosition));
+        pts = pts.withPosition(customStartPos != null ? customStartPos : transformFunc.apply(pts.startPosition));
         PositionTracker pt = new PositionTracker(r, pts, PositionTrackerHardware.makeDefault(r));
 
         Slamra s = new Slamra(pt);
@@ -77,7 +78,7 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
         }
         r.start();
 
-        Group container = new Group("container");
+        Group container = new Group("container", r.taskManager);
         TimedTask autoTask = new TimedTask("auto task", container);
         TimedTask killer = new TimedTask("killer", container);
         positionSolver.setNewTarget(pt.getCurrentPosition(), true);
@@ -113,11 +114,11 @@ l.setCone(4);
                     throw new RuntimeException("pick a pole idiot!");
             }
         }
-        park(autoTask);
+        parkOnly(autoTask);
 
         while (opModeIsActive()) {
             r.run();
-            container.run();
+            //container.run();
             telemetry.addData("position", pt.getCurrentPosition());
             telemetry.addData("Ultra [Left : Mid : Right]", "["
                     + df.format(l.getLeftUltra()) + " : "
@@ -141,6 +142,16 @@ l.setCone(4);
         positionSolver.addMoveToTaskEx(tileToInchAuto(parkId == 1 ? locOne : parkId == 2 ? locTwo : locThree), autoTask);
     }
 
+    private void parkOnly(TaskEx autoTask){
+        Vector3 locOne = isRight ? new Vector3(-0.5, 1.5, 180) : new Vector3(-2.5, 1.5, 180);
+        Vector3 locTwo = new Vector3(-1.5, 1.5, 180);
+        Vector3 locThree = isRight ? new Vector3(-2.5, 1.5, 180) : new Vector3(-0.5, 1.5, 180);
+        int parkId = aprilTag.parkID;
+        //Parking task
+        positionSolver.addMoveToTaskEx(tileToInchAuto(new Vector3(-1.5, 1.5, 180)), autoTask);
+        positionSolver.addMoveToTaskEx(tileToInchAuto(parkId == 1 ? locOne : parkId == 2 ? locTwo : locThree), autoTask);
+    }
+
     private void moveSideTall(TimedTask autoTask){
         Vector3 start = new Vector3(-1.5,2.68,90);
         Vector3 through1T = new Vector3(-0.5,2.5,90);
@@ -156,6 +167,9 @@ l.setCone(4);
         positionSolver.addMoveToTaskEx(tileToInchAuto(through2T), autoTask);
         l.addAutoPreDropToTask(autoTask, 3);
         positionSolver.addMoveToTaskEx(tileToInchAuto(preloadDepositT), autoTask);
+
+        autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
+
         l.addAutoDropToTask(autoTask);
         //dock while moving
         positionSolver.addMoveToTaskEx(tileToInchAuto(through3T), autoTask);
@@ -204,6 +218,9 @@ l.setCone(4);
         positionSolver.addMoveToTaskEx(tileToInchAuto(poleStopT), autoTask);
         l.addAutoPreDropToTask(autoTask, 3);
         positionSolver.addMoveToTaskEx(tileToInchAuto(poleT), autoTask);
+
+        autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
+
         l.addAutoDropToTask(autoTask);
         // END REPEATABLE CYCLE
 //        l.addAutoDockToTask(autoTask);
@@ -261,19 +278,26 @@ l.setCone(4);
 
     private void moveSideMid(TimedTask autoTask){
         Vector3 rightLoadedPrep = new Vector3(-1.5,.5,225);
-        Vector3 poleM = new Vector3(-1.2175,0.7875,225);
+        Vector3 specificPoleM = new Vector3(-1.2175,0.7875,225);
         Vector3 rightTallPrep = new Vector3(-1.5,0.5,180);
         Vector3 afterSignalPush = new Vector3(-1.5, .5, 90);
         Vector3 rightStack = new Vector3(-2.55,.5,180);
+        Vector3 poleM = new Vector3(-1.23,0.77,225);
 
 
         positionSolver.addMoveToTaskEx(tileToInchAuto(pushSignal), autoTask);
         l.addAutoPreDropToTask(autoTask, 2);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightLoadedPrep), autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(poleM), autoTask);
-        autoTask.addDelay(1000);
+        //autoTask.addDelay(1000);
+        autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
+        //autoTask.addDelay(100);
+
+//        autoTask.addStep(() -> l.setLiftPosition(l.getLiftPosition() - 250));
+//        autoTask.addStep(l::isLiftInTolerance);
+
         l.addAutoDropToTask(autoTask);
-        autoTask.addDelay(750); // was 1000
+        autoTask.addDelay(150); // was 1000
         l.addAutoDockToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightLoadedPrep), autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
@@ -309,14 +333,21 @@ l.setCone(4);
         Vector3 rightStack = new Vector3(-2.55,.5,180);
         Vector3 rightStackBackup = new Vector3(-2.57, .5, 180);
         Vector3 rightLoadedPrep = new Vector3(-1.5,.5,225);
-        Vector3 poleM = new Vector3(-1.2175,0.7875,225);
+        Vector3 specificPoleM = new Vector3(-1.2175,0.7875,225);
+        Vector3 poleM = new Vector3(-1.23,0.77,225);
+
 //        positionSolver.addMoveToTaskEx(tileToInchAuto(pushSignal), autoTask);
 //        // repeatable cycle
         l.addAutoPreDropToTask(autoTask, 2);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightLoadedPrep), autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(poleM), autoTask);
-        autoTask.addDelay(1000);
+//        autoTask.addDelay(1000);
+        autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
+
+//        autoTask.addStep(() -> l.setLiftPosition(l.getLiftPosition() - 250));
+//        autoTask.addStep(l::isLiftInTolerance);
+
         l.addAutoDropToTask(autoTask);
         autoTask.addDelay(750); // was 1000
         l.addAutoDockToTask(autoTask);
@@ -342,8 +373,10 @@ l.setCone(4);
         l.addAutoPreDropToTask(autoTask, 3);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightLoadedPrep), autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTall), autoTask);
-        autoTask.addDelay(2000);
-//        positionSolver.triggerEvent(Robot.Events.STOP);
+
+        autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
+
+        //        positionSolver.triggerEvent(Robot.Events.STOP);
         l.addAutoDropToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
         l.addAutoDockToTask(autoTask);
@@ -356,7 +389,9 @@ l.setCone(4);
         positionSolver.addMoveToTaskEx(tileToInchAuto(afterStackPrep),autoTask);
         l.addAutoPreDropToTask(autoTask, 3);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTall), autoTask);
-        autoTask.addDelay(2000);
+
+        autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
+
 //        positionSolver.triggerEvent(Robot.Events.STOP);
         l.addAutoDropToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
@@ -369,8 +404,10 @@ l.setCone(4);
         positionSolver.addMoveToTaskEx(tileToInchAuto(afterStackPrep),autoTask);
         l.addAutoPreDropToTask(autoTask, 3);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTall), autoTask);
-        autoTask.addDelay(2000);
-//        positionSolver.triggerEvent(Robot.Events.STOP);
+
+        autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
+
+        //        positionSolver.triggerEvent(Robot.Events.STOP);
         l.addAutoDropToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
         l.addAutoDockToTask(autoTask);
@@ -382,8 +419,10 @@ l.setCone(4);
         positionSolver.addMoveToTaskEx(tileToInchAuto(afterStackPrep),autoTask);
         l.addAutoPreDropToTask(autoTask, 3);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTall), autoTask);
-        autoTask.addDelay(2000);
-//        positionSolver.triggerEvent(Robot.Events.STOP);
+
+        autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
+
+        //        positionSolver.triggerEvent(Robot.Events.STOP);
         l.addAutoDropToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
         l.addAutoDockToTask(autoTask);
@@ -395,8 +434,10 @@ l.setCone(4);
         positionSolver.addMoveToTaskEx(tileToInchAuto(afterStackPrep),autoTask);
         l.addAutoPreDropToTask(autoTask, 3);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTall), autoTask);
-        autoTask.addDelay(2000);
-//        positionSolver.triggerEvent(Robot.Events.STOP);
+
+        autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
+
+        //        positionSolver.triggerEvent(Robot.Events.STOP);
         l.addAutoDropToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
         l.addAutoDockToTask(autoTask);
@@ -408,7 +449,9 @@ l.setCone(4);
         positionSolver.addMoveToTaskEx(tileToInchAuto(afterStackPrep),autoTask);
         l.addAutoPreDropToTask(autoTask, 3);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTall), autoTask);
-        autoTask.addDelay(2000);
+
+        autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
+
 //        positionSolver.triggerEvent(Robot.Events.STOP);
         l.addAutoDropToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
