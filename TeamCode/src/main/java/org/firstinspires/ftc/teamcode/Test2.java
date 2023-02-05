@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.parts.drive.DriveTeleop;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
 import org.firstinspires.ftc.teamcode.parts.lifter.LifterTeleop;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
 
 import java.text.DecimalFormat;
@@ -57,11 +58,14 @@ public class Test2 extends LinearOpMode {
         new DriveTeleop(d);
         //new HeaderKeeper(d);
         PositionTracker pt = new PositionTracker(r);
-        Slamra s = new Slamra(pt);
+
+//        Slamra s = new Slamra(pt);
+        EncoderTracker et = new EncoderTracker(pt);
+
         //new EncoderTracker(pt);
         Lifter l = new Lifter(r);
         new LifterTeleop(l);
-        Tag t = new Tag(r);
+//        Tag t = new Tag(r);
         //Led statLed = new Led(r);
 
         DecimalFormat df = new DecimalFormat("#0.0");
@@ -70,25 +74,25 @@ public class Test2 extends LinearOpMode {
         TimedTask deliverConeTask = new TimedTask("deliver cone");
 
         r.init();
-        s.onStart();
-        // inject initial autonomous field start position
-        s.slamraFieldStart = fieldStartPos;
-
-        s.updateSlamraPosition();
-        Vector3 startupPose = s.slamraRawPose;
+//        s.onStart();
+//        // inject initial autonomous field start position
+//        s.slamraFieldStart = fieldStartPos;
+//
+//        s.updateSlamraPosition();
+//        Vector3 startupPose = s.slamraRawPose;
 
         while (!isStarted()) {
-            s.updateSlamraPosition();
-            //telemetry.addData("pt position", pt.getCurrentPosition());
-            telemetry.addData("raw position", s.slamraRawPose);
-            if(!startupPose.equals(s.slamraRawPose)) telemetry.addLine("***** SLAMRA READY *****");
+//            s.updateSlamraPosition();
+//            //telemetry.addData("pt position", pt.getCurrentPosition());
+//            telemetry.addData("raw position", s.slamraRawPose);
+//            if(!startupPose.equals(s.slamraRawPose)) telemetry.addLine("***** SLAMRA READY *****");
             //telemetry.addData("final position", s.slamraFinal);
             r.opMode.telemetry.update();
             sleep(50);
         }
 
         r.start();
-        s.setupFieldOffset();
+//        s.setupFieldOffset();
 
 //        ((TaskEx) l.getTaskManager().getChild(Lifter.TaskNames.autoHome)).restart();
         l.startAutoHome();
@@ -134,7 +138,7 @@ public class Test2 extends LinearOpMode {
 //            }
             if(gamepad1.dpad_down) telemetry.addData("tasks", r.getTaskManager());
             if(gamepad1.dpad_down) telemetry.addData("events", r.getEventManager());
-            telemetry.addLine(String.format("\nDetected tag ID=%s", t.detectedID));
+//            telemetry.addLine(String.format("\nDetected tag ID=%s", t.detectedID));
             r.opMode.telemetry.addData("time", System.currentTimeMillis() - start);
 
             telemetry.update();

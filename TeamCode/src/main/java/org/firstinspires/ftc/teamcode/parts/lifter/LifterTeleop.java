@@ -47,7 +47,8 @@ public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, O
         parent.setBaseController(() -> new LifterControl(
                 (double) settings.heightSpeedSupplier.get(),
                 (double) settings.turnSpeedSupplier.get() * settings.turnSpeedMultiplier,
-                settings.grabberCloseSupplier.get()
+                settings.grabberCloseSupplier.get(),
+                settings.forceDownSupplier.get()
         ), true);
     }
 

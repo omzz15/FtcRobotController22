@@ -83,17 +83,17 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
         TimedTask killer = new TimedTask("killer", container);
         positionSolver.setNewTarget(pt.getCurrentPosition(), true);
 
-//        // AFTER 27 SECONDS, PARK!
-        killer.addDelay(27000);
-        killer.addStep(() -> autoTask.runCommand(Group.Command.PAUSE));
-        park(killer);
+////        // AFTER 27 SECONDS, PARK!
+//        killer.addDelay(25000);
+//        killer.addStep(() -> autoTask.runCommand(Group.Command.PAUSE));
+//        park(killer);
 
 
         /******** Autonomous Setup ****************
          start position (-1.5,2.68,90)
          Various autonomous paths setup at bottom
         ******************************************/
-        //IMPORTANT!! Need to go to parki3ng safe position at the end of all tasks
+        //IMPORTANT!! Need to go to parking safe position at the end of all tasks
 l.setCone(4);
         autoTask.addStep(() -> {
             LifterControl.flipOpen = 0;
@@ -114,7 +114,8 @@ l.setCone(4);
                     throw new RuntimeException("pick a pole idiot!");
             }
         }
-        parkOnly(autoTask);
+        if(parkOnly) parkOnly(autoTask);
+        else park(autoTask);
 
         while (opModeIsActive()) {
             r.run();
@@ -132,24 +133,28 @@ l.setCone(4);
     }
 
     private void park(TaskEx autoTask){
-        //Parking locations (for bottom left start):
+        //Parking locations
         Vector3 locOne = isRight ? new Vector3(-0.5, .5, 180) : new Vector3(-2.5, .5, 180);
-        Vector3 locTwo = new Vector3(-1.5, .5, 180);
+        Vector3 locTwo = new Vector3(-1.5, .5, 90);
         Vector3 locThree = isRight ? new Vector3(-2.5, .5, 180) : new Vector3(-0.5, .5, 180);
         int parkId = aprilTag.parkID;
         //Parking task
-        positionSolver.addMoveToTaskEx(tileToInchAuto(new Vector3(-1.5, .5, 180)), autoTask);
+        positionSolver.addMoveToTaskEx(tileToInchAuto(new Vector3(-1.5, .5, 90)), autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(parkId == 1 ? locOne : parkId == 2 ? locTwo : locThree), autoTask);
     }
 
-    private void parkOnly(TaskEx autoTask){
-        Vector3 locOne = isRight ? new Vector3(-0.5, 1.5, 180) : new Vector3(-2.5, 1.5, 180);
-        Vector3 locTwo = new Vector3(-1.5, 1.5, 180);
-        Vector3 locThree = isRight ? new Vector3(-2.5, 1.5, 180) : new Vector3(-0.5, 1.5, 180);
+    private void parkOnly(TimedTask autoTask){
+
+        Vector3 locOne = isRight ? new Vector3(-0.5, 1.5, 90) : new Vector3(-2.5, 1.5, 90);
+        Vector3 locTwo = new Vector3(-1.5, 1.5, 90);
+        Vector3 locThree = isRight ? new Vector3(-2.5, 1.5, 90) : new Vector3(-0.5, 1.5, 90);
         int parkId = aprilTag.parkID;
         //Parking task
-        positionSolver.addMoveToTaskEx(tileToInchAuto(new Vector3(-1.5, 1.5, 180)), autoTask);
-        positionSolver.addMoveToTaskEx(tileToInchAuto(parkId == 1 ? locOne : parkId == 2 ? locTwo : locThree), autoTask);
+//        autoTask.addDelay(15000);
+        positionSolver.addMoveToTaskEx(tileToInchAuto(new Vector3(-1.5, 1.5, 90)), autoTask);
+        if(!(parkId == 2))
+            positionSolver.addMoveToTaskEx(tileToInchAuto(parkId == 1 ? locOne : locThree), autoTask);
+        autoTask.addStep(() -> positionSolver.triggerEvent(Robot.Events.STOP));
     }
 
     private void moveSideTall(TimedTask autoTask){
@@ -223,65 +228,14 @@ l.setCone(4);
 
         l.addAutoDropToTask(autoTask);
         // END REPEATABLE CYCLE
-//        l.addAutoDockToTask(autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(poleStopT), autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(wallStop), autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(wall), autoTask);
-//        l.addAutoMoveToConeToTaskEx(autoTask);
-//        //grab
-//        l.addAutoGrabToTask(autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(poleStopT), autoTask);
-//        l.addAutoPreDropToTask(autoTask, 3);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(poleT), autoTask);
-//        l.addAutoDropToTask(autoTask);
-//        //dock while moving
-//        l.addAutoDockToTask(autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(poleStopT), autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(wallStop), autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(wall), autoTask);
-//        l.addAutoMoveToConeToTaskEx(autoTask);
-//        //grab
-//        l.addAutoGrabToTask(autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(poleStopT), autoTask);
-//        l.addAutoPreDropToTask(autoTask, 3);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(poleT), autoTask);
-//        l.addAutoDropToTask(autoTask);
-//        //dock while moving
-//        l.addAutoDockToTask(autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(poleStopT), autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(wallStop), autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(wall), autoTask);
-//        l.addAutoMoveToConeToTaskEx(autoTask);
-//        //grab
-//        l.addAutoGrabToTask(autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(poleStopT), autoTask);
-//        l.addAutoPreDropToTask(autoTask, 3);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(poleT), autoTask);
-//        l.addAutoDropToTask(autoTask);
-//        //dock while moving
-//        l.addAutoDockToTask(autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(poleStopT), autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(wallStop), autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(wall), autoTask);
-//        l.addAutoMoveToConeToTaskEx(autoTask);
-//        //grab
-//        l.addAutoGrabToTask(autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(poleStopT), autoTask);
-//        l.addAutoPreDropToTask(autoTask, 3);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(poleT), autoTask);
-//        l.addAutoDropToTask(autoTask);
-//        //dock while moving
-//        //get into parking safe position
-//        l.addAutoDockToTask(autoTask);
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(poleStopT), autoTask);
     }
 
     private void moveSideMid(TimedTask autoTask){
-        Vector3 rightLoadedPrep = new Vector3(-1.5,.5,225);
+        Vector3 rightLoadedPrep = new Vector3(-1.5,.65,225);
         Vector3 specificPoleM = new Vector3(-1.2175,0.7875,225);
-        Vector3 rightTallPrep = new Vector3(-1.5,0.5,180);
+        Vector3 rightTallPrep = new Vector3(-1.5,0.65,180);
         Vector3 afterSignalPush = new Vector3(-1.5, .5, 90);
-        Vector3 rightStack = new Vector3(-2.55,.5,180);
+        Vector3 rightStack = new Vector3(-2.55,.65,180);
         Vector3 poleM = new Vector3(-1.23,0.77,225);
 
 
@@ -307,16 +261,18 @@ l.setCone(4);
         autoTask.addDelay(500); // was 1000
 
 //        setupSideMid(autoTask);
-        setupSideMid(autoTask);
-        setupSideMid(autoTask);
-        setupSideMid(autoTask);
-        setupSideMid(autoTask);
+//        setupSideMid(autoTask);
+//        setupSideMid(autoTask);
+//        setupSideMid(autoTask);
 
         l.addAutoPreDropToTask(autoTask, 2);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightLoadedPrep), autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(poleM), autoTask);
-        autoTask.addDelay(1000);
+
+        autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
+
         l.addAutoDropToTask(autoTask);
+        autoTask.addDelay(150); // was 1000
         l.addAutoDockToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
     }
@@ -329,12 +285,12 @@ l.setCone(4);
         Vector3 preloadDepositM = new Vector3(-1.23,1.25,135);
         //through2M
         Vector3 through3M = new Vector3(-1.5,1.5,180);
-        Vector3 rightTallPrep = new Vector3(-1.5,0.5,180);
-        Vector3 rightStack = new Vector3(-2.55,.5,180);
+        Vector3 rightTallPrep = new Vector3(-1.5,0.65,180);
+        Vector3 rightStack = new Vector3(-2.55,.65,180);
         Vector3 rightStackBackup = new Vector3(-2.57, .5, 180);
-        Vector3 rightLoadedPrep = new Vector3(-1.5,.5,225);
+        Vector3 rightLoadedPrep = new Vector3(-1.5,.65,225);
         Vector3 specificPoleM = new Vector3(-1.2175,0.7875,225);
-        Vector3 poleM = new Vector3(-1.23,0.77,225);
+        Vector3 poleM = new Vector3(-1.25,0.77,225);
 
 //        positionSolver.addMoveToTaskEx(tileToInchAuto(pushSignal), autoTask);
 //        // repeatable cycle

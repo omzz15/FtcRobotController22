@@ -142,7 +142,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         addAutoPreDropToTask(task);
     }
 
-    public void liftWithPower(double power){
+    public void liftWithPower(double power, boolean force){
         if(Math.abs(power) < getSettings().minRegisterVal) return;
 
         if(power < 0)
@@ -150,7 +150,10 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         else
             power *= getSettings().maxUpLiftSpeed;
 
-        setLiftPosition(getHardware().leftLiftMotor.getCurrentPosition() + (int)power);
+        if(force)
+            setLiftPositionUnsafe(getHardware().leftLiftMotor.getCurrentPosition() + (int)power);
+        else
+            setLiftPosition(getHardware().leftLiftMotor.getCurrentPosition() + (int)power);
     }
 
     public void setLiftPosition(int position){
@@ -368,6 +371,8 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
             getHardware().leftLiftMotor.setTargetPosition(0);
             getHardware().rightLiftMotor.setTargetPosition(0);
 
+            liftTargetPosition = 0;
+
             setMotorsToRunConfig();
         });
     }
@@ -584,7 +589,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 
     @Override
     public void onRun(LifterControl control) { //TODO separate keeping lifter motor position from onRun
-        liftWithPower(control.lifterPower);
+        liftWithPower(control.lifterPower, control.forceMoveLifter);
         turnWithPower(control.turningPower);
         //setGrabberPower(control.closePower);
         if(LifterControl.flipOpen == 0) //TODO fix this crazy logic

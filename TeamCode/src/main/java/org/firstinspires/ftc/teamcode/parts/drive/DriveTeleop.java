@@ -31,14 +31,14 @@ public class DriveTeleop extends LoopedPartImpl<Drive, DriveTeleopSettings, Obje
 
     @Override
     public void onRun() {
-        parent.parent.opMode.telemetry.addData("Drive Speed", getSettings().midModeSupplier.get() ? "mid" : getSettings().slowModeSupplier.get() ? "slow" : "fast");
+        parent.parent.opMode.telemetry.addData("Drive Speed", getSettings().slowModeSupplier.get() ? "slow" : getSettings().midModeSupplier.get() ? "mid" : "fast");
     }
 
     @Override
     public void onStart() {
         parent.setBaseController(() -> new DriveControl(
-                getSettings().midModeSupplier.get() ? VectorMath.multiply(getSettings().powerSupplier.get(), getSettings().midModeSpeed) :
                 getSettings().slowModeSupplier.get() ? VectorMath.multiply(getSettings().powerSupplier.get(), getSettings().slowModeSpeed) :
+                getSettings().midModeSupplier.get() ? VectorMath.multiply(getSettings().powerSupplier.get(), getSettings().midModeSpeed) :
                 getSettings().powerSupplier.get(),
 
                 getSettings().stopSupplier.get()

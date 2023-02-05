@@ -7,7 +7,7 @@ public class AutoLeftMid extends AutoRightDangerousAndAll {
     @Override
     public void initAuto(){
         isRight = false;
-        transformFunc = (v) -> v.withX(-v.X).addY(-.0).withZ(-180 - v.Z);
+        transformFunc = (v) -> v.withX(-v.X).withZ(-180 - v.Z);
         targetPole = 1;
     }
 
