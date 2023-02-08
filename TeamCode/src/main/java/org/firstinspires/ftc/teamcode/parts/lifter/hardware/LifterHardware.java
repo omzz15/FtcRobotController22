@@ -18,8 +18,7 @@ import om.self.ezftc.utils.hardware.servo.ServoSettings;
 
 public class LifterHardware {
     public final DcMotor leftLiftMotor;
-    public final DcMotor rightLiftMotor;
-    public final Servo leftTurnServo;
+    public static final double liftHoldPower = 1;//TODO make not static
     public final Servo rightTurnServo;
     public final Servo grabServo;
     //public final ColorRangeSensor leftRange;
@@ -32,7 +31,8 @@ public class LifterHardware {
     public final RevBlinkinLedDriver blinkin;
     public final DigitalChannel limitSwitch;
     public final RevColorSensorV3 coneSensor;
-    public static final double liftHoldPower = 0.7;//TODO make not static
+    //public final DcMotor rightLiftMotor;
+    public final Servo leftTurnServo;
 
     public LifterHardware(DcMotor leftLiftMotor, DcMotor rightLiftMotor, Servo leftTurnServo,
                           Servo rightTurnServo, Servo grabServo, ColorRangeSensor leftRange,
@@ -42,7 +42,7 @@ public class LifterHardware {
                           RevBlinkinLedDriver blinkin, DigitalChannel limitSwitch,
                           RevColorSensorV3 coneSensor) {
         this.leftLiftMotor = leftLiftMotor;
-        this.rightLiftMotor = rightLiftMotor;
+        //this.rightLiftMotor = rightLiftMotor;
         this.leftTurnServo = leftTurnServo;
         this.rightTurnServo = rightTurnServo;
         this.grabServo = grabServo;

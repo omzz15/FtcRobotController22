@@ -161,12 +161,12 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     }
 
     private void setLiftPositionUnsafe(int position){
-        int diff = getHardware().rightLiftMotor.getCurrentPosition() - getHardware().leftLiftMotor.getCurrentPosition();
+        //int diff = getHardware().rightLiftMotor.getCurrentPosition() - getHardware().leftLiftMotor.getCurrentPosition();
 
         liftTargetPosition = position;
 
         getHardware().leftLiftMotor.setTargetPosition(position);
-        getHardware().rightLiftMotor.setTargetPosition(position + diff);
+        //getHardware().rightLiftMotor.setTargetPosition(position + diff);
     }
 
     public boolean isLiftInTolerance(){
@@ -342,17 +342,17 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         double power = -0.125;
 
         getHardware().leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         getHardware().leftLiftMotor.setPower(power);
-        getHardware().rightLiftMotor.setPower(power);
+        //getHardware().rightLiftMotor.setPower(power);
     }
     private void setMotorsToRunConfig(){
         getHardware().leftLiftMotor.setPower(LifterHardware.liftHoldPower);
-        getHardware().rightLiftMotor.setPower(LifterHardware.liftHoldPower);
+        //getHardware().rightLiftMotor.setPower(LifterHardware.liftHoldPower);
 
         getHardware().leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     public void constructAutoHome(){
@@ -366,10 +366,10 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         }, () -> !getHardware().limitSwitch.getState(), 5000);
         autoHomeTask.addStep(() -> {
             getHardware().leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            getHardware().rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            //getHardware().rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             getHardware().leftLiftMotor.setTargetPosition(0);
-            getHardware().rightLiftMotor.setTargetPosition(0);
+            //getHardware().rightLiftMotor.setTargetPosition(0);
 
             liftTargetPosition = 0;
 
@@ -443,8 +443,8 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
             getHardware().leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             getHardware().leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            getHardware().rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            //getHardware().rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            //getHardware().rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         });
 
         //configure movement
