@@ -51,7 +51,7 @@ dependencies {
 //    custom stuff
     //implementation 'io.github.omzz15:supplier:1.0.0-FTCRELEASE' //TODO put back with 1.1.0
 
-    implementation 'io.github.omzz15:task:4.2.2-FTCRELEASE'
+    implementation 'io.github.omzz15:task:4.2.3-FTCRELEASE'
     implementation 'io.github.omzz15:beans:2.1.2-FTCRELEASE'
 
     implementation 'org.openftc:apriltag:1.1.1'

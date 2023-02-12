@@ -3,8 +3,12 @@ package org.firstinspires.ftc.teamcode.parts.positiontracker;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.hardware.PositionTrackerHardware;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.settings.PositionTrackerSettings;
+
+import java.util.Hashtable;
+import java.util.LinkedList;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.LoopedPartImpl;
@@ -16,6 +20,7 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
     private Vector3 currentPosition = new Vector3();
     private double offset;
     private long lastUpdateTime = System.currentTimeMillis();
+    private LinkedList<PositionTicket> tickets = new LinkedList<>();
 
     public PositionTracker(Robot robot) {
         super(robot, "position tracker", robot.startTaskManager);
@@ -37,9 +42,18 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
         return currentPosition;
     }
 
+    /**
+     * @param currentPosition the current position
+     * @deprecated you should add a position ticket so it integrates!!
+     */
+    @Deprecated
     public void setCurrentPosition(Vector3 currentPosition) {
         this.currentPosition = currentPosition;
         lastUpdateTime = System.currentTimeMillis();
+    }
+
+    public void addPositionTicket(PositionTicket pt){
+        tickets.add(pt);
     }
 
     public boolean isPositionStale(){
@@ -93,6 +107,15 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
 
     @Override
     public void onRun() {
+
+        if(!tickets.isEmpty()) {
+
+            lastUpdateTime = System.currentTimeMillis();
+
+            currentPosition = tickets.getFirst().position; //todo add something better
+
+            tickets.clear();
+        }
         updateAngle();
     }
 

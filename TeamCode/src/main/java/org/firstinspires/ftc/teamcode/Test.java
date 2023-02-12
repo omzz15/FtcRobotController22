@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.parts.drive.headerkeeper.HeaderKeeper;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.odometry.Odometry;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Vector3;
@@ -29,23 +30,17 @@ import om.self.task.core.TaskEx;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@Disabled
-@TeleOp(name="move to position Test", group="Linear Opmode")
+@TeleOp(name="odo bot Test", group="Linear Opmode")
 public class Test extends LinearOpMode {
     @Override
     public void runOpMode() {
-        long start;
 
         Robot r = new Robot(this);
         Drive d = new Drive(r);
         new DriveTeleop(d);
-        PositionTracker pt = new PositionTracker(r);
-        new EncoderTracker(pt);
-        PositionSolver ps = new PositionSolver(d);
 
-        TaskEx test = new TaskEx("auto test", r.taskManager);
-        ps.addMoveToTaskEx(new Vector3(0,30,0), test);
-        ps.addMoveToTaskEx(new Vector3(0,-30,0), test);
+        PositionTracker pt = new PositionTracker(r);
+        new Odometry(pt);
 
         r.init();
 
@@ -54,17 +49,12 @@ public class Test extends LinearOpMode {
         r.start();
 
         while (opModeIsActive()) {
-            start = System.currentTimeMillis();
             r.run();
             r.opMode.telemetry.addData("position", pt.getCurrentPosition());
-            r.opMode.telemetry.addData("solver", ps.isDone());
-
-            for(String s: d.getControllerNameMapping().keySet())
-                r.opMode.telemetry.addData("drive controller: " + s, "");
 
             if(r.opMode.gamepad1.a) r.opMode.telemetry.addData("task manager", r.getTaskManager());
             if(r.opMode.gamepad1.b) r.opMode.telemetry.addData("event manager", r.getEventManager());
-            r.opMode.telemetry.addData("time", System.currentTimeMillis() - start);
+
             r.opMode.telemetry.update();
         }
 

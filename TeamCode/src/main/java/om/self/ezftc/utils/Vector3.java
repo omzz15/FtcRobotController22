@@ -30,6 +30,12 @@ public class Vector3 {
 		Z = 0;
 	}
 
+	public Vector3(double val){
+		this.X = val;
+		this.Y = val;
+		this.Z = val;
+	}
+
 	public double[] toArray() {
 		return new double[]{X,Y,Z};
 	}

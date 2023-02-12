@@ -129,6 +129,18 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         task.waitForEvent(eventManager.getContainer(Events.preDropComplete));
     }
 
+    public void forceAddAutoPreDropToTask(TaskEx task){
+        task.addStep(autoPreDropTask::restart);
+    }
+
+    public void addAutoPreDropToTask(TaskEx task, int pole, boolean wait){
+        task.addStep(() -> this.pole = pole);
+
+        task.addStep(autoPreDropTask::restart);
+        if(wait)
+            task.waitForEvent(eventManager.getContainer(Events.preDropComplete));
+    }
+
     private final TimedTask coneRangeingTask = new TimedTask(TaskNames.coneMeasureRanges, getTaskManager());
 
     private int ultraRangeModule = 0; // keeps track of measuring ranges
@@ -137,10 +149,6 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     private double rightDist;
     private double midDist;
 
-    public void addAutoPreDropToTask(TaskEx task, int pole){
-        task.addStep(() -> this.pole = pole);
-        addAutoPreDropToTask(task);
-    }
 
     public void liftWithPower(double power, boolean force){
         if(Math.abs(power) < getSettings().minRegisterVal) return;

@@ -79,7 +79,7 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
         yChannel.setNewTarget(target.Y, resetPID);
         rChannel.setNewTarget(target.Z, resetPID);
 
-        triggerEvent(Robot.Events.START);//TODO make this better
+        triggerEvent(Robot.Events.START);// TODO make this better
     }
 
     public boolean isDone(){

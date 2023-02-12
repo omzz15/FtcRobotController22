@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
 import org.firstinspires.ftc.teamcode.parts.lifter.LifterControl;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.hardware.PositionTrackerHardware;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.settings.PositionTrackerSettings;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
@@ -23,14 +24,15 @@ import om.self.task.core.Group;
 import om.self.task.core.TaskEx;
 import om.self.task.other.TimedTask;
 
-@Autonomous(name="auto-RIGHT-dangerous", group="Test")
-public class AutoRightDangerousAndAll extends LinearOpMode{
+@Autonomous(name="autoEncoderTest", group="Test")
+public class TestAutoENCODER extends LinearOpMode{
     public Function<Vector3, Vector3> transformFunc;
     public boolean isRight;
     public int targetPole;
     public boolean parkOnly;
     public Vector3 customStartPos;
 
+    EncoderTracker encoderTracker;
     Lifter l;
     PositionSolver positionSolver;
     Tag aprilTag;
@@ -57,20 +59,21 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
         pts = pts.withPosition(customStartPos != null ? customStartPos : transformFunc.apply(pts.startPosition));
         PositionTracker pt = new PositionTracker(r, pts, PositionTrackerHardware.makeDefault(r));
 
-        Slamra s = new Slamra(pt);
+        encoderTracker = new EncoderTracker(pt);
+//        Slamra s = new Slamra(pt);
         l = new Lifter(r);
         positionSolver = new PositionSolver(d);
         aprilTag = new Tag(r);
 
         DecimalFormat df = new DecimalFormat("#0.0");
         r.init();
-        s.updateSlamraPosition();
-        Vector3 startupPose = s.slamraRawPose;
+//        s.updateSlamraPosition();
+//        Vector3 startupPose = s.slamraRawPose;
         while (!isStarted()) {
-            s.updateSlamraPosition();
+//            s.updateSlamraPosition();
             aprilTag.onRun();
-            telemetry.addData("raw position", s.slamraRawPose);
-            if(!startupPose.equals(s.slamraRawPose)) telemetry.addLine("***** SLAMRA READY *****");
+//            telemetry.addData("raw position", s.slamraRawPose);
+//            if(!startupPose.equals(s.slamraRawPose)) telemetry.addLine("***** SLAMRA READY *****");
             telemetry.addLine(String.format("\nDetected tag ID=%s", aprilTag.detectedID));
             telemetry.addLine(String.format("\nPark ID=%s", aprilTag.parkID));
             r.opMode.telemetry.update();
@@ -230,8 +233,6 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
         // END REPEATABLE CYCLE
     }
 
-
-
     private void moveSideMid(TimedTask autoTask){
         Vector3 rightLoadedPrep = new Vector3(-1.5,.65,225);
         Vector3 specificPoleM = new Vector3(-1.2175,0.7875,225);
@@ -239,7 +240,6 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
         Vector3 afterSignalPush = new Vector3(-1.5, .5, 90);
         Vector3 rightStack = new Vector3(-2.55,.65,180);
         Vector3 poleM = new Vector3(-1.23,0.77,225);
-
 
 
         positionSolver.addMoveToTaskEx(tileToInchAuto(pushSignal), autoTask);
@@ -282,11 +282,9 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
 
     private void setupSideMid(TimedTask autoTask){
         // alliance side mid pole
-        //start position
         Vector3 through1M = new Vector3(-1.5,1.5,90);
         Vector3 through2M = new Vector3(-1.5,1.5,135);
         Vector3 preloadDepositM = new Vector3(-1.23,1.25,135);
-        //through2M
         Vector3 through3M = new Vector3(-1.5,1.5,180);
         Vector3 rightTallPrep = new Vector3(-1.5,0.65,180);
         Vector3 rightStack = new Vector3(-2.55,.65,180);
@@ -295,18 +293,11 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
         Vector3 specificPoleM = new Vector3(-1.2175,0.7875,225);
         Vector3 poleM = new Vector3(-1.25,0.77,225);
 
-//        positionSolver.addMoveToTaskEx(tileToInchAuto(pushSignal), autoTask);
-//        // repeatable cycle
         l.addAutoPreDropToTask(autoTask, 2, false);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightLoadedPrep), autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(poleM), autoTask);
-//        autoTask.addDelay(1000);
         autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
-
-//        autoTask.addStep(() -> l.setLiftPosition(l.getLiftPosition() - 250));
-//        autoTask.addStep(l::isLiftInTolerance);
-
         l.addAutoDropToTask(autoTask);
         autoTask.addDelay(750); // was 1000
         l.addAutoDockToTask(autoTask);
@@ -319,122 +310,81 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
     }
 
     private void setupSideDangerous(TimedTask autoTask){
-        // dangerous tall pole
         Vector3 rightLoadedPrep = new Vector3(-1.5,.5,90);
         Vector3 afterStackPrep = new Vector3(-1.5, .5, 180);
         Vector3 rightTallPrep = new Vector3(-1.5,0.5,180);
         Vector3 rightTall = new Vector3(-1.21, 0.21, 135);
         Vector3 rightStack = new Vector3(-2.68,.5,180);
-
         //  dangerous tall pole path
         positionSolver.addMoveToTaskEx(tileToInchAuto(pushSignal), autoTask);
-
         l.addAutoPreDropToTask(autoTask, 3, false);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightLoadedPrep), autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTall), autoTask);
-
         autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
-
-        //        positionSolver.triggerEvent(Robot.Events.STOP);
         l.addAutoDropToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
         l.addAutoDockToTask(autoTask);
         autoTask.addDelay(500);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightStack), autoTask);
         autoTask.addDelay(500);
-        //Not working for some reason (not moving?):   l.addAutoMoveToConeToTaskEx(autoTask);
+        l.addAutoMoveToConeToTaskEx(autoTask);
         l.addAutoGrabToTask(autoTask);
         autoTask.addDelay(1000);
         positionSolver.addMoveToTaskEx(tileToInchAuto(afterStackPrep),autoTask);
         l.addAutoPreDropToTask(autoTask, 3, false);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTall), autoTask);
-
         autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
-
-//        positionSolver.triggerEvent(Robot.Events.STOP);
         l.addAutoDropToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
         l.addAutoDockToTask(autoTask);
         autoTask.addDelay(500);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightStack), autoTask);
-//        l.addAutoMoveToConeToTaskEx(autoTask);
+        l.addAutoMoveToConeToTaskEx(autoTask);
         l.addAutoGrabToTask(autoTask);
         autoTask.addDelay(1000);
         positionSolver.addMoveToTaskEx(tileToInchAuto(afterStackPrep),autoTask);
         l.addAutoPreDropToTask(autoTask, 3, false);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTall), autoTask);
-
         autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
-
-        //        positionSolver.triggerEvent(Robot.Events.STOP);
         l.addAutoDropToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
         l.addAutoDockToTask(autoTask);
         autoTask.addDelay(500);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightStack), autoTask);
-//        l.addAutoMoveToConeToTaskEx(autoTask);
+        l.addAutoMoveToConeToTaskEx(autoTask);
         l.addAutoGrabToTask(autoTask);
         autoTask.addDelay(1000);
         positionSolver.addMoveToTaskEx(tileToInchAuto(afterStackPrep),autoTask);
         l.addAutoPreDropToTask(autoTask, 3, false);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTall), autoTask);
-
         autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
-
-        //        positionSolver.triggerEvent(Robot.Events.STOP);
         l.addAutoDropToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
         l.addAutoDockToTask(autoTask);
         autoTask.addDelay(500);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightStack), autoTask);
-//        l.addAutoMoveToConeToTaskEx(autoTask);
+        l.addAutoMoveToConeToTaskEx(autoTask);
         l.addAutoGrabToTask(autoTask);
         autoTask.addDelay(1000);
         positionSolver.addMoveToTaskEx(tileToInchAuto(afterStackPrep),autoTask);
         l.addAutoPreDropToTask(autoTask, 3, false);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTall), autoTask);
-
         autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
-
-        //        positionSolver.triggerEvent(Robot.Events.STOP);
         l.addAutoDropToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
         l.addAutoDockToTask(autoTask);
         autoTask.addDelay(500);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightStack), autoTask);
-//        l.addAutoMoveToConeToTaskEx(autoTask);
+        l.addAutoMoveToConeToTaskEx(autoTask);
         l.addAutoGrabToTask(autoTask);
         autoTask.addDelay(1000);
         positionSolver.addMoveToTaskEx(tileToInchAuto(afterStackPrep),autoTask);
         l.addAutoPreDropToTask(autoTask, 3, false);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTall), autoTask);
-
         autoTask.addTimedStep(() -> {}, l::isPoleInRange, 3000);
-
-//        positionSolver.triggerEvent(Robot.Events.STOP);
         l.addAutoDropToTask(autoTask);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
         l.addAutoDockToTask(autoTask);
         autoTask.addDelay(500);
-        //pull away from stack after lifiting!!!
     }
 }
-
-
-/***************************************************************************************************
- * Old Telemetry from active OPMODE
- *             //telemetry.addData("raw position", s.slamraRawPose);
- *             //telemetry.addData("tilt position", l.getCurrentTurnPosition());
- *             //telemetry.addData("is closed", l.isGrabberClosed());
- *             //telemetry.addData("right servo offset", l.getSettings().rightTurnServoOffset);
- *             //telemetry.addData("lift position:",df.format(l.getLiftPosition()));
- *
- *                         //condition ? run if true : condition ? run if true : condition ? run if true : throw new RuntimeError("im dead :(");
- *
- * //            if(gamepad2.dpad_left){
- * //                l.getSettings().rightTurnServoOffset -= 0.0001;
- * //            }
- * //            if(gamepad2.dpad_right){
- * //                l.getSettings().rightTurnServoOffset += 0.0001;
- * //            }
- */
