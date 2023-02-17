@@ -8,16 +8,21 @@ import org.firstinspires.ftc.teamcode.parts.drive.DriveControl;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.ControllablePart;
 import om.self.ezftc.utils.PID;
+import om.self.ezftc.utils.Vector3;
+import om.self.ezftc.utils.VectorMath;
 import om.self.supplier.consumer.EdgeConsumer;
 import om.self.task.core.Group;
 import om.self.task.core.TaskEx;
 import om.self.task.other.TimedTask;
 
 public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardware, LifterControl>{
+    int dockDelay = 110; //abi:110, zach:600
+
     private boolean grabberClosed = false;
 
     private final Group movementTask = new Group("auto movement",getTaskManager());
@@ -43,6 +48,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     private int pole; //the pole height(0 - terminal, 1 - low, 2 - mid, 3 - high)
     private int liftTargetPosition;
     private PositionSolver positionSolver;
+    private PositionTracker positionTracker;
     private int timesInPoleRange = 0;
 
     private final EdgeConsumer homingEdge = new EdgeConsumer();
@@ -104,6 +110,11 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     private void constructAutoPreDrop(){
         autoPreDropTask.autoStart = false;
 
+
+        autoPreDropTask.addStep(() -> {
+            LifterControl.flipOpen = 0;
+            setGrabberClosed();
+        });
         autoPreDropTask.addStep(this::preAutoMove);
        // height should be 2060 for high, (-200 for clearance)
         //changed turn pos from .286 to .141 because couldn't open all the way without hititng
@@ -111,7 +122,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
             if(pole == 0)
                 setTurnPosition(0.34);
             else
-                setTurnPosition(.444);
+                setTurnPosition(.27);
         });
         autoPreDropTask.addDelay(100);
         autoPreDropTask.addStep(()->setLiftPosition(poleToPos[pole]));
@@ -280,7 +291,8 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoPreDrop2Task.autoStart = false;
 
         autoPreDrop2Task.addStep(this::preAutoMove);
-        autoPreDrop2Task.addStep(()->setTurnPosition(.238));
+        autoPreDrop2Task.addStep(()->setLiftPosition(poleToPos[pole] + 165));
+        autoPreDrop2Task.addStep(()->setTurnPosition(.17));
         //autoPreDrop2Task.addStep(()->setLiftPosition(poleToPos[pole]));
         //autoPreDrop2Task.addStep(this::isLiftInTolerance);
         //autoPreDrop2Task.addDelay(500);
@@ -322,6 +334,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
      * MUST RUN autoDock before
      */
     private void constructAutoGrab(){
+
         autoGrabTask.autoStart = false;
 
         autoGrabTask.addStep(this::preAutoMove);
@@ -335,14 +348,17 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoGrabTask.addStep(this::isLiftInTolerance);
         autoGrabTask.addStep(this::postAutoMove);
         autoGrabTask.addStep(() -> triggerEvent(Events.grabComplete));
+
     }
 
     public void startAutoGrab(){
-        autoGrabTask.restart();
+        if(getLiftPosition() < 900) {
+            autoGrabTask.restart();
+        }
     }
 
     public void addAutoGrabToTask(TaskEx task){
-        task.addStep(autoGrabTask::restart);
+        task.addStep(this::startAutoGrab);
         task.waitForEvent(eventManager.getContainer(Events.grabComplete));
     }
 
@@ -365,6 +381,12 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 
     public void constructAutoHome(){
         autoHomeTask.autoStart = false;
+
+
+        autoGrabTask.addStep(() -> {
+            LifterControl.flipOpen = 0;
+            setGrabberClosed();
+        });
 
         autoHomeTask.addStep(() -> {
             setMotorsToHomeConfig();
@@ -402,9 +424,9 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
             }
         });
         autoDockTask.addStep(()->setTurnPosition(.95));
-        autoDockTask.addDelay(100);
+        autoDockTask.addDelay(dockDelay);
         autoDockTask.addStep(()->setLiftPosition(coneToPos[cone]));
-        autoDockTask.addDelay(500);
+//        autoDockTask.addDelay(500);
         autoDockTask.addStep(this::isLiftInTolerance);
         autoDockTask.addStep(()-> setGrabberOpen(false));
         autoDockTask.addStep(()-> {LifterControl.flipOpen = (cone == 0 ? 2 : 1);});
@@ -423,8 +445,69 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         triggerEvent(ControllablePart.Events.startControllers); //TODO make better
     }
 
-    public static final class ContollerNames {
-        public static final String distanceContoller = "distance contoller"; //TODO make better
+    // Line - shaped sensors
+    public void doConeRange(DriveControl control) {
+        int startDist = 25;
+        double finalDist = 12.75;
+        int tolerance = 1;
+        int sideTol = 5;
+
+        double sidePower = 0.075;
+//        double forwardPower = 0.08;
+        double forwardP = 0.01;
+
+
+        boolean inLeft = getLeftUltra() < startDist;
+        boolean inRight = getRightUltra() < startDist;
+
+        double shortest = getShortest();
+
+        if (getLiftPosition() > 500 && (shortest < startDist) && getCurrentTurnPosition() > 0.25) {
+            if(startConeRange){
+                if(positionSolver != null)
+                    positionSolver.triggerEvent(Robot.Events.STOP);
+                //code for when it is first in position
+                startConeRange = false;
+            }
+            // looking for middle side to side
+            if (inLeft) { // pole to the right
+                control.power = control.power.addX(sidePower); // move to right
+//                timesInPoleRange = 0;
+            } else if (inRight) { // pole to the right
+                control.power = control.power.addX(-sidePower); // move to left
+
+//                positionSolver.addMoveToTaskEx(new Vector3(VectorMath.translateAsVector2(positionTracker.getCurrentPosition(), .5,0)));
+//                timesInPoleRange = 0;
+            }
+            // setting in/out range
+//            if (shortest - tolerance > finalDist) {
+//                control.power = control.power.addY(-forwardPower);
+//                timesInPoleRange = 0;
+//            } else if (shortest + tolerance < finalDist) {
+//                control.power = control.power.addY(forwardPower);
+//                timesInPoleRange = 0;
+//            } else {
+//                /* lined up in/out */
+//                if(!(inLeft || inRight))
+//                    timesInPoleRange++;
+//            }
+
+            control.power = control.power.addY(forwardP * (finalDist - shortest));
+
+            if(Math.abs(finalDist - shortest) <= tolerance && !(inLeft || inRight))
+                timesInPoleRange++;
+            else
+                timesInPoleRange = 0;
+        }
+        else {
+            /*Not in close enough to polish position yet */
+//            if(!startConeRange)
+//                if(positionSolver != null)
+//                    positionSolver.triggerEvent(Robot.Events.START);
+            startConeRange = true;
+
+            timesInPoleRange = 0;
+        }
     }
 
     @Override
@@ -532,67 +615,11 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         return timesInPoleRange > 4;
     }
 
-    // Line - shaped sensors
-    public void doConeRange(DriveControl control) {
-        int startDist = 25;
-        double finalDist = 11.5;
-        int tolerance = 1;
-        int sideTol = 5;
-
-        double sidePower = 0.075;
-//        double forwardPower = 0.08;
-        double forwardP = 0.01;
-
-
-        boolean inLeft = getLeftUltra() < startDist;
-        boolean inRight = getRightUltra() < startDist;
-
-        double shortest = getShortest();
-
-        if (getLiftPosition() > 500 && (shortest < startDist) && getCurrentTurnPosition() > 0.35) {
-            if(startConeRange){
-                if(positionSolver != null)
-                    positionSolver.triggerEvent(Robot.Events.STOP);
-                //code for when it is first in position
-                startConeRange = false;
-            }
-            // looking for middle side to side
-            if (inLeft) { // pole to the right
-                control.power = control.power.addX(sidePower); // move to right
-//                timesInPoleRange = 0;
-            } else if (inRight) { // pole to the right
-                control.power = control.power.addX(-sidePower); // move to left
-//                timesInPoleRange = 0;
-            }
-            // setting in/out range
-//            if (shortest - tolerance > finalDist) {
-//                control.power = control.power.addY(-forwardPower);
-//                timesInPoleRange = 0;
-//            } else if (shortest + tolerance < finalDist) {
-//                control.power = control.power.addY(forwardPower);
-//                timesInPoleRange = 0;
-//            } else {
-//                /* lined up in/out */
-//                if(!(inLeft || inRight))
-//                    timesInPoleRange++;
-//            }
-
-            control.power = control.power.addY(forwardP * (finalDist - shortest));
-
-            if(Math.abs(finalDist - shortest) <= tolerance && !(inLeft || inRight))
-                timesInPoleRange++;
-            else
-                timesInPoleRange = 0;
-        }
-        else {
-            /*Not in close enough to polish position yet */
-//            if(!startConeRange)
-//                if(positionSolver != null)
-//                    positionSolver.triggerEvent(Robot.Events.START);
-            startConeRange = true;
-
-            timesInPoleRange = 0;
-        }
+    @Override
+    public void onBeanLoad() {
+        drive = getBeanManager().getBestMatch(Drive.class, false);
+        positionSolver = getBeanManager().getBestMatch(PositionSolver.class, false, true);
+        positionTracker = getBeanManager().getBestMatch(PositionTracker.class, false, true);
     }
 
     @Override
@@ -624,10 +651,8 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         parent.opMode.telemetry.addData("pole in range", isPoleInRange());
     }
 
-    @Override
-    public void onBeanLoad() {
-        drive = getBeanManager().getBestMatch(Drive.class, false);
-        positionSolver = getBeanManager().getBestMatch(PositionSolver.class, true, true);
+    public static final class ContollerNames {
+        public static final String distanceContoller = "distance controller"; //TODO make better
     }
 
     public static final class TaskNames{

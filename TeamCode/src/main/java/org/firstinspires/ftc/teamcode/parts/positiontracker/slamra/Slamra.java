@@ -23,6 +23,7 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 	Vector3 slamraFieldOffset = new Vector3 (0,0,0);
 	public Vector3 slamraFinal = new Vector3(0,0,0);
 	//End of LK ????????
+	Vector3 lastPos = new Vector3();
 
 	//constructors
 	public Slamra(PositionTracker parent) {
@@ -66,12 +67,14 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 	@Override
 	public void onRun() {
 		updateSlamraPosition();
-		parent.setCurrentPosition(slamraFinal);
+		if(slamraFinal != lastPos)
+			parent.setCurrentPosition(slamraFinal);
+		lastPos = slamraFinal;
 	}
 
 	public void updateSlamraPosition() {
 		T265Camera.CameraUpdate up = slamra.getLastReceivedCameraUpdate();
-		if (up == null) return;
+//		if (up == null) return;
 		Pose2d update = up.pose;
 		slamraRawPose = new Vector3(update.getX(), update.getY(), Math.toDegrees(update.getHeading()));
 

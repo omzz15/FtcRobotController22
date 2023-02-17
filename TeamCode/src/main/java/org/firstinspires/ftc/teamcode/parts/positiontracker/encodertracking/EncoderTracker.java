@@ -41,7 +41,7 @@ public class EncoderTracker extends LoopedPartImpl<PositionTracker, EncoderTrack
     @Override
     public void onRun() {
          Vector3 currentPos = parent.getCurrentPosition();
-         double currentAngle = currentPos.Z;
+         double currentAngle = currentPos.Z - 90;
 
          int[] currMotorPos = drive.getMotorPositions();
          int[] diff = new int[]{
@@ -53,8 +53,8 @@ public class EncoderTracker extends LoopedPartImpl<PositionTracker, EncoderTrack
          lastMotorPos = currMotorPos;
 
         //get the X and Y movement of the robot
-        double XMove = (.25 * (-diff[0] + diff[2] + diff[1] - diff[3])) / getSettings().ticksPerInchSideways;
-        double YMove = (.25 * (diff[0] + diff[2] + diff[1] + diff[3])) / getSettings().ticksPerInchForward;
+        double XMove = ((.25 * (-diff[0] + diff[2] + diff[1] - diff[3])) / getSettings().ticksPerInchSideways);
+        double YMove = ((.25 * (diff[0] + diff[2] + diff[1] + diff[3])) / getSettings().ticksPerInchForward);
 
         //rotate movement and add to robot positionTracker
         Vector3 movement = new Vector3(
