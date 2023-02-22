@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.parts.lifter.settings;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+
 import java.util.function.Supplier;
+
 import om.self.ezftc.core.Robot;
 import om.self.supplier.suppliers.EdgeSupplier;
 

@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.parts.apriltags.Tag;
 import org.firstinspires.ftc.teamcode.parts.bulkread.BulkRead;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.drive.DriveTeleop;
@@ -18,7 +19,6 @@ import java.text.DecimalFormat;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Vector3;
-import om.self.task.core.TaskEx;
 import om.self.task.other.TimedTask;
 
 /**
@@ -36,7 +36,7 @@ import om.self.task.other.TimedTask;
  */
 
 @TeleOp(name="Teleop", group="Linear Opmode")
-public class Test2 extends LinearOpMode {
+public class Teleop extends LinearOpMode {
     double tileSide = 23.5;
     public Vector3 tiletoField(Vector3 p){
         return new Vector3(p.X * tileSide, p.Y * tileSide, p.Z);
@@ -51,6 +51,8 @@ public class Test2 extends LinearOpMode {
     @Override
     public void runOpMode() {
         long start;
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        TelemetryPacket packet = new TelemetryPacket();
 
         Robot r = new Robot(this);
         new BulkRead(r);
@@ -59,70 +61,39 @@ public class Test2 extends LinearOpMode {
         //new HeaderKeeper(d);
         PositionTracker pt = new PositionTracker(r);
 
-//        Slamra s = new Slamra(pt);
-        EncoderTracker et = new EncoderTracker(pt);
+        Slamra s = new Slamra(pt);
+//        EncoderTracker et = new EncoderTracker(pt);
 
-        //new EncoderTracker(pt);
         Lifter l = new Lifter(r);
         new LifterTeleop(l);
-//        Tag t = new Tag(r);
-        //Led statLed = new Led(r);
+
 
         DecimalFormat df = new DecimalFormat("#0.0");
-        TimedTask autoTask = new TimedTask("auto task");
-        TimedTask getConeTask = new TimedTask("get cone");
-        TimedTask deliverConeTask = new TimedTask("deliver cone");
-
         r.init();
-//        s.onStart();
-//        // inject initial autonomous field start position
-//        s.slamraFieldStart = fieldStartPos;
-//
-//        s.updateSlamraPosition();
-//        Vector3 startupPose = s.slamraRawPose;
 
-        while (!isStarted()) {
-//            s.updateSlamraPosition();
-//            //telemetry.addData("pt position", pt.getCurrentPosition());
-//            telemetry.addData("raw position", s.slamraRawPose);
-//            if(!startupPose.equals(s.slamraRawPose)) telemetry.addLine("***** SLAMRA READY *****");
-            //telemetry.addData("final position", s.slamraFinal);
-            r.opMode.telemetry.update();
-            sleep(50);
-        }
+        while (!isStarted()) {}
 
         r.start();
-//        s.setupFieldOffset();
 
-//        ((TaskEx) l.getTaskManager().getChild(Lifter.TaskNames.autoHome)).restart();
         l.startAutoHome();
-
-//        l.addAutoDropPre(deliverConeTask,2060);
-//        l.addAutoDrop(deliverConeTask);
-//
-//        l.addAutoGrabPre(getConeTask,0);
-//        l.addAutoGrabToTask(getConeTask,0);
-
-        /*l.addAutoDockToTask(autoTask, 0);
-        autoTask.addDelay(2000);
-        l.addAutoGrabToTask(autoTask);
-        autoTask.addDelay(2000);
-        l.addAutoPreDropToTask(autoTask, 2);
-        autoTask.addDelay(2000);
-        l.addAutoDropToTask(autoTask);
-        */
-//        l.autoDockTask.restart();
 
         while (opModeIsActive()) {
             start = System.currentTimeMillis();
             r.run();
-            //if(gamepad1.y) getConeTask.run();
-            //if(gamepad1.b) l.autoDockTask.run();
+
+            double x = s.slamraFinal.X;
+            double y = s.slamraFinal.Y;
+            double z = Math.toRadians(s.slamraFinal.Z);
+            double x1 = Math.cos(z)*8;
+            double y1 = Math.sin(z)*8;
+            packet.fieldOverlay().setFill("blue").fillCircle(x,y,6);
+            packet.fieldOverlay().setStroke("red").strokeLine(x,y,x+x1,y+y1);
+
             telemetry.addData("limit hit", !l.getHardware().limitSwitch.getState());
             telemetry.addData("position", pt.getCurrentPosition());
             telemetry.addData("tile position", fieldToTile(pt.getCurrentPosition()));
             telemetry.addData("tilt position", l.getCurrentTurnPosition());
-//            //telemetry.addData("is closed", l.isGrabberClosed());
+            telemetry.addData("is grabber closed", l.isGrabberClosed());
             telemetry.addData("right servo offset", df.format(l.getSettings().rightTurnServoOffset));
             telemetry.addData("lift position:",df.format(l.getLiftPosition()));
             telemetry.addData("Ultra [Left : Mid : Right]", "["
@@ -130,18 +101,13 @@ public class Test2 extends LinearOpMode {
                     + df.format(l.getMidUltra()) + " : "
                     + df.format(l.getRightUltra()) +"]");
 
-//            if(gamepad2.dpad_left){
-//                l.getSettings().rightTurnServoOffset -= 0.0001;
-//            }
-//            if(gamepad2.dpad_right){
-//                l.getSettings().rightTurnServoOffset += 0.0001;
-//            }
             if(gamepad1.dpad_down) telemetry.addData("tasks", r.getTaskManager());
             if(gamepad1.dpad_down) telemetry.addData("events", r.getEventManager());
-//            telemetry.addLine(String.format("\nDetected tag ID=%s", t.detectedID));
             r.opMode.telemetry.addData("time", System.currentTimeMillis() - start);
 
+            dashboard.sendTelemetryPacket(packet);
             telemetry.update();
+
         }
         r.stop();
     }

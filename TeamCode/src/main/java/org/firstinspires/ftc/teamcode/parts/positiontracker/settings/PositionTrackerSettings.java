@@ -24,8 +24,8 @@ public class PositionTrackerSettings {
 	public static PositionTrackerSettings makeDefault(){
 		return new PositionTrackerSettings(
 				AxesOrder.XYZ,
-				true,
-				30,
+				false,
+				100,
 				new Vector3(5,5,10),
 				new Vector3(-1.5 * Constants.tileSide,62,90)
 		);

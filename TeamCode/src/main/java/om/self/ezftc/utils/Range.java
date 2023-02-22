@@ -1,5 +1,9 @@
 package om.self.ezftc.utils;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+
+import om.self.task.core.GroupEx;
+
 public class Range {
 	double min;
 	double max;
@@ -11,10 +15,6 @@ public class Range {
 
 	public double cap(double val){
 			return (val < min) ? min : (val > max) ? max : val;
-	}
-
-	public int capInt(int val){
-		return (int)cap(val);
 	}
 
 	/**
@@ -43,5 +43,25 @@ public class Range {
 	 */
 	public double doubleConvert(double val, Range range2){
 		return convertFrom(range2.convertTo(val));
+	}
+
+	public static boolean isInLimit(double val, double min, double max){
+		return min < val && val < max;
+	}
+
+	public static boolean isInLimit(int val, int min, int max){
+		return min < val && val < max;
+	}
+
+	public static double limit(double val, double min, double max){
+		return Math.min(Math.max(val, min), max);
+	}
+
+	public static int limit(int val, int min, int max){
+		return Math.min(Math.max(val, min), max);
+	}
+
+	public boolean isInLimit(double val){
+		return isInLimit(val, min, max);
 	}
 }

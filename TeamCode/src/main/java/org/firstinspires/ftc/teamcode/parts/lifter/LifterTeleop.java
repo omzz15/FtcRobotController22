@@ -73,7 +73,7 @@ public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, O
             parent.startAutoDrop2();
 
         if(magic.get()){
-            parent.setLiftPosition(parent.getLiftPosition() - 170);
+            parent.setLiftPosition(parent.getLiftPosition() - 190);
         }
 
         if(parent.parent.opMode.gamepad2.start || parent.parent.opMode.gamepad1.start){

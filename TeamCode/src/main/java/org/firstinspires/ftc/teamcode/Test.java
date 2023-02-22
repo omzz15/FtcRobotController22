@@ -8,12 +8,17 @@ import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.drive.DriveTeleop;
 import org.firstinspires.ftc.teamcode.parts.drive.headerkeeper.HeaderKeeper;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
+import org.firstinspires.ftc.teamcode.parts.positionsolver.settings.PositionSolverSettings;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.odometry.Odometry;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
+
+import java.util.function.Supplier;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Vector3;
+import om.self.supplier.suppliers.EdgeSupplier;
 import om.self.task.core.Task;
 import om.self.task.core.TaskEx;
 
@@ -41,6 +46,11 @@ public class Test extends LinearOpMode {
 
         PositionTracker pt = new PositionTracker(r);
         new EncoderTracker(pt); //Odometry(pt)
+        new Slamra(pt);
+        PositionSolver ps = new PositionSolver(d, PositionSolverSettings.makeDefaultWithoutAlwaysRun());
+
+        Supplier<Boolean> moveForward = new EdgeSupplier(() -> gamepad1.dpad_up).getRisingEdgeSupplier();
+        Supplier<Boolean> moveRight = new EdgeSupplier(() -> gamepad1.dpad_right).getRisingEdgeSupplier();
 
         r.init();
 
@@ -48,12 +58,18 @@ public class Test extends LinearOpMode {
 
         r.start();
 
+        pt.positionSourceId = EncoderTracker.class;
+
         while (opModeIsActive()) {
             r.run();
             r.opMode.telemetry.addData("position", pt.getCurrentPosition());
 
             if(r.opMode.gamepad1.a) r.opMode.telemetry.addData("task manager", r.getTaskManager());
             if(r.opMode.gamepad1.b) r.opMode.telemetry.addData("event manager", r.getEventManager());
+            if(moveForward.get())
+                ps.setNewTarget(pt.getCurrentPosition().addY(5), true);
+            if(moveRight.get())
+                ps.setNewTarget(pt.getCurrentPosition().addX(5), true);
 
             r.opMode.telemetry.update();
         }

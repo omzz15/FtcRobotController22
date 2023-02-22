@@ -20,7 +20,7 @@ public class DriveSettings {
     public static DriveSettings makeDefault(){
         return new DriveSettings(
                 DriveSettings.DriveMode.MECANUM,
-                new Vector3(0.1,0.1,0.1),
+                new Vector3(0.075,0.075,0.075),
                 true
         );
     }

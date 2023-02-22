@@ -19,7 +19,7 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
 //        public static final String done = "DONE";
 //    } //TODO add done event
 
-    private boolean t;
+    private boolean t = false;
 
     protected PositionTracker positionTracker;
 
@@ -82,6 +82,12 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
         triggerEvent(Robot.Events.START);// TODO make this better
     }
 
+    public void setMaxPower(double maxX, double maxY, double maxR){
+        xChannel.setMaxPower(maxX);
+        yChannel.setMaxPower(maxY);
+        rChannel.setMaxPower(maxR);
+    }
+
     public boolean isDone(){
         return xChannel.isDone() && yChannel.isDone() && rChannel.isDone();
     }
@@ -112,10 +118,10 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
 
     @Override
     public void onStart() {
-//        if(!t) {
-//            setNewTarget(positionTracker.getCurrentPosition(), true);
-//            t = true;
-//        }
+        if(!t) {
+            t = true;
+            setNewTarget(positionTracker.getCurrentPosition(), true);
+        }
     }
 
     @Override

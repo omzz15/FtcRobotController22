@@ -21,7 +21,7 @@ import om.self.task.core.TaskEx;
 import om.self.task.other.TimedTask;
 
 public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardware, LifterControl>{
-    int dockDelay = 110; //abi:110, zach:600
+    public int dockDelay = 110; //abi:110, zach:600
 
     private boolean grabberClosed = false;
 

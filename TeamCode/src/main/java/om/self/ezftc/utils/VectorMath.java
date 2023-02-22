@@ -37,8 +37,8 @@ public class VectorMath {
      */
     public static Vector3 translateAsVector2(Vector3 val, double x, double y){
         double r = Math.toRadians(val.Z);
-        double xOut = val.X + x * Math.cos(r) - y * Math.sin(r);
-        double yOut = val.Y + y * Math.cos(r) + x * Math.sin(r);
+        double xOut = val.X + y * Math.cos(r) + x * Math.sin(r);
+        double yOut = val.Y - x * Math.cos(r) + y * Math.sin(r);
         return new Vector3(xOut, yOut, val.Z);
     }
 

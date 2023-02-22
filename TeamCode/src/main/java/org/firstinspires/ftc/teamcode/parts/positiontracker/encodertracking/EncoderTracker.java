@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTicket;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
 import om.self.ezftc.core.part.LoopedPartImpl;
@@ -41,7 +42,7 @@ public class EncoderTracker extends LoopedPartImpl<PositionTracker, EncoderTrack
     @Override
     public void onRun() {
          Vector3 currentPos = parent.getCurrentPosition();
-         double currentAngle = currentPos.Z - 90;
+         double currentAngle = currentPos.Z;
 
          int[] currMotorPos = drive.getMotorPositions();
          int[] diff = new int[]{
@@ -53,18 +54,19 @@ public class EncoderTracker extends LoopedPartImpl<PositionTracker, EncoderTrack
          lastMotorPos = currMotorPos;
 
         //get the X and Y movement of the robot
-        double XMove = ((.25 * (-diff[0] + diff[2] + diff[1] - diff[3])) / getSettings().ticksPerInchSideways);
+        double XMove = -((.25 * (-diff[0] + diff[2] + diff[1] - diff[3])) / getSettings().ticksPerInchSideways);
         double YMove = ((.25 * (diff[0] + diff[2] + diff[1] + diff[3])) / getSettings().ticksPerInchForward);
 
-        //rotate movement and add to robot positionTracker
-        Vector3 movement = new Vector3(
-            YMove * java.lang.Math.sin(currentAngle * java.lang.Math.PI / 180) - XMove * java.lang.Math.cos(currentAngle * java.lang.Math.PI / 180),
-            XMove * java.lang.Math.sin(currentAngle * java.lang.Math.PI / 180) + YMove * java.lang.Math.cos(currentAngle * java.lang.Math.PI / 180),
-            0
-        );
+        parent.parent.opMode.telemetry.addData("raw x movement", XMove);
+        parent.parent.opMode.telemetry.addData("raw y movement", YMove);
 
-        parent.setCurrentPosition(VectorMath.add(currentPos, movement));
+        //rotate movement and add to robot positionTracker
+
+
+        parent.addPositionTicket(EncoderTracker.class, new PositionTicket(VectorMath.translateAsVector2(currentPos, XMove, YMove)));
     }
+
+
 
     @Override
     public void onStop() {

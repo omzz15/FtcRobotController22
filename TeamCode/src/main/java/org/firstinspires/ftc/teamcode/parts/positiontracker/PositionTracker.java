@@ -4,8 +4,10 @@ package org.firstinspires.ftc.teamcode.parts.positiontracker;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.hardware.PositionTrackerHardware;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.settings.PositionTrackerSettings;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -20,7 +22,8 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
     private Vector3 currentPosition = new Vector3();
     private double offset;
     private long lastUpdateTime = System.currentTimeMillis();
-    private LinkedList<PositionTicket> tickets = new LinkedList<>();
+    public Class positionSourceId; //TODO make better
+    private Hashtable<Class, PositionTicket> tickets = new Hashtable();
 
     public PositionTracker(Robot robot) {
         super(robot, "position tracker", robot.startTaskManager);
@@ -52,8 +55,8 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
         lastUpdateTime = System.currentTimeMillis();
     }
 
-    public void addPositionTicket(PositionTicket pt){
-        tickets.add(pt);
+    public void addPositionTicket(Class id, PositionTicket pt){
+        tickets.put(id, pt);
     }
 
     public boolean isPositionStale(){
@@ -73,7 +76,14 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
 
     @Override
     public void onBeanLoad() {
+        if(getBeanManager().getBestMatch(Slamra.class, true, true) != null)
+            positionSourceId = Slamra.class;
+        else if(getBeanManager().getBestMatch(EncoderTracker.class, true, true) != null)
+            positionSourceId = EncoderTracker.class;
+        else
+            positionSourceId = null;
 
+        //TODO something better
     }
 
     @Override
@@ -82,7 +92,7 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
 
     @Override
     public void onStart() {
-
+        lastUpdateTime = System.currentTimeMillis();
     }
 
     @Override
@@ -107,15 +117,12 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
 
     @Override
     public void onRun() {
-
-        if(!tickets.isEmpty()) {
-
+        if(positionSourceId != null && tickets.containsKey(positionSourceId)){
             lastUpdateTime = System.currentTimeMillis();
-
-            currentPosition = tickets.getFirst().position; //todo add something better
-
+            currentPosition = tickets.get(positionSourceId).position; //todo add something better
             tickets.clear();
         }
+
         updateAngle();
     }
 
@@ -123,4 +130,5 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
     public void onStop() {
 
     }
+
 }

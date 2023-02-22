@@ -52,7 +52,7 @@ public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, 
         double fieldXMovement = Math.cos(radAngle) * robotXMovement + Math.sin(radAngle) * robotYMovement;
         double fieldYMovement = Math.cos(radAngle) * robotYMovement + Math.sin(radAngle) * robotXMovement;
 
-        parent.addPositionTicket(new PositionTicket(pos.addX(fieldXMovement).addY(fieldYMovement).withZ(angle)));
+        parent.addPositionTicket(Odometry.class, new PositionTicket(pos.addX(fieldXMovement).addY(fieldYMovement).withZ(angle)));
 
         lastLeftYPos = getHardware().leftYWheel.getCurrentPosition();
         lastRightYPos = getHardware().rightYWheel.getCurrentPosition();
