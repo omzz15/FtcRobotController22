@@ -6,6 +6,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.hardware.PositionTrackerHardware;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.odometry.Odometry;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.settings.PositionTrackerSettings;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
 
@@ -80,8 +81,8 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
             positionSourceId = Slamra.class;
         else if(getBeanManager().getBestMatch(EncoderTracker.class, true, true) != null)
             positionSourceId = EncoderTracker.class;
-        else
-            positionSourceId = null;
+        else if(getBeanManager().getBestMatch(Odometry.class, true, true) != null)
+            positionSourceId = Odometry.class;
 
         //TODO something better
     }

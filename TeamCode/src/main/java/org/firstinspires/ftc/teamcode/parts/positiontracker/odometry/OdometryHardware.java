@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.parts.positiontracker.odometry;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.util.Hashtable;
@@ -22,7 +23,7 @@ public class OdometryHardware {
         return new OdometryHardware(
                 new MotorSettings(MotorSettings.Number.TWO_B).makeMotor(map),
                 new MotorSettings(MotorSettings.Number.ONE_B).makeMotor(map),
-                new MotorSettings(MotorSettings.Number.ZERO_B).makeMotor(map)
+                new MotorSettings(MotorSettings.Number.ZERO_B, DcMotorSimple.Direction.REVERSE).makeMotor(map)
         );
     }
 }

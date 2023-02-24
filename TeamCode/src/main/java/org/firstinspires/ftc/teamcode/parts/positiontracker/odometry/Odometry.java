@@ -1,19 +1,16 @@
 package org.firstinspires.ftc.teamcode.parts.positiontracker.odometry;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTicket;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
-
-import java.util.function.Supplier;
 
 import om.self.ezftc.core.part.LoopedPartImpl;
 import om.self.ezftc.utils.AngleMath;
 import om.self.ezftc.utils.Vector3;
-import om.self.task.core.Group;
+import om.self.ezftc.utils.VectorMath;
 
 public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, OdometryHardware> {
     int lastLeftYPos, lastRightYPos, lastXPos;
+    double cumulativeDistance = 0;
 
     public Odometry(PositionTracker parent, OdometrySettings settings, OdometryHardware hardware) {
         super(parent, "odometry");
@@ -27,14 +24,21 @@ public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, 
     }
 
     private double getAngleFromDiff(int leftYDiff, int rightYDiff){
-        return leftYDiff - rightYDiff / getSettings().ticksPerRotation;
+        return (leftYDiff - rightYDiff) / getSettings().ticksPerRotation;
     }
 
     @Override
     public void onRun() {
-        int leftYDiff = getHardware().leftYWheel.getCurrentPosition() - lastLeftYPos;
-        int rightYDiff = getHardware().rightYWheel.getCurrentPosition() - lastRightYPos;
-        int XDiff = getHardware().XWheel.getCurrentPosition() - lastXPos;
+        parent.parent.opMode.telemetry.addData("y odo dist", (getHardware().leftYWheel.getCurrentPosition() + getHardware().rightYWheel.getCurrentPosition()) / 2.0);
+        parent.parent.opMode.telemetry.addData("cumulativeDistance", cumulativeDistance);
+
+        int currLeftY = getHardware().leftYWheel.getCurrentPosition();
+        int currRightY = getHardware().leftYWheel.getCurrentPosition();
+        int currX = getHardware().XWheel.getCurrentPosition();
+
+        int leftYDiff = currLeftY - lastLeftYPos;
+        int rightYDiff = currRightY - lastRightYPos;
+        int XDiff = currX - lastXPos;
 
         parent.parent.opMode.telemetry.addData("left y diff", leftYDiff);
         parent.parent.opMode.telemetry.addData("right y diff", rightYDiff);
@@ -42,21 +46,18 @@ public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, 
 
         Vector3 pos = parent.getCurrentPosition();
 
-        double angle = AngleMath.scaleAngle(pos.Z) + getAngleFromDiff(leftYDiff, rightYDiff);
+        double angle = AngleMath.scaleAngle(pos.Z + getAngleFromDiff(leftYDiff, rightYDiff));
 
-        double robotXMovement = XDiff / getSettings().ticksPerInch;
-        double robotYMovement = (leftYDiff + rightYDiff) / (2 * getSettings().ticksPerInch);
+        double XMove = XDiff / getSettings().ticksPerInch;
+        double YMove = (leftYDiff + rightYDiff) / (2 * getSettings().ticksPerInch);
 
-        double radAngle = Math.toRadians(angle);
+        cumulativeDistance += YMove;
 
-        double fieldXMovement = Math.cos(radAngle) * robotXMovement + Math.sin(radAngle) * robotYMovement;
-        double fieldYMovement = Math.cos(radAngle) * robotYMovement + Math.sin(radAngle) * robotXMovement;
+        parent.addPositionTicket(Odometry.class, new PositionTicket(VectorMath.translateAsVector2(pos.withZ(angle), XMove, YMove)));
 
-        parent.addPositionTicket(Odometry.class, new PositionTicket(pos.addX(fieldXMovement).addY(fieldYMovement).withZ(angle)));
-
-        lastLeftYPos = getHardware().leftYWheel.getCurrentPosition();
-        lastRightYPos = getHardware().rightYWheel.getCurrentPosition();
-        lastXPos = getHardware().XWheel.getCurrentPosition();
+        lastLeftYPos = currLeftY;
+        lastRightYPos = currRightY;
+        lastXPos = currX;
     }
 
     @Override
