@@ -4,36 +4,35 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import om.self.task.core.GroupEx;
 
-public class Range {
-	double min;
-	double max;
+public abstract class Range<T>{
+	T min;
+	T max;
 
-	public Range(double min, double max){
+	public Range(T min, T max){
 		this.min = min;
 		this.max = max;
 	}
 
-	public double cap(double val){
-			return (val < min) ? min : (val > max) ? max : val;
-	}
+	/**
+	 * takes the val and limits it to be within the min and max values of the range
+	 * @param val the value to limit
+	 * @return the constrained value
+	 */
+	public abstract T limit(T val);
 
 	/**
 	 * converts a value to unit value
 	 * @param val a value in range min - max
 	 * @return a value in range 0 - 1
 	 */
-	public double convertTo(double val){
-		return (val - min)/(max - min);
-	}
+	public abstract T convertTo(T val);
 
 	/**
 	 * converts a unit value to value
 	 * @param val a value in range 0 - 1
 	 * @return a value in range min - max
 	 */
-	public double convertFrom(double val){
-		return val * (max - min) + min;
-	}
+	public abstract T convertFrom(T val);
 
 	/**
 	 * converts a value from the second Range range to an equivalent value in the first Range range
@@ -41,27 +40,14 @@ public class Range {
 	 * @param range2 the second Range for converting
 	 * @return the value converted to the first end point space in range min - max
 	 */
-	public double doubleConvert(double val, Range range2){
+	public T doubleConvert(T val, Range<T> range2){
 		return convertFrom(range2.convertTo(val));
 	}
 
-	public static boolean isInLimit(double val, double min, double max){
-		return min < val && val < max;
-	}
-
-	public static boolean isInLimit(int val, int min, int max){
-		return min < val && val < max;
-	}
-
-	public static double limit(double val, double min, double max){
-		return Math.min(Math.max(val, min), max);
-	}
-
-	public static int limit(int val, int min, int max){
-		return Math.min(Math.max(val, min), max);
-	}
-
-	public boolean isInLimit(double val){
-		return isInLimit(val, min, max);
-	}
+	/**
+	 * checks if the passed in value is within the range stored
+	 * @param val the value to check
+	 * @return whether the value is in range
+	 */
+	public abstract boolean isInLimit(T val);
 }
