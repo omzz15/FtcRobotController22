@@ -273,8 +273,8 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoDropTask.autoStart = false;
 
         autoDropTask.addStep(this::preAutoMove);
-        autoDropTask.addStep(()->setTurnPosition(.238));
-        autoDropTask.addStep(()->setLiftPosition(poleToPos[pole] - 200));
+        autoDropTask.addStep(()->setTurnPosition(.17));
+        autoDropTask.addStep(()->setLiftPosition(poleToPos[pole] - 190));
         autoDropTask.addStep(this::isLiftInTolerance);
         autoDropTask.addDelay(100); // reduce this delay as needed for tuning,was 500
         autoDropTask.addStep(()->setGrabberOpen(false));

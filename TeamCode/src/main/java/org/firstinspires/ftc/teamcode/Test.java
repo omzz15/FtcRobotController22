@@ -18,6 +18,7 @@ import java.util.function.Supplier;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Vector3;
+import om.self.ezftc.utils.VectorMath;
 import om.self.supplier.suppliers.EdgeSupplier;
 import om.self.task.core.Task;
 import om.self.task.core.TaskEx;
@@ -63,7 +64,7 @@ public class Test extends LinearOpMode {
         while (opModeIsActive()) {
             r.run();
             r.opMode.telemetry.addData("position", pt.getCurrentPosition());
-
+            r.opMode.telemetry.addData("tile position", VectorMath.divide(pt.getCurrentPosition(), 23.5));
             if(r.opMode.gamepad1.a) r.opMode.telemetry.addData("task manager", r.getTaskManager());
             if(r.opMode.gamepad1.b) r.opMode.telemetry.addData("event manager", r.getEventManager());
             if(moveForward.get())

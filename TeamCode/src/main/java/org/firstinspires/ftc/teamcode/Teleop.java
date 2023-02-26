@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.parts.drive.DriveTeleop;
 //import org.firstinspires.ftc.teamcode.parts.led.Led;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
 import org.firstinspires.ftc.teamcode.parts.lifter.LifterTeleop;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTicket;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
@@ -19,6 +20,7 @@ import java.text.DecimalFormat;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Vector3;
+import om.self.ezftc.utils.VectorMath;
 import om.self.task.other.TimedTask;
 
 /**
@@ -38,6 +40,7 @@ import om.self.task.other.TimedTask;
 @TeleOp(name="Teleop", group="Linear Opmode")
 public class Teleop extends LinearOpMode {
     double tileSide = 23.5;
+    boolean slideDone = false;
     public Vector3 tiletoField(Vector3 p){
         return new Vector3(p.X * tileSide, p.Y * tileSide, p.Z);
     }
@@ -67,7 +70,6 @@ public class Teleop extends LinearOpMode {
         Lifter l = new Lifter(r);
         new LifterTeleop(l);
 
-
         DecimalFormat df = new DecimalFormat("#0.0");
         r.init();
 
@@ -80,6 +82,7 @@ public class Teleop extends LinearOpMode {
         while (opModeIsActive()) {
             start = System.currentTimeMillis();
             r.run();
+
 
             double x = s.slamraFinal.X;
             double y = s.slamraFinal.Y;
@@ -108,6 +111,13 @@ public class Teleop extends LinearOpMode {
             dashboard.sendTelemetryPacket(packet);
             telemetry.update();
 
+            pt.positionSourceId = Teleop.class;
+            if (!slideDone) {
+                slideDone = true;
+                // one time slide to side 5 inches
+
+                pt.addPositionTicket(Teleop.class, new PositionTicket(VectorMath.translateAsVector2(pt.getCurrentPosition(), 7, 0)));
+            }
         }
         r.stop();
     }
