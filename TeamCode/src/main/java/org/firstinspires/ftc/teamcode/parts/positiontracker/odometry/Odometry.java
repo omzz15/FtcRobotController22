@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.parts.positiontracker.odometry;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTicket;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
@@ -29,12 +31,17 @@ public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, 
 
     @Override
     public void onRun() {
+
         parent.parent.opMode.telemetry.addData("y odo dist", (getHardware().leftYWheel.getCurrentPosition() + getHardware().rightYWheel.getCurrentPosition()) / 2.0);
         parent.parent.opMode.telemetry.addData("cumulativeDistance", cumulativeDistance);
 
         int currLeftY = getHardware().leftYWheel.getCurrentPosition();
-        int currRightY = getHardware().leftYWheel.getCurrentPosition();
+        int currRightY = getHardware().rightYWheel.getCurrentPosition();
         int currX = getHardware().XWheel.getCurrentPosition();
+
+        parent.parent.opMode.telemetry.addData("left y", currLeftY);
+        parent.parent.opMode.telemetry.addData("right y", currRightY);
+        parent.parent.opMode.telemetry.addData("middle x", currX);
 
         int leftYDiff = currLeftY - lastLeftYPos;
         int rightYDiff = currRightY - lastRightYPos;
@@ -46,7 +53,9 @@ public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, 
 
         Vector3 pos = parent.getCurrentPosition();
 
-        double angle = AngleMath.scaleAngle(pos.Z + getAngleFromDiff(leftYDiff, rightYDiff));
+        double odoAngle = getAngleFromDiff(leftYDiff, rightYDiff);
+        parent.parent.opMode.telemetry.addData("odo delta angle", odoAngle);
+        double angle = AngleMath.scaleAngle(pos.Z + odoAngle);
 
         double XMove = XDiff / getSettings().ticksPerInch;
         double YMove = (leftYDiff + rightYDiff) / (2 * getSettings().ticksPerInch);
@@ -70,6 +79,9 @@ public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, 
 
     @Override
     public void onStart() {
+        getHardware().XWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        getHardware().leftYWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        getHardware().rightYWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lastXPos = getHardware().XWheel.getCurrentPosition();
         lastLeftYPos = getHardware().leftYWheel.getCurrentPosition();
         lastRightYPos = getHardware().rightYWheel.getCurrentPosition();
