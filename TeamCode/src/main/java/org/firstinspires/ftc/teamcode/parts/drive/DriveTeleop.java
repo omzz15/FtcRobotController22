@@ -5,9 +5,11 @@ import org.firstinspires.ftc.teamcode.parts.drive.settings.DriveTeleopSettings;
 
 import om.self.ezftc.core.part.LoopedPartImpl;
 import om.self.ezftc.core.part.Part;
+import om.self.ezftc.utils.Vector3;
 import om.self.ezftc.utils.VectorMath;
 
 public class DriveTeleop extends LoopedPartImpl<Drive, DriveTeleopSettings, ObjectUtils.Null> {
+    Vector3 invertVector = new Vector3(-1,-1,1);
 
     public DriveTeleop(Drive parent) {
         super(parent, "drive teleop");
@@ -39,7 +41,7 @@ public class DriveTeleop extends LoopedPartImpl<Drive, DriveTeleopSettings, Obje
         parent.setBaseController(() -> new DriveControl(
                 getSettings().slowModeSupplier.get() ? VectorMath.multiply(getSettings().powerSupplier.get(), getSettings().slowModeSpeed) :
                 getSettings().midModeSupplier.get() ? VectorMath.multiply(getSettings().powerSupplier.get(), getSettings().midModeSpeed) :
-                getSettings().powerSupplier.get(),
+                getSettings().invertSupplier.get() ? VectorMath.multiply(getSettings().powerSupplier.get(), invertVector) : getSettings().powerSupplier.get(),
 
                 getSettings().stopSupplier.get()
         ), true);

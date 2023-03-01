@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
 import om.self.ezftc.core.part.LoopedPartImpl;
 import om.self.ezftc.core.part.Part;
+import om.self.ezftc.utils.Vector2;
 import om.self.ezftc.utils.Vector3;
 import om.self.ezftc.utils.VectorMath;
 
@@ -63,7 +64,7 @@ public class EncoderTracker extends LoopedPartImpl<PositionTracker, EncoderTrack
         //rotate movement and add to robot positionTracker
 
 
-        parent.addPositionTicket(EncoderTracker.class, new PositionTicket(VectorMath.translateAsVector2(currentPos, XMove, YMove)));
+        parent.addPositionTicket(EncoderTracker.class, new PositionTicket(VectorMath.translateAsVector2(currentPos, XMove, YMove), new Vector2(XMove, YMove)));
     }
 
 

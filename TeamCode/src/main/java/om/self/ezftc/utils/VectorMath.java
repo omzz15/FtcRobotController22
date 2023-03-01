@@ -1,10 +1,15 @@
 package om.self.ezftc.utils;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.checkerframework.checker.index.qual.PolyUpperBound;
 
 public class VectorMath {
     public static Vector3 add(Vector3 v1, Vector3 v2){
         return new Vector3(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
+    }
+
+    public static Vector2 add(Vector2 v1, Vector2 v2){
+        return new Vector2(v1.X + v2.X, v1.Y + v2.Y);
     }
 
     public static Vector3 subtract(Vector3 v1, Vector3 v2){
@@ -16,7 +21,7 @@ public class VectorMath {
     }
 
     public static Vector3 multiply(Vector3 v1, Vector3 v2){
-        throw new NotImplementedException(); //todo add matrix multiplication
+        return new Vector3(v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z);
     }
 
     public static Vector3 multiply(Vector3 v1, double val){

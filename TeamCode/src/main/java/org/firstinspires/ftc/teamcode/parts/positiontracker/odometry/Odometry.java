@@ -7,12 +7,17 @@ import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
 import om.self.ezftc.core.part.LoopedPartImpl;
 import om.self.ezftc.utils.AngleMath;
+import om.self.ezftc.utils.Vector2;
 import om.self.ezftc.utils.Vector3;
 import om.self.ezftc.utils.VectorMath;
 
 public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, OdometryHardware> {
     int lastLeftYPos, lastRightYPos, lastXPos;
     double cumulativeDistance = 0;
+
+    double odoAngle = 0;
+    double cumulativeOdoAngle = 0; //TESTING
+    double lastImuAngle =  0;
 
     public Odometry(PositionTracker parent, OdometrySettings settings, OdometryHardware hardware) {
         super(parent, "odometry");
@@ -53,16 +58,29 @@ public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, 
 
         Vector3 pos = parent.getCurrentPosition();
 
-        double odoAngle = getAngleFromDiff(leftYDiff, rightYDiff);
-        parent.parent.opMode.telemetry.addData("odo delta angle", odoAngle);
-        double angle = AngleMath.scaleAngle(pos.Z + odoAngle);
+        odoAngle += getAngleFromDiff(leftYDiff, rightYDiff);
+        cumulativeOdoAngle += getAngleFromDiff(leftYDiff, rightYDiff);
+
+        double imuAng = parent.getImuAngle();
+        boolean imuAccurate = Math.abs(imuAng - lastImuAngle) < 0.5;
+        if(imuAccurate){
+            odoAngle = imuAng;
+        }
+
+        lastImuAngle = imuAng;
+
+        parent.parent.opMode.telemetry.addData("imu accurate", imuAccurate);
+        parent.parent.opMode.telemetry.addData("odo angle", odoAngle);
+        parent.parent.opMode.telemetry.addData("cumulitave angle", cumulativeOdoAngle);
+
+        double angle = AngleMath.scaleAngle(odoAngle);
 
         double XMove = XDiff / getSettings().ticksPerInch;
         double YMove = (leftYDiff + rightYDiff) / (2 * getSettings().ticksPerInch);
 
         cumulativeDistance += YMove;
 
-        parent.addPositionTicket(Odometry.class, new PositionTicket(VectorMath.translateAsVector2(pos.withZ(angle), XMove, YMove)));
+        parent.addPositionTicket(Odometry.class, new PositionTicket(VectorMath.translateAsVector2(pos.withZ(angle), XMove, YMove), new Vector2(XMove, YMove)));
 
         lastLeftYPos = currLeftY;
         lastRightYPos = currRightY;
@@ -79,16 +97,25 @@ public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, 
 
     @Override
     public void onStart() {
+        getHardware().leftYServo.setPosition(getSettings().leftYServoDown);
+        getHardware().rightYServo.setPosition(getSettings().rightYServoDown);
+        getHardware().XWheelServo.setPosition(getSettings().XServoDown);
+
         getHardware().XWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         getHardware().leftYWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         getHardware().rightYWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lastXPos = getHardware().XWheel.getCurrentPosition();
         lastLeftYPos = getHardware().leftYWheel.getCurrentPosition();
         lastRightYPos = getHardware().rightYWheel.getCurrentPosition();
+
+        odoAngle = parent.getCurrentPosition().Z;
+        lastImuAngle = parent.getImuAngle();
     }
 
     @Override
     public void onStop() {
-
+        getHardware().leftYServo.setPosition(getSettings().leftYServoUp);
+        getHardware().rightYServo.setPosition(getSettings().rightYServoUp);
+        getHardware().XWheelServo.setPosition(getSettings().XServoUp);
     }
 }

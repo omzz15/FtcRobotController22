@@ -16,15 +16,19 @@ import java.util.LinkedList;
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.LoopedPartImpl;
 import om.self.ezftc.utils.AngleMath;
+import om.self.ezftc.utils.Vector2;
 import om.self.ezftc.utils.Vector3;
+import om.self.ezftc.utils.VectorMath;
 
 
 public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettings, PositionTrackerHardware> {
     private Vector3 currentPosition = new Vector3();
+    private Vector2 relativePosition = new Vector2();
     private double offset;
     private long lastUpdateTime = System.currentTimeMillis();
     public Class positionSourceId; //TODO make better
     private Hashtable<Class, PositionTicket> tickets = new Hashtable();
+    private double imuAngle = 0;
 
     public PositionTracker(Robot robot) {
         super(robot, "position tracker", robot.startTaskManager);
@@ -39,6 +43,7 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
     public void setAngle(double angle){
         updateAngle();
         offset += currentPosition.Z - angle;
+        imuAngle = angle;
         currentPosition = currentPosition.withZ(angle);
     }
 
@@ -56,6 +61,10 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
         lastUpdateTime = System.currentTimeMillis();
     }
 
+    public Vector2 getRelativePosition() {
+        return relativePosition;
+    }
+
     public void addPositionTicket(Class id, PositionTicket pt){
         tickets.put(id, pt);
     }
@@ -64,12 +73,17 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
         return System.currentTimeMillis() - lastUpdateTime > getSettings().stalePosTime;
     }
 
+    public double getImuAngle(){
+        return imuAngle;
+    }
+
     private void updateAngle() {
         if(getHardware() != null) {
             double angle = getHardware().imu.getAngularOrientation(AxesReference.EXTRINSIC, getSettings().axesOrder, AngleUnit.DEGREES).thirdAngle;
             if (getSettings().flipAngle)
                 angle *= -1;
             angle -= offset;
+            imuAngle = angle;
             setCurrentPosition(currentPosition.withZ(AngleMath.scaleAngle(angle)));
         }
     }
@@ -118,13 +132,15 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
 
     @Override
     public void onRun() {
+        updateAngle();
+
         if(positionSourceId != null && tickets.containsKey(positionSourceId)){
             lastUpdateTime = System.currentTimeMillis();
-            currentPosition = tickets.get(positionSourceId).position; //todo add something better
+            PositionTicket ticket = tickets.get(positionSourceId);
+            currentPosition = ticket.position; //todo add something better
+            relativePosition = VectorMath.add(relativePosition, ticket.robotRelative);
             tickets.clear();
         }
-
-        updateAngle();
     }
 
     @Override

@@ -178,12 +178,16 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
     }
 
     private  void autoCircuit(TimedTask autoTask){
-        Vector3 terminal = new Vector3(-2.5,2.6,180);
+        Vector3 terminal = new Vector3(-2.4,2.5,180);
         Vector3 preTerm = new Vector3(-2.3,0.5,90);
-        Vector3 preCPL = new Vector3();
-        Vector3 closePoleLow = new Vector3();
+        Vector3 preCPLmove = new Vector3(-1.5, 2.5, 90);
+        Vector3 preCPLturn = new Vector3(-1.5, 2.5, 180);
+        Vector3 preCPL = new Vector3(-1.5, 2, 180);
+        Vector3 closePoleLow = new Vector3(-1.4, 2, 180);
         Vector3 stack = new Vector3(-2.5,.5,180);
-        Vector3 poleMid = new Vector3();
+        Vector3 preMPturn = new Vector3(-1.5, 1.5, 180);
+        Vector3 preMP = new Vector3(-1.5, 1, 180);
+        Vector3 MP = new Vector3(-1.4, 1, 180);
     }
 
     private void moveMidStraight(TimedTask autoTask){

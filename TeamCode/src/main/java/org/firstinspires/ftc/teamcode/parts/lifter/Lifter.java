@@ -291,7 +291,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoPreDrop2Task.autoStart = false;
 
         autoPreDrop2Task.addStep(this::preAutoMove);
-        autoPreDrop2Task.addStep(()->setLiftPosition(poleToPos[pole] + 165));
+        autoPreDrop2Task.addStep(()->setLiftPosition(poleToPos[pole] + 50));
         autoPreDrop2Task.addStep(()->setTurnPosition(.17));
         //autoPreDrop2Task.addStep(()->setLiftPosition(poleToPos[pole]));
         //autoPreDrop2Task.addStep(this::isLiftInTolerance);
@@ -455,12 +455,17 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         double sidePower = 0.075;
 //        double forwardPower = 0.08;
         double forwardP = 0.01;
-
-
+        double sideShift = 1;
+        double farSideShift = 1.5;
+        double thisShift = sideShift;
         boolean inLeft = getLeftUltra() < startDist;
         boolean inRight = getRightUltra() < startDist;
 
+        boolean inFarLeft = inLeft && (getLeftUltra() < getMidUltra());
+        boolean inFarRight = inRight && (getRightUltra() < getMidUltra());
+
         double shortest = getShortest();
+
 
         if (getLiftPosition() > 500 && (shortest < startDist) && getCurrentTurnPosition() > 0.25) {
             if(startConeRange){
@@ -469,15 +474,23 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
                 //code for when it is first in position
                 startConeRange = false;
             }
-            // looking for middle side to side
-            if (inLeft) { // pole to the right
-                control.power = control.power.addX(sidePower); // move to right
-//                timesInPoleRange = 0;
-            } else if (inRight) { // pole to the right
-                control.power = control.power.addX(-sidePower); // move to left
 
-//                positionSolver.addMoveToTaskEx(new Vector3(VectorMath.translateAsVector2(positionTracker.getCurrentPosition(), .5,0)));
-//                timesInPoleRange = 0;
+            if (inFarLeft || inFarRight) thisShift = farSideShift;
+            else thisShift = sideShift;
+
+            // looking for middle side to side
+            if (getMidUltra() > getLeftUltra() || getMidUltra() > getRightUltra()) { // only slide when needed
+//                if (inLeft && !positionSolver.xRelativeChannel.isRunning()) { // pole to the right
+//                    positionSolver.xRelativeChannel.setNewTarget(thisShift, true);
+//                    //control.power = control.power.addX(sidePower); // move to right
+////                timesInPoleRange = 0;
+//                } else if (inRight && !positionSolver.xRelativeChannel.isRunning()) { // pole to the right
+//                    positionSolver.xRelativeChannel.setNewTarget(-thisShift, true);
+//                    //positionSolver.setNewTarget(VectorMath.translateAsVector2(positionTracker.getCurrentPosition(), -thisShift, 0), true);
+//                    //control.power = control.power.addX(-sidePower); // move to left
+////                positionSolver.addMoveToTaskEx(new Vector3(VectorMath.translateAsVector2(positionTracker.getCurrentPosition(), .5,0)));
+////                timesInPoleRange = 0;
+//                }
             }
             // setting in/out range
 //            if (shortest - tolerance > finalDist) {
