@@ -62,11 +62,12 @@ public class TeleopForza extends LinearOpMode {
         new DriveTeleop(d, DriveTeleopSettings.makeForza(r));
         //new HeaderKeeper(d);
         PositionTracker pt = new PositionTracker(r);
-        PositionSolver ps = new PositionSolver(d, PositionSolverSettings.makeDefaultWithoutAlwaysRun());
+        PositionSolver ps = new PositionSolver(d, PositionSolverSettings.defaultNoAlwaysRunSettings);
 
         //Slamra s = new Slamra(pt);
         EncoderTracker et = new EncoderTracker(pt);
         Odometry odo = new Odometry(pt);
+        odo.raise();
 
         Lifter l = new Lifter(r);
         new LifterTeleop(l);
@@ -74,12 +75,10 @@ public class TeleopForza extends LinearOpMode {
         DecimalFormat df = new DecimalFormat("#0.0");
 
         r.init();
-        odo.triggerEvent(Robot.Events.STOP);
 
         while (!isStarted()) {}
 
         r.start();
-        odo.triggerEvent(Robot.Events.STOP);
         l.startAutoHome();
 
         pt.positionSourceId = EncoderTracker.class;

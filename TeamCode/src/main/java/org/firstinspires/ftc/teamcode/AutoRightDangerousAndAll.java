@@ -66,7 +66,9 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
         pt = new PositionTracker(r, pts, PositionTrackerHardware.makeDefault(r));
 
         //Slamra s = new Slamra(pt);
-        new Odometry(pt);
+        Odometry odo = new Odometry(pt);
+        odo.lower();
+
         l = new Lifter(r);
         positionSolver = new PositionSolver(d);
         aprilTag = new Tag(r);
@@ -95,10 +97,10 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
         TimedTask killer = new TimedTask("killer", container);
         positionSolver.setNewTarget(pt.getCurrentPosition(), true);
         TaskEx posTrackSwitch = new TaskEx("pos track switch", container);
-////        // AFTER 27 SECONDS, PARK!
-//        killer.addDelay(25000);
-//        killer.addStep(() -> autoTask.runCommand(Group.Command.PAUSE));
-//        park(killer);
+//        // AFTER 25 SECONDS, PARK!
+        killer.addDelay(25000);
+        killer.addStep(() -> autoTask.runCommand(Group.Command.PAUSE));
+        park(killer);
 
 
 

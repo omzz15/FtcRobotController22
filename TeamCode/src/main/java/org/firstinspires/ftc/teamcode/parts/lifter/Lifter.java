@@ -445,6 +445,8 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         triggerEvent(ControllablePart.Events.startControllers); //TODO make better
     }
 
+//    boolean autoDropRun = false;
+
     // Line - shaped sensors
     public void doConeRange(DriveControl control) {
         int startDist = 25;
@@ -452,12 +454,14 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         int tolerance = 1;
         int sideTol = 5;
 
-        double sidePower = 0.075;
+//        double sidePower = 0.075;
+        double sidePower = 0.08;
 //        double forwardPower = 0.08;
-        double forwardP = 0.01;
-        double sideShift = 1;
-        double farSideShift = 1.5;
-        double thisShift = sideShift;
+//        double forwardP = 0.01;
+        double forwardP = 0.015;
+//        double sideShift = 1;
+//        double farSideShift = 1.5;
+//        double thisShift = sideShift;
         boolean inLeft = getLeftUltra() < startDist;
         boolean inRight = getRightUltra() < startDist;
 
@@ -475,11 +479,21 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
                 startConeRange = false;
             }
 
-            if (inFarLeft || inFarRight) thisShift = farSideShift;
-            else thisShift = sideShift;
+//            if (inFarLeft || inFarRight) thisShift = farSideShift;
+//            else thisShift = sideShift;
+
+            if (inFarLeft) { // pole to the right
+                control.power = control.power.addX(sidePower); // move to right
+//                timesInPoleRange = 0;
+            } else if (inFarRight) { // pole to the right
+                control.power = control.power.addX(-sidePower); // move to left
+
+//                positionSolver.addMoveToTaskEx(new Vector3(VectorMath.translateAsVector2(positionTracker.getCurrentPosition(), .5,0)));
+//                timesInPoleRange = 0;
+            }
 
             // looking for middle side to side
-            if (getMidUltra() > getLeftUltra() || getMidUltra() > getRightUltra()) { // only slide when needed
+//            if (getMidUltra() > getLeftUltra() || getMidUltra() > getRightUltra()) { // only slide when needed
 //                if (inLeft && !positionSolver.xRelativeChannel.isRunning()) { // pole to the right
 //                    positionSolver.xRelativeChannel.setNewTarget(thisShift, true);
 //                    //control.power = control.power.addX(sidePower); // move to right
@@ -491,7 +505,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 ////                positionSolver.addMoveToTaskEx(new Vector3(VectorMath.translateAsVector2(positionTracker.getCurrentPosition(), .5,0)));
 ////                timesInPoleRange = 0;
 //                }
-            }
+//            }
             // setting in/out range
 //            if (shortest - tolerance > finalDist) {
 //                control.power = control.power.addY(-forwardPower);
@@ -507,10 +521,17 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 
             control.power = control.power.addY(forwardP * (finalDist - shortest));
 
-            if(Math.abs(finalDist - shortest) <= tolerance && !(inLeft || inRight))
+            if(Math.abs(finalDist - shortest) <= tolerance && !(inLeft || inRight)) {
                 timesInPoleRange++;
-            else
+//                if(isConeInRange() && !autoDropRun) {
+//                    startAutoDrop2();
+//                    autoDropRun = true;
+//                }
+            }
+            else {
                 timesInPoleRange = 0;
+//                autoDropRun = false;
+            }
         }
         else {
             /*Not in close enough to polish position yet */
@@ -520,6 +541,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
             startConeRange = true;
 
             timesInPoleRange = 0;
+//            autoDropRun = false;
         }
     }
 

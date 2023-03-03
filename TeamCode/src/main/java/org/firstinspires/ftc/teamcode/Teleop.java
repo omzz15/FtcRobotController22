@@ -68,11 +68,12 @@ public class Teleop extends LinearOpMode {
         //new HeaderKeeper(d);
         PositionTracker pt = new PositionTracker(r);
         //PositionSolver ps = new PositionSolver(d, PositionSolverSettings.makeDefaultWithoutAlwaysRun());
-        //XRelativeSolver solver = new XRelativeSolver(d);
+        XRelativeSolver solver = new XRelativeSolver(d);
 
         //Slamra s = new Slamra(pt);
         EncoderTracker et = new EncoderTracker(pt);
         Odometry odo = new Odometry(pt);
+        odo.raise();
 
         Lifter l = new Lifter(r);
         new LifterTeleop(l);
@@ -80,12 +81,11 @@ public class Teleop extends LinearOpMode {
         DecimalFormat df = new DecimalFormat("#0.0");
 
         r.init();
-        odo.triggerEvent(Robot.Events.STOP);
 
         while (!isStarted()) {}
 
         r.start();
-        odo.triggerEvent(Robot.Events.STOP);
+
         l.startAutoHome();
 
         pt.positionSourceId = EncoderTracker.class;
@@ -123,9 +123,9 @@ public class Teleop extends LinearOpMode {
             if(gamepad1.dpad_down) telemetry.addData("events", r.getEventManager());
             r.opMode.telemetry.addData("time", System.currentTimeMillis() - start);
 
-//            if(gamepad1.dpad_down) {
-//                solver.setNewTarget(10, true);
-//            }
+            if(gamepad1.dpad_down) {
+                solver.setNewTarget(10, true);
+            }
 
             dashboard.sendTelemetryPacket(packet);
             telemetry.update();

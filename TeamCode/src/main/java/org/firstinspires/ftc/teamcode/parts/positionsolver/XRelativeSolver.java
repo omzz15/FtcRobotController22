@@ -16,7 +16,7 @@ public class XRelativeSolver extends Solver<Drive, DriveControl>{
 
     public XRelativeSolver(Drive drive) {
         super(drive, "x relative channel");
-        setSettings(new SolverSettings(0.3,10,true,10000, new PIDCoefficients(0.05, 0,0), 1));
+        setSettings(new SolverSettings(0.6,10,true,10000, new PIDCoefficients(0.05, 0,0), 1));
     }
 
     public XRelativeSolver(Drive drive, SolverSettings settings){

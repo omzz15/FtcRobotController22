@@ -31,7 +31,7 @@ public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, 
     }
 
     private double getAngleFromDiff(int leftYDiff, int rightYDiff){
-        return (leftYDiff - rightYDiff) / getSettings().ticksPerRotation;
+        return (leftYDiff - rightYDiff) * 360 / getSettings().ticksPerRotation;
     }
 
     @Override
@@ -58,8 +58,8 @@ public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, 
 
         Vector3 pos = parent.getCurrentPosition();
 
-        odoAngle += getAngleFromDiff(leftYDiff, rightYDiff);
-        cumulativeOdoAngle += getAngleFromDiff(leftYDiff, rightYDiff);
+        odoAngle = AngleMath.scaleAngle(getAngleFromDiff(leftYDiff, rightYDiff) + odoAngle);
+        cumulativeOdoAngle = AngleMath.scaleAngle(getAngleFromDiff(leftYDiff, rightYDiff) + cumulativeOdoAngle);
 
         double imuAng = parent.getImuAngle();
         boolean imuAccurate = Math.abs(imuAng - lastImuAngle) < 0.5;
@@ -73,14 +73,14 @@ public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, 
         parent.parent.opMode.telemetry.addData("odo angle", odoAngle);
         parent.parent.opMode.telemetry.addData("cumulitave angle", cumulativeOdoAngle);
 
-        double angle = AngleMath.scaleAngle(odoAngle);
+        double angle = odoAngle;
 
         double XMove = XDiff / getSettings().ticksPerInch;
         double YMove = (leftYDiff + rightYDiff) / (2 * getSettings().ticksPerInch);
 
         cumulativeDistance += YMove;
 
-        parent.addPositionTicket(Odometry.class, new PositionTicket(VectorMath.translateAsVector2(pos.withZ(angle), XMove, YMove), new Vector2(XMove, YMove)));
+        parent.addPositionTicket(Odometry.class, new PositionTicket(VectorMath.translateAsVector2(pos.withZ(imuAng), XMove, YMove), new Vector2(XMove, YMove)));
 
         lastLeftYPos = currLeftY;
         lastRightYPos = currRightY;
@@ -93,14 +93,11 @@ public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, 
     }
 
     @Override
-    public void onInit() {}
+    public void onInit() {
+    }
 
     @Override
     public void onStart() {
-        getHardware().leftYServo.setPosition(getSettings().leftYServoDown);
-        getHardware().rightYServo.setPosition(getSettings().rightYServoDown);
-        getHardware().XWheelServo.setPosition(getSettings().XServoDown);
-
         getHardware().XWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         getHardware().leftYWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         getHardware().rightYWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -114,6 +111,15 @@ public class Odometry extends LoopedPartImpl<PositionTracker, OdometrySettings, 
 
     @Override
     public void onStop() {
+    }
+
+    public void lower(){
+        getHardware().leftYServo.setPosition(getSettings().leftYServoDown);
+        getHardware().rightYServo.setPosition(getSettings().rightYServoDown);
+        getHardware().XWheelServo.setPosition(getSettings().XServoDown);
+    }
+
+    public void raise(){
         getHardware().leftYServo.setPosition(getSettings().leftYServoUp);
         getHardware().rightYServo.setPosition(getSettings().rightYServoUp);
         getHardware().XWheelServo.setPosition(getSettings().XServoUp);

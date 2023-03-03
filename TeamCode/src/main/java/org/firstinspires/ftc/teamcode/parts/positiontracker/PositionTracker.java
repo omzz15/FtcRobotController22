@@ -83,8 +83,8 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
             if (getSettings().flipAngle)
                 angle *= -1;
             angle -= offset;
-            imuAngle = angle;
-            setCurrentPosition(currentPosition.withZ(AngleMath.scaleAngle(angle)));
+            imuAngle = AngleMath.scaleAngle(angle);
+            setCurrentPosition(currentPosition.withZ(imuAngle));
         }
     }
 

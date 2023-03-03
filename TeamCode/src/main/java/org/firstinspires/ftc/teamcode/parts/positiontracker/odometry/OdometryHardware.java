@@ -34,8 +34,8 @@ public class OdometryHardware {
                 new MotorSettings(MotorSettings.Number.ONE_B, DcMotorSimple.Direction.REVERSE).makeMotor(map),
                 new MotorSettings(MotorSettings.Number.TWO_B).makeMotor(map),
                 new MotorSettings(MotorSettings.Number.THREE_B, DcMotorSimple.Direction.REVERSE).makeMotor(map),
-                new ServoSettings(ServoSettings.Number.ONE_B).makeServo(map),
                 new ServoSettings(ServoSettings.Number.THREE_B).makeServo(map),
+                new ServoSettings(ServoSettings.Number.ONE_B).makeServo(map),
                 new ServoSettings(ServoSettings.Number.THREE).makeServo(map)
         );
     }

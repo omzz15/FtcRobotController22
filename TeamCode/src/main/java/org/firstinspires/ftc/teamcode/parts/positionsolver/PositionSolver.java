@@ -65,7 +65,7 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
 
     public PositionSolver(Drive parent) {
         super(parent, "position solver");
-        setSettings(PositionSolverSettings.makeDefault());
+        setSettings(PositionSolverSettings.defaultSettings);
     }
 
     public PositionSolver(Drive parent, PositionSolverSettings settings){
