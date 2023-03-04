@@ -79,7 +79,7 @@ public class TeleopForza extends LinearOpMode {
         while (!isStarted()) {}
 
         r.start();
-        l.startAutoHome();
+        //l.startAutoHome();
 
         pt.positionSourceId = EncoderTracker.class;
 

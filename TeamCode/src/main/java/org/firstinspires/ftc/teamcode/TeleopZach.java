@@ -71,7 +71,7 @@ public class TeleopZach extends LinearOpMode {
 
         r.start();
 
-        l.startAutoHome();
+        //l.startAutoHome();
 
         while (opModeIsActive()) {
             start = System.currentTimeMillis();

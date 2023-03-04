@@ -37,7 +37,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     private final TimedTask autoMoveToCone = new TimedTask(TaskNames.autoMoveToCone, getTaskManager());
     PID autoMoveToConePID = new PID();
 
-    private final int[] coneToPos = {0,130,240,370,470}; //TODO move to settings
+    private final int[] coneToPos = {0,110,220,350,450}; //TODO move to settings
 
 
     private Drive drive;
@@ -87,16 +87,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     public boolean isConeInRangeTeleOp(){
         return getDistToCone() < 3 && !isGrabberClosed();
     }
-
-    private void constructAutoMoveToCone(){
-        autoMoveToCone.autoStart = false;
-
-        autoMoveToCone.addStep(() -> {
-            drive.addController("Move to cone", (control) -> control.power = control.power.addY(.07 * getDistToCone()));
-        });
-        autoMoveToCone.addTimedStep(() -> {parent.opMode.telemetry.addData("moving to cone", true);}, this::isConeInRange, 3000);
-        autoMoveToCone.addStep(() -> drive.removeController("Move to cone"));
-    }
+    boolean autoDropRun = false;
 
     public void startAutoMoveToCone(){
         autoMoveToCone.restart();
@@ -107,28 +98,14 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         taskEx.addStep(autoMoveToCone::isDone);
     }
 
-    private void constructAutoPreDrop(){
-        autoPreDropTask.autoStart = false;
+    private void constructAutoMoveToCone(){
+        autoMoveToCone.autoStart = false;
 
-
-        autoPreDropTask.addStep(() -> {
-            LifterControl.flipOpen = 0;
-            setGrabberClosed();
+        autoMoveToCone.addStep(() -> {
+            drive.addController("Move to cone", (control) -> control.power = control.power.addY(.07 * getDistToCone()));
         });
-        autoPreDropTask.addStep(this::preAutoMove);
-       // height should be 2060 for high, (-200 for clearance)
-        //changed turn pos from .286 to .141 because couldn't open all the way without hititng
-        autoPreDropTask.addStep(()->{
-            if(pole == 0)
-                setTurnPosition(0.34);
-            else
-                setTurnPosition(.27);
-        });
-        autoPreDropTask.addDelay(100);
-        autoPreDropTask.addStep(()->setLiftPosition(poleToPos[pole]));
-        autoPreDropTask.addStep(this::isLiftInTolerance);
-        autoPreDropTask.addStep(this::postAutoMove);
-        autoPreDropTask.addStep(() -> triggerEvent(Events.preDropComplete));
+        autoMoveToCone.addTimedStep(() -> {parent.opMode.telemetry.addData("moving to cone", true);}, this::isConeInRange, 1500);
+        autoMoveToCone.addStep(() -> drive.removeController("Move to cone"));
     }
 
     public void startAutoPreDrop(){
@@ -266,21 +243,28 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         this.pole = pole;
     }
 
-    /**
-     * MUST RUN autoDropPre before
-     */
-    private void constructAutoDrop(){
-        autoDropTask.autoStart = false;
+    private void constructAutoPreDrop(){
+        autoPreDropTask.autoStart = false;
 
-        autoDropTask.addStep(this::preAutoMove);
-        autoDropTask.addStep(()->setTurnPosition(.17));
-        autoDropTask.addStep(()->setLiftPosition(poleToPos[pole] - 190));
-        autoDropTask.addStep(this::isLiftInTolerance);
-        autoDropTask.addDelay(100); // reduce this delay as needed for tuning,was 500
-        autoDropTask.addStep(()->setGrabberOpen(false));
-        autoDropTask.addDelay(500); //TODO tune to less,was 2000
-        autoDropTask.addStep(this::postAutoMove);
-        autoDropTask.addStep(() -> triggerEvent(Events.dropComplete));
+
+        autoPreDropTask.addStep(() -> {
+            LifterControl.flipOpen = 0;
+            setGrabberClosed();
+        });
+        autoPreDropTask.addStep(this::preAutoMove);
+       // height should be 2060 for high, (-200 for clearance)
+        //changed turn pos from .286 to .141 because couldn't open all the way without hititng
+        autoPreDropTask.addStep(()->{
+            if(pole == 0)
+                setTurnPosition(0.34);
+            else
+                setTurnPosition(.27);
+        });
+//        autoPreDropTask.addDelay(100);
+        autoPreDropTask.addStep(()->setLiftPosition(poleToPos[pole]));
+        autoPreDropTask.addStep(this::isLiftInTolerance);
+        autoPreDropTask.addStep(this::postAutoMove);
+        autoPreDropTask.addStep(() -> triggerEvent(Events.preDropComplete));
     }
 
     public void startAutoDrop(){
@@ -330,25 +314,22 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         task.addStep(() -> this.cone = cone);
         addAutoDockToTask(task);
     }
+
     /**
-     * MUST RUN autoDock before
+     * MUST RUN autoDropPre before
      */
-    private void constructAutoGrab(){
+    private void constructAutoDrop(){
+        autoDropTask.autoStart = false;
 
-        autoGrabTask.autoStart = false;
-
-        autoGrabTask.addStep(this::preAutoMove);
-        //autoGrabTask.addDelay(2000);
-        autoGrabTask.addStep(() -> {
-            LifterControl.flipOpen = 0;
-            setGrabberClosed();
-        });
-        autoGrabTask.addDelay(500); // needed to let grabber open
-        autoGrabTask.addStep(() -> setLiftPosition(coneToPos[cone] + 400));
-        autoGrabTask.addStep(this::isLiftInTolerance);
-        autoGrabTask.addStep(this::postAutoMove);
-        autoGrabTask.addStep(() -> triggerEvent(Events.grabComplete));
-
+        autoDropTask.addStep(this::preAutoMove);
+        autoDropTask.addStep(()->setTurnPosition(.17));
+        autoDropTask.addStep(()->setLiftPosition(poleToPos[pole] - 190));
+        autoDropTask.addStep(this::isLiftInTolerance);
+        autoDropTask.addDelay(100); // reduce this delay as needed for tuning,was 500
+        autoDropTask.addStep(()->setGrabberOpen(false));
+        autoDropTask.addDelay(350); //TODO tune to less,was 2000
+        autoDropTask.addStep(this::postAutoMove);
+        autoDropTask.addStep(() -> triggerEvent(Events.dropComplete));
     }
 
     public void startAutoGrab(){
@@ -426,7 +407,6 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         autoDockTask.addStep(()->setTurnPosition(.95));
         autoDockTask.addDelay(dockDelay);
         autoDockTask.addStep(()->setLiftPosition(coneToPos[cone]));
-//        autoDockTask.addDelay(500);
         autoDockTask.addStep(this::isLiftInTolerance);
         autoDockTask.addStep(()-> setGrabberOpen(false));
         autoDockTask.addStep(()-> {LifterControl.flipOpen = (cone == 0 ? 2 : 1);});
@@ -445,12 +425,31 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         triggerEvent(ControllablePart.Events.startControllers); //TODO make better
     }
 
-//    boolean autoDropRun = false;
+    /**
+     * MUST RUN autoDock before
+     */
+    private void constructAutoGrab(){
+
+        autoGrabTask.autoStart = false;
+
+        autoGrabTask.addStep(this::preAutoMove);
+        //autoGrabTask.addDelay(2000);
+        autoGrabTask.addStep(() -> {
+            LifterControl.flipOpen = 0;
+            setGrabberClosed();
+        });
+        autoGrabTask.addDelay(200); // needed to let grabber close
+        autoGrabTask.addStep(() -> setLiftPosition(coneToPos[cone] + 450));
+        autoGrabTask.addStep(this::isLiftInTolerance);
+        autoGrabTask.addStep(this::postAutoMove);
+        autoGrabTask.addStep(() -> triggerEvent(Events.grabComplete));
+
+    }
 
     // Line - shaped sensors
     public void doConeRange(DriveControl control) {
-        int startDist = 25;
-        double finalDist = 12.75;
+        int startDist = 30;
+        double finalDist = 14.5;
         int tolerance = 1;
         int sideTol = 5;
 
@@ -521,16 +520,16 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 
             control.power = control.power.addY(forwardP * (finalDist - shortest));
 
-            if(Math.abs(finalDist - shortest) <= tolerance && !(inLeft || inRight)) {
+            if(Math.abs(finalDist - shortest) <= tolerance && !(inFarLeft || inFarRight)) {
                 timesInPoleRange++;
-//                if(isConeInRange() && !autoDropRun) {
-//                    startAutoDrop2();
-//                    autoDropRun = true;
-//                }
+                if(isConeInRange() && !autoDropRun) {
+                    startAutoDrop2();
+                    autoDropRun = true;
+                }
             }
             else {
-                timesInPoleRange = 0;
-//                autoDropRun = false;
+                timesInPoleRange = Math.max(timesInPoleRange-1, 0);
+                autoDropRun = false;
             }
         }
         else {
@@ -647,7 +646,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     }
 
     public boolean isPoleInRange(){
-        return timesInPoleRange > 4;
+        return timesInPoleRange > 10;
     }
 
     @Override

@@ -86,7 +86,7 @@ public class Teleop extends LinearOpMode {
 
         r.start();
 
-        l.startAutoHome();
+        //l.startAutoHome();
 
         pt.positionSourceId = EncoderTracker.class;
 

@@ -37,7 +37,7 @@ import om.self.task.core.TaskEx;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@TeleOp(name="enc bot test w/ relative move", group="Linear Opmode")
+@TeleOp(name="odo bot test w/ relative move", group="Linear Opmode")
 public class Test extends LinearOpMode {
     @Override
     public void runOpMode() {
@@ -47,8 +47,8 @@ public class Test extends LinearOpMode {
         new DriveTeleop(d);
 
         PositionTracker pt = new PositionTracker(r);
-        new EncoderTracker(pt);
-        //new Odometry(pt);
+//        new EncoderTracker(pt);
+        new Odometry(pt);
         //new Slamra(pt);
         //PositionSolver ps = new PositionSolver(d, PositionSolverSettings.makeDefaultWithoutAlwaysRun());
         XRelativeSolver solver = new XRelativeSolver(d);
@@ -62,7 +62,7 @@ public class Test extends LinearOpMode {
 
         r.start();
 
-        pt.positionSourceId = EncoderTracker.class;
+        pt.positionSourceId = Odometry.class;
 
         while (opModeIsActive()) {
             r.run();
