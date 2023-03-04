@@ -41,7 +41,7 @@ import om.self.task.other.TimedTask;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Teleop", group="Linear Opmode")
+@TeleOp(name="2 Teleop", group="Linear Opmode")
 public class Teleop extends LinearOpMode {
     double tileSide = 23.5;
     boolean slideDone = false;

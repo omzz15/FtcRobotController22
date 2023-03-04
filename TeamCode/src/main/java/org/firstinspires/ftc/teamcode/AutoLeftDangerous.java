@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import om.self.ezftc.utils.AngleMath;
 
-@Autonomous(name="Auto-LEFT-Dangerous", group="Test")
+@Autonomous(name="6 Auto-LEFT-Dangerous", group="Test")
 public class AutoLeftDangerous extends AutoRightDangerousAndAll {
     @Override
     public void initAuto(){

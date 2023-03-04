@@ -1,6 +1,6 @@
 
 package org.firstinspires.ftc.teamcode.parts.positionsolver.settings;
-
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 public class PositionSolverSettings {
@@ -17,6 +17,12 @@ public class PositionSolverSettings {
     public static PositionSolverSettings loseSettings = new PositionSolverSettings(
             new SolverSettings(5, 5, true, 10000, new PIDCoefficients(0.05, 0, 0), 1),
             new SolverSettings(5, 5, true, 10000, new PIDCoefficients(0.05, 0, 0), 1),
+            new SolverSettings(10, 5, true, 10000, new PIDCoefficients(0.0125, 0, 0), 1)
+    );
+
+    public static PositionSolverSettings extraLoseSettings = new PositionSolverSettings(
+            new SolverSettings(25, 5, true, 10000, new PIDCoefficients(0.05, 0, 0), 1),
+            new SolverSettings(10, 5, true, 10000, new PIDCoefficients(0.05, 0, 0), 1),
             new SolverSettings(10, 5, true, 10000, new PIDCoefficients(0.0125, 0, 0), 1)
     );
 

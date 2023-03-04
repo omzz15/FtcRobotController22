@@ -36,7 +36,7 @@ import om.self.ezftc.utils.Vector3;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Teleop Forza", group="Linear Opmode")
+@TeleOp(name="1 Teleop Forza", group="Linear Opmode")
 public class TeleopForza extends LinearOpMode {
     double tileSide = 23.5;
     boolean slideDone = false;
@@ -98,6 +98,10 @@ public class TeleopForza extends LinearOpMode {
             double y1 = Math.sin(z)*8;
             packet.fieldOverlay().setFill("blue").fillCircle(x,y,6);
             packet.fieldOverlay().setStroke("red").strokeLine(x,y,x+x1,y+y1);
+
+            // Debug lines
+            telemetry.addData("opmode name",r.opMode.getClass().getName());
+            telemetry.addData("opmode name",r.opMode.getClass().getAnnotation(TeleOp.class));
 
             telemetry.addData("limit hit", !l.getHardware().limitSwitch.getState());
             //telemetry.addData("position", pt.getCurrentPosition());

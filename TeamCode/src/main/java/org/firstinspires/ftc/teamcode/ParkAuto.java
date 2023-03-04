@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import om.self.ezftc.utils.AngleMath;
 
-@Autonomous(name="park auto", group="Test")
+@Autonomous(name="1 park auto", group="Test")
 public class ParkAuto extends AutoRightDangerousAndAll {
     @Override
     public void initAuto(){

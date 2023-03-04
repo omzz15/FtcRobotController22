@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -24,7 +25,7 @@ import om.self.ezftc.utils.Vector3;
 import om.self.task.core.Group;
 import om.self.task.core.TaskEx;
 import om.self.task.other.TimedTask;
-
+@Disabled
 @Autonomous(name="SLAMRA-auto-RIGHT-DANGEROUS", group="Test")
 public class TestAutoSLAMRA extends LinearOpMode{
     public Function<Vector3, Vector3> transformFunc;
