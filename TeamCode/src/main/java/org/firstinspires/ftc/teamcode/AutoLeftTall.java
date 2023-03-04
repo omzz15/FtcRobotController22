@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-@Autonomous(name="5 Auto-LEFT-Tall", group="Test")
+@Disabled
+@Autonomous(name="7 Auto-LEFT-Tall", group="Test")
 public class AutoLeftTall extends AutoRightDangerousAndAll {
     @Override
     public void initAuto(){

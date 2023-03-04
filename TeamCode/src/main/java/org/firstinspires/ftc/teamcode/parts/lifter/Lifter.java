@@ -462,7 +462,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     // Line - shaped sensors
     public void doConeRange(DriveControl control) {
         int startDist = 30;
-        double finalDist = 14.5;
+        double finalDist = 14;
         int tolerance = 1;
         int sideTol = 5;
 
