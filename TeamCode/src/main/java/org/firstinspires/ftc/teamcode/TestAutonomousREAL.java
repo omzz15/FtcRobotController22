@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Const;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.teamcode.parts.apriltags.Tag;
 import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
@@ -11,11 +12,14 @@ import org.firstinspires.ftc.teamcode.parts.lifter.LifterControl;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.Solver;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.hardware.PositionTrackerHardware;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.settings.PositionTrackerSettings;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
 
 import java.text.DecimalFormat;
 
 import om.self.ezftc.core.Robot;
+import om.self.ezftc.utils.AngleMath;
 import om.self.ezftc.utils.Constants;
 import om.self.ezftc.utils.Vector;
 import om.self.ezftc.utils.Vector3;
@@ -29,13 +33,33 @@ public class TestAutonomousREAL extends LinearOpMode{
     PositionSolver positionSolver;
     Tag aprilTag;
 
-
+    boolean isLeftSide;
+    //Vector3 fieldStartPos;
+    private Vector3 flipINate (Vector3 pos) {
+        if (!isLeftSide) return pos;
+        return new Vector3(-pos.X, pos.Y, AngleMath.scaleAngle(180-pos.Z));
+    }
+    public void setAutoVar (){
+        isLeftSide = false;
+        //fieldStartPos = new Vector3(-1.5 * Constants.tileSide,62,90);
+    }
 
     @Override
     public void runOpMode() {
+        setAutoVar();
         Robot r = new Robot(this);
         Drive d = new Drive(r);
-        PositionTracker pt = new PositionTracker(r);
+        //PositionTracker pt = new PositionTracker(r);   //LK Delete next line
+        PositionTracker pt = new PositionTracker(
+            r,
+            new PositionTrackerSettings(
+                AxesOrder.XYZ,
+                true,
+                30,
+                flipINate(new Vector3(-1.5 * Constants.tileSide,62,90))
+            ),
+            PositionTrackerHardware.makeDefault(r)
+        );
         Slamra s = new Slamra(pt);
         l = new Lifter(r);
         positionSolver = new PositionSolver(d);
