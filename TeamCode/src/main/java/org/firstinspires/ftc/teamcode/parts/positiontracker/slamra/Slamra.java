@@ -119,6 +119,16 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 		//=x_robot*SIN(RADIANS($C10))+y_robot*COS(RADIANS($C10))
 		slamraRobotPose = slamraRobotPose.withY(sY + (rX*Math.sin(Math.toRadians(sR)) + rY*Math.cos(Math.toRadians(sR))));
 		slamraRobotPose = slamraRobotPose.withZ(sR + rR);
+
+		/* Proposed slamra transformation code cleanup phase 1
+		Vector3 pose1 = slamraRawPose;
+		Vector3 pose2 = slamraRobotOffset;
+		slamraRobotPose = new Vector3(
+				pose1.X + (pose2.X*Math.cos(Math.toRadians(pose1.Z)) - pose2.Y*Math.sin(Math.toRadians(pose1.Z))),
+				pose1.Y + (pose2.X*Math.sin(Math.toRadians(pose1.Z)) + pose2.Y*Math.cos(Math.toRadians(pose1.Z))),
+				pose1.Z + pose2.Z
+		);
+		*/
 	}
 
 	// run this once at start after getting first robot pose
@@ -142,6 +152,17 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 		slamraFieldOffset = slamraFieldOffset.withX(fX - (rX*Math.cos(Math.toRadians(sR)) - rY*Math.sin(Math.toRadians(sR))));
 		//=M4*SIN(RADIANS(r_field_slam))+N4*COS(RADIANS(r_field_slam))
 		slamraFieldOffset = slamraFieldOffset.withY(fY - (rX*Math.sin(Math.toRadians(sR)) + rY*Math.cos(Math.toRadians(sR))));
+
+		/* Proposed slamra transformation code cleanup phase 1
+		Vector3 sFS = slamraFieldStart;
+		Vector3 sRP = slamraRobotPose;
+		double offsetR = sFS.Z - sRP.Z;
+		slamraFieldOffset = new Vector3 (
+				sFS.X - (sRP.X*Math.cos(Math.toRadians(offsetR)) - sRP.Y*Math.sin(Math.toRadians(offsetR))),
+				sFS.Y - (sRP.X*Math.sin(Math.toRadians(offsetR)) + sRP.Y*Math.cos(Math.toRadians(offsetR))),
+				offsetR
+		);
+		*/
 	}
 
 	void setSlamraFinal() {
@@ -158,6 +179,16 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 		//=I11*SIN(RADIANS(r_field_slam))+J11*COS(RADIANS(r_field_slam))
 		slamraFinal = slamraFinal.withY((rX*Math.sin(Math.toRadians(oR)) + rY*Math.cos(Math.toRadians(oR))) + oY);
 		slamraFinal = slamraFinal.withZ(rR + oR);
+
+		/* Proposed slamra transformation code cleanup phase 1
+		Vector3 pose1 = slamraFieldOffset;
+		Vector3 pose2 = slamraRobotPose;
+		slamraFinal = new Vector3(
+				pose1.X + (pose2.X*Math.cos(Math.toRadians(pose1.Z)) - pose2.Y*Math.sin(Math.toRadians(pose1.Z))),
+				pose1.Y + (pose2.X*Math.sin(Math.toRadians(pose1.Z)) + pose2.Y*Math.cos(Math.toRadians(pose1.Z))),
+				pose1.Z + pose2.Z
+		);
+		*/
 	}
 	//End of LK ????????
 
