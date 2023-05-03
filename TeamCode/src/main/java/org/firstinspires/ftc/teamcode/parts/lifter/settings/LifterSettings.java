@@ -40,8 +40,6 @@ public class LifterSettings {
         this.maxPoles = maxPoles;
     }
 
-    //changed grabberservo open pos from .9 to .86 (wouldn't open all the way during autonomous test)
-
     public static LifterSettings makeDefault(){
         return new LifterSettings(
                 0.064,
@@ -50,12 +48,12 @@ public class LifterSettings {
                 0,
                 .7,
                 0.67,
-                0.85,
+                0.82,
                 0.05,
                 150,
                 150,
                 0,
-                3200,
+                3000,
                 20,
                 4,
                 3

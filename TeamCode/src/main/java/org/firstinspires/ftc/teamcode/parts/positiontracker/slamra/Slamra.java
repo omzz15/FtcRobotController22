@@ -5,6 +5,7 @@ import com.spartronics4915.lib.T265Camera;
 import com.spartronics4915.lib.T265Helper;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTicket;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
 import om.self.ezftc.core.part.LoopedPartImpl;
@@ -23,6 +24,8 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 	Vector3 slamraFieldOffset = new Vector3 (0,0,0);
 	public Vector3 slamraFinal = new Vector3(0,0,0);
 	//End of LK ????????
+	Vector3 lastPos = new Vector3();
+	int timesStuck = 0;
 
 	//constructors
 	public Slamra(PositionTracker parent) {
@@ -63,15 +66,29 @@ public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, Obje
 		if(slamra != null) throw new RuntimeException("slamra settings can not be updated after init");
 	}
 
+	public boolean isSlamraDead(){
+		return timesStuck > 4;
+	}
+
 	@Override
 	public void onRun() {
 		updateSlamraPosition();
-		parent.setCurrentPosition(slamraFinal);
+		parent.parent.opMode.telemetry.addData("slam final", slamraFinal);
+		parent.parent.opMode.telemetry.addData("last pos", lastPos);
+		if(!slamraFinal.equals(lastPos)) {
+			parent.addPositionTicket(Slamra.class, new PositionTicket(slamraFinal));
+			timesStuck = 0;
+			lastPos = slamraFinal;
+		}else{
+			timesStuck ++;
+		}
+
+		parent.parent.opMode.telemetry.addData("slamera stuck", timesStuck);
 	}
 
 	public void updateSlamraPosition() {
 		T265Camera.CameraUpdate up = slamra.getLastReceivedCameraUpdate();
-		if (up == null) return;
+//		if (up == null) return;
 		Pose2d update = up.pose;
 		slamraRawPose = new Vector3(update.getX(), update.getY(), Math.toDegrees(update.getHeading()));
 

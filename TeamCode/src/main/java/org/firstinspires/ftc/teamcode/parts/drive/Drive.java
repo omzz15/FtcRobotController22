@@ -21,7 +21,7 @@ public final class Drive extends ControllableLoopedPart<Robot,DriveSettings, Dri
 
     private DrivePowerConverter dpc;
 
-    public Drive(Robot robot){
+    public  Drive(Robot robot){
         super(robot, "drive", robot.regularTaskManager, () -> new DriveControl(new Vector3(0,0,0),false));
         setConfig(
                 DriveSettings.makeDefault(),

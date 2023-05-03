@@ -1,18 +1,18 @@
 package org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking;
 
 public class EncoderTrackerSettings {
-    public final int ticksPerInchSideways;
-    public final int ticksPerInchForward;
+    public final double ticksPerInchSideways;
+    public final double ticksPerInchForward;
 
-    public EncoderTrackerSettings(int ticksPerInchSideways, int ticksPerInchForward) {
+    public EncoderTrackerSettings(double ticksPerInchSideways, double ticksPerInchForward) {
         this.ticksPerInchSideways = ticksPerInchSideways;
         this.ticksPerInchForward = ticksPerInchForward;
     }
 
     public static EncoderTrackerSettings makeDefault(){
         return new EncoderTrackerSettings(
-                55,
-                48
+                52.38,
+                45.68
         );
     }
 }

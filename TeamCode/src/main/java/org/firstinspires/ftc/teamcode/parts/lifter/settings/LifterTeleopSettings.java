@@ -1,12 +1,11 @@
 package org.firstinspires.ftc.teamcode.parts.lifter.settings;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+
 import java.util.function.Supplier;
+
 import om.self.ezftc.core.Robot;
-import om.self.supplier.modifiers.EdgeModifier;
-import om.self.supplier.modifiers.LatchedModifier;
 import om.self.supplier.suppliers.EdgeSupplier;
-import om.self.supplier.suppliers.LatchedSupplier;
 
 public class LifterTeleopSettings {
     public final Supplier<Float> heightSpeedSupplier;
@@ -21,9 +20,11 @@ public class LifterTeleopSettings {
     public final Supplier<Integer> coneChangeSupplier; //change the height level of the cone
 
     public final Supplier<Boolean> autoHomeSupplier;
-    public final Supplier<Boolean> forceOpenSupplier;
+    public final Supplier<Boolean> forceCloseSupplier;
 
-    public LifterTeleopSettings(Supplier<Float> heightSpeedSupplier, Supplier<Float> turnSpeedSupplier, double turnSpeedMultiplier, Supplier<Boolean> grabberCloseSupplier, Supplier<Boolean> autoGrabSupplier, Supplier<Boolean> autoDockSupplier, Supplier<Boolean> autoDropSupplier, Supplier<Integer> preDropSupplier, Supplier<Integer> coneChangeSupplier, Supplier<Boolean> autoHomeSupplier, Supplier<Boolean> forceOpenSupplier) {
+    public final Supplier<Boolean> forceDownSupplier;
+
+    public LifterTeleopSettings(Supplier<Float> heightSpeedSupplier, Supplier<Float> turnSpeedSupplier, double turnSpeedMultiplier, Supplier<Boolean> grabberCloseSupplier, Supplier<Boolean> autoGrabSupplier, Supplier<Boolean> autoDockSupplier, Supplier<Boolean> autoDropSupplier, Supplier<Integer> preDropSupplier, Supplier<Integer> coneChangeSupplier, Supplier<Boolean> autoHomeSupplier, Supplier<Boolean> forceCloseSupplier, Supplier<Boolean> forceDownSupplier) {
         this.heightSpeedSupplier = heightSpeedSupplier;
         this.turnSpeedSupplier = turnSpeedSupplier;
         this.turnSpeedMultiplier = turnSpeedMultiplier;
@@ -34,7 +35,8 @@ public class LifterTeleopSettings {
         this.preDropSupplier = preDropSupplier;
         this.coneChangeSupplier = coneChangeSupplier;
         this.autoHomeSupplier = autoHomeSupplier;
-        this.forceOpenSupplier = forceOpenSupplier;
+        this.forceCloseSupplier = forceCloseSupplier;
+        this.forceDownSupplier = forceDownSupplier;
     }
 
     public static LifterTeleopSettings makeDefault(Robot robot){
@@ -67,7 +69,8 @@ public class LifterTeleopSettings {
                 () -> gamepad.dpad_right ? 0 : gamepad.dpad_down ? 1 : gamepad.dpad_left ? 2 : gamepad.dpad_up ? 3 : -1,
                 () -> downSupplier.isRisingEdge() ? -1 : upSupplier.isRisingEdge() ? 1 : 0,
                 new EdgeSupplier(() -> robot.opMode.gamepad1.x).getRisingEdgeSupplier(),
-                () -> robot.opMode.gamepad1.y
+                () -> robot.opMode.gamepad1.y,
+                () -> robot.opMode.gamepad1.dpad_down
         );
     }
 }

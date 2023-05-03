@@ -58,6 +58,11 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
             getEventManager().attachToEvent(Events.complete, "stop part", () -> getEventManager().triggerEvent(Robot.Events.STOP));
     }
 
+    public void setMaxPower(double maxPower){
+        pid.minClamp = -maxPower;
+        pid.maxClamp = maxPower;
+    }
+
     public abstract double getError(double target);
 
     public abstract void move(CONTROL base);

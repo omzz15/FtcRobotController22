@@ -26,7 +26,7 @@ public class Vector2{
         switch(index){
             case 1: return X;
             case 2: return Y;
-            default: throw new IndexOutOfBoundsException("the index '" + index + "' is not inside a vector 3");
+            default: throw new IndexOutOfBoundsException("the index '" + index + "' is not inside a vector 2");
         }
     }
 

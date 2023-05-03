@@ -7,12 +7,12 @@ import java.util.function.Supplier;
 
 import om.self.ezftc.core.part.LoopedPartImpl;
 import om.self.supplier.suppliers.EdgeSupplier;
-import om.self.task.core.TaskEx;
 
 public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, ObjectUtils.Null> {
     private LifterTeleopSettings settings;
 
     private EdgeSupplier preDropEdge = new EdgeSupplier();
+//    private Supplier<Boolean> coneInRangeEdge = new EdgeSupplier(parent::isConeInRangeTeleOp).getRisingEdgeSupplier();
 
     Supplier<Boolean> magic = new EdgeSupplier(() -> parent.parent.opMode.gamepad2.a).getRisingEdgeSupplier();
 
@@ -47,7 +47,8 @@ public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, O
         parent.setBaseController(() -> new LifterControl(
                 (double) settings.heightSpeedSupplier.get(),
                 (double) settings.turnSpeedSupplier.get() * settings.turnSpeedMultiplier,
-                settings.grabberCloseSupplier.get()
+                settings.grabberCloseSupplier.get(),
+                settings.forceDownSupplier.get()
         ), true);
     }
 
@@ -64,7 +65,7 @@ public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, O
             parent.setPole(settings.preDropSupplier.get());
             parent.startAutoPreDrop();
         }
-        else if(settings.autoGrabSupplier.get())
+        else if(settings.autoGrabSupplier.get())//  || coneInRangeEdge.get())
             parent.startAutoGrab();
         else if(settings.autoDockSupplier.get())
             parent.startAutoDock();
@@ -72,7 +73,7 @@ public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, O
             parent.startAutoDrop2();
 
         if(magic.get()){
-            parent.setLiftPosition(parent.getLiftPosition() - 200);
+            parent.setLiftPosition(parent.getLiftPosition() - 190);
         }
 
         if(parent.parent.opMode.gamepad2.start || parent.parent.opMode.gamepad1.start){
@@ -82,12 +83,12 @@ public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, O
         if(settings.autoHomeSupplier.get())
             parent.startAutoHome();
 
-        if(settings.forceOpenSupplier.get()){
+        if(settings.forceCloseSupplier.get()){
             LifterControl.flipOpen = 0;
             parent.setGrabberClosed();
         }
 
-        parent.parent.opMode.telemetry.addData("cone", parent.getCone());
+        parent.parent.opMode.telemetry.addData("cone", parent.getCone() + 1);
     }
 
     @Override

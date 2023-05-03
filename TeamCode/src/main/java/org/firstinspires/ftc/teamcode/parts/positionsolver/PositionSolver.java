@@ -7,11 +7,10 @@ import org.firstinspires.ftc.teamcode.parts.positionsolver.settings.PositionSolv
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
 import om.self.ezftc.core.Robot;
-import om.self.ezftc.core.part.ControllablePart;
 import om.self.ezftc.core.part.Part;
 import om.self.ezftc.utils.AngleMath;
-import om.self.ezftc.utils.PID;
 import om.self.ezftc.utils.Vector3;
+import om.self.ezftc.utils.VectorMath;
 import om.self.task.core.TaskEx;
 
 public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUtils.Null> {
@@ -19,7 +18,7 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
 //        public static final String done = "DONE";
 //    } //TODO add done event
 
-    private boolean t;
+    private boolean t = false;
 
     protected PositionTracker positionTracker;
 
@@ -66,7 +65,7 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
 
     public PositionSolver(Drive parent) {
         super(parent, "position solver");
-        setSettings(PositionSolverSettings.makeDefault());
+        setSettings(PositionSolverSettings.defaultSettings);
     }
 
     public PositionSolver(Drive parent, PositionSolverSettings settings){
@@ -79,7 +78,13 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
         yChannel.setNewTarget(target.Y, resetPID);
         rChannel.setNewTarget(target.Z, resetPID);
 
-        triggerEvent(Robot.Events.START);//TODO make this better
+        triggerEvent(Robot.Events.START);// TODO make this better
+    }
+
+    public void setMaxPower(double maxX, double maxY, double maxR){
+        xChannel.setMaxPower(maxX);
+        yChannel.setMaxPower(maxY);
+        rChannel.setMaxPower(maxR);
     }
 
     public boolean isDone(){
@@ -112,10 +117,10 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
 
     @Override
     public void onStart() {
-//        if(!t) {
-//            setNewTarget(positionTracker.getCurrentPosition(), true);
-//            t = true;
-//        }
+        if(!t) {
+            t = true;
+            setNewTarget(positionTracker.getCurrentPosition(), true);
+        }
     }
 
     @Override
