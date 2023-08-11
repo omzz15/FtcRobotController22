@@ -59,19 +59,19 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
 
     private void construct(){
         //-----event manager-----//
-        //make/attach start
+        //make/attach events
         eventManager.attachToEvent(Robot.Events.INIT, "onInit", this::onInit);
-        //make/attach start
+        eventManager.attachToEvent(Robot.Events.INITIAL_START, "onInitialStart", this::onInitialStart);
         eventManager.attachToEvent(Robot.Events.START, "onStart", () -> {
             running = true;
             onStart();
         });
-        //make/attach stop
         eventManager.attachToEvent(Robot.Events.STOP, "onStop", () -> {
             running = false;
             onStop();
         });
         eventManager.attachToEvent(Robot.Events.STOP, "stop taskManager", () -> taskManager.runCommand(Group.Command.PAUSE));
+
         //add bean!!
         getBeanManager().addBean(this, this::onBeanLoad, true, false);
     }
@@ -143,6 +143,8 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
     public void onSettingsUpdate(SETTINGS settings){}
 
     public void onHardwareUpdate(HARDWARE hardware){}
+
+    public abstract void onInitialStart();
 
     public abstract void onStart();
 

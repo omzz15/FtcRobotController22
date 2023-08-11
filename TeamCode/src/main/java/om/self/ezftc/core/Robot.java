@@ -13,22 +13,18 @@ import om.self.task.core.OrderedGroup;
 import om.self.task.event.EventManager;
 
 /**
- * Sets up the framework by configuring base events, adding all the core beans(ex: OpMode), and generating other bean from classes
+ * Sets up the framework by configuring base events, adding all the core beans(ex: OpMode), and generating other beans such as the task manager
  * <br>
  * <br>
  * USED EVENTS:
  * <ul>
  *     <li>INIT</li>
+ *     <li>INITIAL_START</li>
  *     <li>START</li>
  *     <li>STOP</li>
  * </ul>
  */
 public class Robot implements PartParent{
-//    public boolean enableTelemetry = true;
-//    public boolean enableDashboard = true;
-//    public boolean enableTelemetryDebug = true;
-//    public boolean enableDashboardDebug = true;
-
     //managers
     public final EventManager eventManager = new EventManager("main");
 
@@ -41,6 +37,8 @@ public class Robot implements PartParent{
 
     //other things
     public final OpMode opMode;
+
+    private boolean initialStart = true;
 
     public Robot(OpMode opMode) {
         this.opMode = opMode;
@@ -78,19 +76,15 @@ public class Robot implements PartParent{
     public BeanManager getBeanManager(){return beanManager;}
 
 
-//    public void addDebugSource(Supplier<String> source){
-//        if(enableTelemetryDebug){
-//
-//        }
-//        if(enableDashboardDebug){
-//
-//        }
-//    }
-
-
-    public void init(){eventManager.triggerEventRecursively(Events.INIT);}
+    public void init(){
+        eventManager.triggerEventRecursively(Events.INIT);
+    }
 
     public void start(){
+        if(initialStart){
+            eventManager.triggerEventRecursively(Events.INITIAL_START);
+            initialStart = false;
+        }
         eventManager.triggerEventRecursively(Events.START);
     }
 
@@ -104,6 +98,7 @@ public class Robot implements PartParent{
 
     public static final class Events{
         public static final String INIT = "INIT";
+        public static final String INITIAL_START = "INITIAL_START";
         public static final String START = "START";
         public static final String STOP = "STOP";
     }
