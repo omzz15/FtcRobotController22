@@ -10,7 +10,6 @@ import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.Part;
 import om.self.ezftc.utils.AngleMath;
 import om.self.ezftc.utils.Vector3;
-import om.self.ezftc.utils.VectorMath;
 import om.self.task.core.TaskEx;
 
 public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUtils.Null> {
@@ -78,7 +77,7 @@ public class PositionSolver extends Part<Drive, PositionSolverSettings, ObjectUt
         yChannel.setNewTarget(target.Y, resetPID);
         rChannel.setNewTarget(target.Z, resetPID);
 
-        triggerEvent(Robot.Events.START);// TODO make this better
+        triggerEvent(Robot.Names.Events.START);// TODO make this better
     }
 
     public void setMaxPower(double maxX, double maxY, double maxR){

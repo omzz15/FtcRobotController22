@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.parts.lifter;
 
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -11,13 +10,9 @@ import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
 import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
-import java.lang.annotation.Annotation;
-
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.ControllablePart;
 import om.self.ezftc.utils.PID;
-import om.self.ezftc.utils.Vector3;
-import om.self.ezftc.utils.VectorMath;
 import om.self.supplier.consumer.EdgeConsumer;
 import om.self.task.core.Group;
 import om.self.task.core.TaskEx;
@@ -301,7 +296,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 
     public void addAutoDropToTask(TaskEx task){
         task.addStep(autoDropTask::restart);
-        task.waitForEvent(Events.dropComplete, eventManager, () -> {});
+        task.waitForEvent(eventManager.getContainer(Events.dropComplete), () -> {});
     }
 
     /**
@@ -486,7 +481,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         if (getLiftPosition() > 500 && (shortest < startDist) && getCurrentTurnPosition() > 0.25) {
             if(startConeRange){
                 if(positionSolver != null)
-                    positionSolver.triggerEvent(Robot.Events.STOP);
+                    positionSolver.triggerEvent(Robot.Names.Events.STOP);
                 //code for when it is first in position
                 startConeRange = false;
             }
@@ -576,7 +571,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
         if (getLiftPosition() > 500 && (shortest < startDist) && getCurrentTurnPosition() > 0.25) {
             if(startConeRange){
                 if(positionSolver != null)
-                    positionSolver.triggerEvent(Robot.Events.STOP);
+                    positionSolver.triggerEvent(Robot.Names.Events.STOP);
                 startConeRange = false;
             }
 

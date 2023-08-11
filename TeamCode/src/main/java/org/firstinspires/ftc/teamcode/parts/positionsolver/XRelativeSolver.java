@@ -54,6 +54,6 @@ public class XRelativeSolver extends Solver<Drive, DriveControl>{
     @Override
     public void setNewTarget(double target, boolean resetPID) {
         super.setNewTarget(target, resetPID);
-        triggerEvent(Robot.Events.START);
+        triggerEvent(Robot.Names.Events.START);
     }
 }

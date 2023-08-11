@@ -86,7 +86,7 @@ public class TestAutoSLAMRA extends LinearOpMode{
         }
         r.start();
         if(shutdownps)
-            positionSolver.triggerEvent(Robot.Events.STOP);
+            positionSolver.triggerEvent(Robot.Names.Events.STOP);
 
         Group container = new Group("container", r.taskManager);
         TimedTask autoTask = new TimedTask("auto task", container);
@@ -172,7 +172,7 @@ public class TestAutoSLAMRA extends LinearOpMode{
         positionSolver.addMoveToTaskEx(tileToInchAuto(new Vector3(-1.5, 1.5, 90)), autoTask);
         if(!(parkId == 2))
             positionSolver.addMoveToTaskEx(tileToInchAuto(parkId == 1 ? locOne : locThree), autoTask);
-        autoTask.addStep(() -> positionSolver.triggerEvent(Robot.Events.STOP));
+        autoTask.addStep(() -> positionSolver.triggerEvent(Robot.Names.Events.STOP));
     }
 
     private  void autoCircuit(TimedTask autoTask){

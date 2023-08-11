@@ -42,7 +42,7 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
 
         getEventManager().attachToEvent(Events.timedOut, "set vars and stop part", () -> {
             successful = false;
-            triggerEvent(Robot.Events.STOP);
+            triggerEvent(Robot.Names.Events.STOP);
         });
     }
 
@@ -55,7 +55,7 @@ public abstract class Solver<PARENT extends Part<?,?,?>, CONTROL> extends Part<P
         if(settings.alwaysRun)
             getEventManager().detachFromEvent(Events.complete, "stop part");
         else
-            getEventManager().attachToEvent(Events.complete, "stop part", () -> getEventManager().triggerEvent(Robot.Events.STOP));
+            getEventManager().attachToEvent(Events.complete, "stop part", () -> getEventManager().triggerEvent(Robot.Names.Events.STOP));
     }
 
     public void setMaxPower(double maxPower){

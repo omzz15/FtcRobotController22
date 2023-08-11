@@ -12,7 +12,7 @@ public interface LoopedPart extends PartParent{
     default void constructLoop(){
         Task t = new Task(TaskNames.mainLoop, getTaskManager());
         t.setRunnable(this::onRun);
-        getEventManager().attachToEvent(Robot.Events.START, "start main loop", () -> t.runCommand(Group.Command.START));
+        getEventManager().attachToEvent(Robot.Names.Events.START, "start main loop", () -> t.runCommand(Group.Command.START));
     }
 
     void onRun();

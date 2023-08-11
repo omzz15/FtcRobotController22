@@ -19,7 +19,6 @@ import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.Enco
 import org.firstinspires.ftc.teamcode.parts.positiontracker.hardware.PositionTrackerHardware;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.odometry.Odometry;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.settings.PositionTrackerSettings;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
 
 import java.text.DecimalFormat;
 import java.util.function.Function;
@@ -28,7 +27,6 @@ import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Constants;
 import om.self.ezftc.utils.Vector3;
 import om.self.task.core.Group;
-import om.self.task.core.Task;
 import om.self.task.core.TaskEx;
 import om.self.task.other.TimedTask;
 @Config
@@ -106,7 +104,7 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
         }
         r.start();
         if(shutdownps)
-            positionSolver.triggerEvent(Robot.Events.STOP);
+            positionSolver.triggerEvent(Robot.Names.Events.STOP);
 
         Group container = new Group("container", r.taskManager);
         TimedTask autoTask = new TimedTask("auto task", container);
@@ -209,7 +207,7 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
         positionSolver.addMoveToTaskEx(tileToInchAuto(new Vector3(-1.5, 1.5, 90)), autoTask);
         if(!(parkId == 2))
             positionSolver.addMoveToTaskEx(tileToInchAuto(parkId == 1 ? locOne : locThree), autoTask);
-        autoTask.addStep(() -> positionSolver.triggerEvent(Robot.Events.STOP));
+        autoTask.addStep(() -> positionSolver.triggerEvent(Robot.Names.Events.STOP));
     }
 
 

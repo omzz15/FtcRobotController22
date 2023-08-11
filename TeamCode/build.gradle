@@ -50,7 +50,7 @@ dependencies {
 
 //    custom stuff
     implementation 'io.github.omzz15:supplier:2.0.0-FTCRELEASE'
-    implementation 'io.github.omzz15:task:4.3.2-FTCRELEASE'
+    implementation 'io.github.omzz15:task:4.3.3-FTCRELEASE' //TODO make 4.3.3
     implementation 'io.github.omzz15:beans:2.2.0-FTCRELEASE'
 
     implementation 'org.openftc:apriltag:1.1.1'
