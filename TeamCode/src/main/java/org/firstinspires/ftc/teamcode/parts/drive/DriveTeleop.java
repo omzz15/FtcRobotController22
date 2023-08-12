@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.parts.drive;
 import org.apache.commons.lang3.ObjectUtils;
 import org.firstinspires.ftc.teamcode.parts.drive.settings.DriveTeleopSettings;
 
-import om.self.ezftc.core.part.LoopedPartImpl;
-import om.self.ezftc.core.part.Part;
 import om.self.ezftc.utils.Vector3;
 import om.self.ezftc.utils.VectorMath;
 

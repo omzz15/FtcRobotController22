@@ -5,8 +5,6 @@ import org.firstinspires.ftc.teamcode.parts.drive.Drive;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTicket;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
-import om.self.ezftc.core.part.LoopedPartImpl;
-import om.self.ezftc.core.part.Part;
 import om.self.ezftc.utils.Vector2;
 import om.self.ezftc.utils.Vector3;
 import om.self.ezftc.utils.VectorMath;

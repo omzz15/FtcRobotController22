@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTicket;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
-import om.self.ezftc.core.part.LoopedPartImpl;
 import om.self.ezftc.utils.AngleMath;
 import om.self.ezftc.utils.Vector2;
 import om.self.ezftc.utils.Vector3;

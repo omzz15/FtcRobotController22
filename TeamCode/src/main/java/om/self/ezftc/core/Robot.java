@@ -25,7 +25,9 @@ public class Robot implements PartParent{
      */
     public static final class Names{
         /**
-         * This stores all the events used by the robot
+         * This stores all the events used by the robot. This contains many common events that are used throughout (Ex: Part)<br>
+         * IMPORTANT: Every part creates its own event manager so even thought these events are used in parts, they won't be triggered in children unless you use {@link EventManager#triggerEventRecursively(String)} <br>
+         * Note: These event names should be in relation to the event manager from getEventManager() or the path to the event manager should be specified in the JavaDoc. If you have a child event manager, use the directory of the event (Ex: if the manager 'sub' is attached to 'main' then the event 'event' should be "sub/event")
          */
         public static final class Events {
             /**
@@ -35,7 +37,7 @@ public class Robot implements PartParent{
             /**
              * This is the event that is triggered after the bean manager loads all the beans
              */
-            public static final String BEAN_LOADED = "BEAN_LOADED";
+            public static final String ALL_BEAN_LOADED = "ALL_BEAN_LOADED";
             /**
              * This is the event that is triggered when the robot is first started
              */
@@ -51,7 +53,9 @@ public class Robot implements PartParent{
         }
 
         /**
-         * This stores all the names of groups used by the robot
+         * This stores all the names of groups used by the robot. <br>
+         * Note: These groups should be reachable from the group returned by getTaskManager(). If they are multiple levels down, the path to the group should be specified in the JavaDoc. <br>
+         * Note 2: Robot is a little bit of an exception because {@link #getTaskManager()} returns the regular task manager which is a child of the main task manager.
          */
         public static final class Group {
             /**
@@ -67,11 +71,14 @@ public class Robot implements PartParent{
              */
             public static final String END = "end tasks";
         }
+
+
     }
 
     //managers
     /**
-     * This is the top level event manager that handles all the events and other event managers. This is used to trigger top level events found in {@link Names.Events}
+     * This is the top level event manager that handles all the events and other event managers. This is used to trigger top level events found in {@link Names.Events} <br>
+     * IMPORTANT: To trigger top level events in everything (including parts), use {@link EventManager#triggerEventRecursively(String)}
      */
     public final EventManager eventManager = new EventManager("main");
 
@@ -117,7 +124,7 @@ public class Robot implements PartParent{
         //add events
         eventManager.attachToEvent(Names.Events.INIT, "load dependencies", () -> {
             beanManager.load();
-            eventManager.triggerEventRecursively(Names.Events.BEAN_LOADED);
+            eventManager.triggerEventRecursively(Names.Events.ALL_BEAN_LOADED);
         });
 
         //these should be useless because there is no parent task manager but if something breaks try uncommenting them
@@ -145,17 +152,28 @@ public class Robot implements PartParent{
     }
 
     /**
-     * Returns the top level task manager.
-     * @return {@link #taskManager}
+     * Returns its directory. This is needed to be a {@link PartParent}.
+     * @return "robot"
+     */
+    @Override
+    public String getDir() {
+        return getName();
+    }
+
+    /**
+     * Returns the top level regular task manager. <br>
+     * Note: This is NOT the main task manager, it is the regular task manager which is a child of the main task manager ({@link #taskManager})
+     * @return {@link #regularTaskManager}
      */
     @Override
     public Group getTaskManager() {
-        return taskManager;
+        return regularTaskManager;
     }
 
     /**
      * Returns the top level event manager.
-     * @return {@link #eventManager
+     * @return {@link #eventManager}
+     * @see #eventManager
      */
     @Override
     public EventManager getEventManager() {
@@ -170,7 +188,7 @@ public class Robot implements PartParent{
     public BeanManager getBeanManager(){return beanManager;}
 
     /**
-     * Triggers the {@link Names.Events#INIT} event recursively which will also load all beans then trigger the {@link Names.Events#BEAN_LOADED} event recursively.
+     * Triggers the {@link Names.Events#INIT} event recursively which will also load all beans then trigger the {@link Names.Events#ALL_BEAN_LOADED} event recursively.
      */
     public void init(){
         eventManager.triggerEventRecursively(Names.Events.INIT);
@@ -189,7 +207,7 @@ public class Robot implements PartParent{
     }
 
     /**
-     * This runs the main task manager ({@link #taskManager}) which will run everything in the robot. <br>
+     * This runs the main task manager ({@link #taskManager}) which will run everything in the robot. (This is referred to as a loop in some parts of the library)<br>
      * Note: Even if the robot is stopped, calling this will still run the task manager which could run code so this SHOULD NOT be called if you have stopped the robot.
      */
     public void run(){

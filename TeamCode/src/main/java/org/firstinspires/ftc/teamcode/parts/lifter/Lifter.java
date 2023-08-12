@@ -67,11 +67,11 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     }
 
     private void preAutoMove(){
-        triggerEvent(ControllablePart.Events.stopControllers);
+        triggerEvent(Names.Events.STOP_CONTROLLERS);
         setGrabberClosed();
     }
     private void postAutoMove(){
-        triggerEvent(ControllablePart.Events.startControllers);
+        triggerEvent(Names.Events.START_CONTROLLERS);
     }
     private double coneDist;
 
@@ -430,7 +430,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 
         setLiftPositionUnsafe(getLiftPosition());
 
-        triggerEvent(ControllablePart.Events.startControllers); //TODO make better
+        triggerEvent(Names.Events.START_CONTROLLERS); //TODO make better
     }
 
     /**
@@ -637,13 +637,13 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
     }
 
 //    public void addAutoGrabPre(TimedTask task, int conePos){
-//        task.addStep(() -> triggerEvent(ControllablePart.Events.stopControllers));
+//        task.addStep(() -> triggerEvent(ControllablePart.Events.STOP_CONTROLLERS));
 //        task.addStep(()-> setGrabberClosed());
 //        task.addStep(()-> setLiftPosition(conePos + 400));
 //        task.addStep(this::isLiftInTolerance);
 //        task.addStep(()->setTurnPosition(.95));
 ////        task.addStep(() -> setGrabberOpen(true));
-//        task.addStep(() -> triggerEvent(ControllablePart.Events.startControllers));
+//        task.addStep(() -> triggerEvent(ControllablePart.Events.START_CONTROLLERS));
 //    }
 
 //    public void addAutoOpenGrabber(TimedTask task){
@@ -651,7 +651,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 //    }
 
 //    public void addAutoGrabToTask(TimedTask task, int conePos){
-//        task.addStep(() -> triggerEvent(Events.stopControllers));
+//        task.addStep(() -> triggerEvent(Events.STOP_CONTROLLERS));
 //        task.addStep(() -> setGrabberClosed());
 //        task.addStep(() -> setLiftPosition(conePos + 400));
 //        task.addStep(this::isLiftInTolerance);
@@ -666,7 +666,7 @@ public class Lifter extends ControllablePart<Robot, LifterSettings, LifterHardwa
 //        task.addDelay(500); // needed to let grabber close
 //        task.addStep(() -> setLiftPosition(conePos + 400));
 //        task.addStep(this::isLiftInTolerance);
-//        task.addStep(() -> triggerEvent(Events.startControllers));
+//        task.addStep(() -> triggerEvent(Events.START_CONTROLLERS));
 //    }
 
     public void constructConeRanging(){

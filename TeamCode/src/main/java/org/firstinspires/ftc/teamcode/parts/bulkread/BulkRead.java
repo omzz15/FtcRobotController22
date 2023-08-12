@@ -7,7 +7,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import java.util.List;
 
 import om.self.ezftc.core.Robot;
-import om.self.ezftc.core.part.LoopedPartImpl;
 
 public class BulkRead extends LoopedPartImpl<Robot, ObjectUtils.Null, ObjectUtils.Null> {
     private List<LynxModule> allHubs;

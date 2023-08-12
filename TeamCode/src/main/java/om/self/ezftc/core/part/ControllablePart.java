@@ -1,8 +1,5 @@
 package om.self.ezftc.core.part;
 
-
-import java.util.LinkedList;
-import java.util.SimpleTimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
@@ -13,13 +10,15 @@ import om.self.task.core.Task;
 
 //TODO figure out how to reserve certain positions for specific parts to maintain an order
 public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARDWARE, CONTROL> extends Part<PARENT, SETTINGS, HARDWARE> {
-    //----------Names----------//
-    public static final class Events {
-        public static final String startControllers = "START_CONTROLLERS";
-        public static final String stopControllers = "STOP_CONTROLLERS";
-    }
-    public static final class Tasks {
-        public static final String mainControlLoop = "main control loop";
+    public static final class Names{
+        public static final class Events {
+            public static final String START_CONTROLLERS = "START_CONTROLLERS";
+            public static final String STOP_CONTROLLERS = "STOP_CONTROLLERS";
+        }
+
+        public static final class Tasks {
+            public static final String MAIN_CONTROL_LOOP = "main control loop";
+        }
     }
 
     //controls
@@ -86,7 +85,7 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
 
     void constructControllable(){
         //add main control loop
-        Task controlLoop = new Task(Tasks.mainControlLoop, getTaskManager());
+        Task controlLoop = new Task(Names.Tasks.MAIN_CONTROL_LOOP, getTaskManager());
         controlLoop.autoStart = false; // ensure it doesn't run right away
         controlLoop.setRunnable(() -> {
             CONTROL c = getBaseController().get();
@@ -94,12 +93,12 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
             onRun(c);
         });//basically just runs the controllers
         //add events to stop and start controllers
-        getEventManager().attachToEvent(Events.startControllers, "start control loop", () -> controlLoop.runCommand(Group.Command.START));
-        getEventManager().attachToEvent(Events.stopControllers, "stop control loop", () -> controlLoop.runCommand(Group.Command.PAUSE));
+        getEventManager().attachToEvent(Names.Events.START_CONTROLLERS, "start control loop", () -> controlLoop.runCommand(Group.Command.START));
+        getEventManager().attachToEvent(Names.Events.STOP_CONTROLLERS, "stop control loop", () -> controlLoop.runCommand(Group.Command.PAUSE));
     }
 
     public boolean isControlActive() {
-        return getTaskManager().isChildRunning(Tasks.mainControlLoop);
+        return getTaskManager().isChildRunning(Names.Tasks.MAIN_CONTROL_LOOP);
     }
 
     public Supplier<CONTROL> getBaseController() {
@@ -109,7 +108,7 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
     public void setBaseController(Supplier<CONTROL> baseController, boolean start) {
         this.baseController = baseController;
         if(start)
-            getTaskManager().runKeyedCommand(Tasks.mainControlLoop, Group.Command.START);
+            getTaskManager().runKeyedCommand(Names.Tasks.MAIN_CONTROL_LOOP, Group.Command.START);
     }
 
     public void setBaseControllerToDefault(boolean start){

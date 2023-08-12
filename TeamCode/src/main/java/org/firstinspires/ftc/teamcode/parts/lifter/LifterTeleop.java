@@ -5,7 +5,6 @@ import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterTeleopSettings
 
 import java.util.function.Supplier;
 
-import om.self.ezftc.core.part.LoopedPartImpl;
 import om.self.supplier.suppliers.EdgeSupplier;
 
 public class LifterTeleop extends LoopedPartImpl<Lifter, LifterTeleopSettings, ObjectUtils.Null> {

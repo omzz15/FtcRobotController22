@@ -6,46 +6,70 @@ import om.self.task.core.Group;
 import om.self.task.event.EventManager;
 
 /**
- * Provides a simple configuration of events, beans, and tasks that allow you to make extensions(ex: robot parts or telemetry).
- * PLEASE make new documentation when creating a part.
+ * Provides a simple configuration of events, beans, and tasks that allow you to make extensions(ex: robot parts or telemetry) to {@link Robot} or anything that implements {@link PartParent}. <br>
+ * IMPORTANT: PLEASE make new documentation when creating a part. Any names used (Ex: event, group, and task names) should be stored in a public static Names class (or a public instance of a Names object if it is instance specific). Check {@link Robot.Names} for an example.
  * <br>
  * <br>
- * USED EVENTS:
- * <ul>
- *     <li>START_(part name) --> START_(part name)_(extension name)</li>
- *     <li>STOP_(part name) --> STOP_(part name)_(extension name)</li>
- * </ul>
- * @param <PARENT> the type of the part you want to extend
+ * This class uses events from {@link Robot.Names.Events} and {@link}
  */
 public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implements PartParent {
 
-    //basic
+    public final class Names{
+        public final class Events{
+            /**
+             * This is the event that is triggered when the bean manager finishes loading this part (when {@link #onBeanLoad()} is finished)
+             */
+            public static final String LOADED = "LOADED";
+        }
+    }
+
+    /**
+     * The parent of this part
+     */
     public final PARENT parent;
+    /**
+     * This parts task manager. It is attached to the parents task manager so if any of the parent groups are paused/resumed, this parts tasks will also be paused/resumed.
+     */
     public final Group taskManager;
+    /**
+     * This parts event manager. Each part creates its own manager attached to the parents so to trigger an event globally (have it propagate through all children parts), use {@link EventManager#triggerEventRecursively(String)}
+     */
     public final EventManager eventManager;
+    /**
+     * The name of this part. Used for identification and to register the event manager and task manager so it must be unique in the scope of the parent.
+     */
     public final String name;
 
+    /**
+     * The settings of this part
+     */
     private SETTINGS settings;
+    /**
+     * The hardware of this part
+     */
     private HARDWARE hardware;
 
+    /**
+     * flag that tells if the part is running. Toggled using the {@link Robot.Names.Events#START} and {@link Robot.Names.Events#STOP} events
+     */
     private boolean running;
 
     /**
-     * A constructor for Part that creates task and event managers attached to the parents task and event managers
-     * @param parent the parent of this part(CAN NOT BE NULL)
+     * A constructor for Part that creates task and event managers attached to the parents task and event managers and calls {@link #construct()}
+     * @param parent the parent of this part (CAN NOT BE NULL)
      * @param name the name of this part (used to register an event manager and task manager so it must be unique in the scope of the parent)
      */
     public Part(PARENT parent, String name) {
         this.parent = parent;
         this.name = name;
-        taskManager = new Group(name,  parent.getTaskManager());
+        taskManager = new Group(name, parent.getTaskManager());
         eventManager = new EventManager(name, parent.getEventManager());
         construct();
     }
 
     /**
-     * A constructor for Parts that create an event managers attached to the parents and a task managers attached to the custom task manager
-     * @param parent the parent of this part(CAN NOT BE NULL)
+     * A constructor for Parts that create an event managers attached to the parents and a task managers attached to the custom task manager then calls {@link #construct()}
+     * @param parent the parent of this part (CAN NOT BE NULL)
      * @param name the name of this part (used to register an event manager and task manager so it must be unique in the scope of the parent)
      * @param taskManager the custom task manager that is the parent for this parts task manager
      */
@@ -57,41 +81,78 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
         construct();
     }
 
+    /**
+     * Configures the part by attaching the on action methods to the events and adding itself as a bean to the bean manager
+     */
     private void construct(){
         //-----event manager-----//
         //make/attach events
         eventManager.attachToEvent(Robot.Names.Events.INIT, "onInit", this::onInit);
         eventManager.attachToEvent(Robot.Names.Events.INITIAL_START, "onInitialStart", this::onInitialStart);
         eventManager.attachToEvent(Robot.Names.Events.START, "onStart", () -> {
-            running = true;
             onStart();
+            running = true;
         });
         eventManager.attachToEvent(Robot.Names.Events.STOP, "onStop", () -> {
-            running = false;
             onStop();
+            running = false;
         });
         eventManager.attachToEvent(Robot.Names.Events.STOP, "stop taskManager", () -> taskManager.runCommand(Group.Command.PAUSE));
 
         //add bean!!
-        getBeanManager().addBean(this, this::onBeanLoad, true, false);
+        getBeanManager().addBean(this, this::loadBean, true, false);
     }
 
+    /**
+     * Loads the bean using {@link #onBeanLoad()} and triggers the {@link Names.Events#LOADED} event
+     */
+    private void loadBean(){
+        onBeanLoad();
+        eventManager.triggerEvent(Names.Events.LOADED);
+    }
 
+    /**
+     * Gets the name of this part. Generally for identification or debugging purposes
+     * @return the name of this part
+     */
     @Override
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets the directory of the part parent for identification purposes in relation to the top level part (robot)
+     *
+     * @return the directory of the part parent
+     */
+    @Override
+    public String getDir() {
+        return parent.getDir() + PartParent.dirChar + getName();
+    }
+
+    /**
+     * Gets the task manager of the part so other parts can add tasks and run code on this part
+     * @return the task manager of the part ({@link #taskManager}).
+     */
     @Override
     public Group getTaskManager(){
         return taskManager;
     }
 
+    /**
+     * Gets the event manager of the part so other parts can add and trigger events on this part
+     * @return the event manager of the part ({@link #eventManager})
+     */
     @Override
     public EventManager getEventManager() {
         return eventManager;
     }
 
+    /**
+     * Triggers an event on this part. <br>
+     * Note: This calls the recursive version of {@link EventManager#triggerEventRecursively(String)} so the event will propagate through all children parts
+     * @param event the event to trigger
+     */
     public void triggerEvent(String event){
         eventManager.triggerEventRecursively(event);
     }
@@ -101,52 +162,104 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
         eventManager.triggerEventRecursively(event);
     }
 
+    /**
+     * Gets the bean manager so the part can add itself as a bean and get other beans for dependency injection. <br>
+     * Note: This should only return the top level bean manager. No other bean managers should even be created.
+     * @return the bean manager of the part parent (should be the top level bean manager)
+     */
     @Override
     public BeanManager getBeanManager(){
         return parent.getBeanManager();
     }
 
+    /**
+     * Gets the settings of this part. It could return null.
+     * @return the settings of this part
+     */
     public SETTINGS getSettings() {
         return settings;
     }
 
+    /**
+     * Calls {@link #onSettingsUpdate(Object)} then sets the settings of this part
+     * @param settings the new settings
+     */
     public void setSettings(SETTINGS settings) {
         onSettingsUpdate(settings);
         this.settings = settings;
     }
 
+    /**
+     * Gets the hardware of this part. It could return null.
+     * @return the hardware of this part
+     */
     public HARDWARE getHardware() {
         return hardware;
     }
 
+    /**
+     * Calls {@link #onHardwareUpdate(Object)} then sets the hardware of this part
+     * @param hardware the new hardware
+     */
     public void setHardware(HARDWARE hardware) {
         onHardwareUpdate(hardware);
         this.hardware = hardware;
     }
 
+    /**
+     * Sets the settings and hardware of this part
+     * @param settings the new settings
+     * @param hardware the new hardware
+     */
     public void setConfig(SETTINGS settings, HARDWARE hardware){
         setSettings(settings);
         setHardware(hardware);
     }
 
+    /**
+     * Gets if this part is running.
+     * @return {@link #running}
+     */
     public boolean isRunning() {
         return running;
     }
 
+    /**
+     * Method that gets called by the bean manager to load this part
+     */
     public abstract void onBeanLoad();
 
     /**
-     * WARNING: beans may not be loaded onInit, please use onStart for beans
+     * Method that gets called when {@link Robot.Names.Events#INIT} is triggered to initialize the part. <br>
+     * WARNING: beans may not be loaded onInit, so please use the {@link #onBeanLoad()} or {@link #onStart()} methods to access beans.
      */
     public abstract void onInit();
 
+    /**
+     * Called when the settings of this part are updated.
+     * @param settings the new settings
+     */
     public void onSettingsUpdate(SETTINGS settings){}
 
+    /**
+     * Called when the hardware of this part is updated.
+     * @param hardware the new hardware
+     */
     public void onHardwareUpdate(HARDWARE hardware){}
 
+    /**
+     * Method that gets called when {@link Robot.Names.Events#INITIAL_START} is triggered to run code on specifically the first start. <br>
+     * Note: This method is run before {@link Robot.Names.Events#START} is triggered and {@link #onStart()} runs.
+     */
     public abstract void onInitialStart();
 
+    /**
+     * Method that gets called when {@link Robot.Names.Events#START} is triggered to start the part.
+     */
     public abstract void onStart();
 
+    /**
+     * Method that gets called when {@link Robot.Names.Events#STOP} is triggered to stop the part.
+     */
     public abstract void onStop();
 }

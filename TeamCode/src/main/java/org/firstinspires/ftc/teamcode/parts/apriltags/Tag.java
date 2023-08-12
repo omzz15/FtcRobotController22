@@ -31,8 +31,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 import om.self.ezftc.core.Robot;
-import om.self.ezftc.core.part.LoopedPartImpl;
- 
+
 public class Tag extends LoopedPartImpl<Robot, ObjectUtils.Null, ObjectUtils.Null> {
     static int cameraMonitorViewId;
     // Lens intrinsics

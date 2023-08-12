@@ -8,7 +8,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTicket;
 import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
 
-import om.self.ezftc.core.part.LoopedPartImpl;
 import om.self.ezftc.utils.Vector3;
 
 public class Slamra extends LoopedPartImpl<PositionTracker, SlamraSettings, ObjectUtils.Null> {
