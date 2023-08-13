@@ -55,20 +55,16 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
     private boolean running;
 
     /**
-     * A constructor for Part that creates task and event managers attached to the parents task and event managers and calls {@link #construct()}
+     * A constructor that calls {@link #Part(PartParent, String, Group)} with the task manager of the parent for Group
      * @param parent the parent of this part (CAN NOT BE NULL)
      * @param name the name of this part (used to register an event manager and task manager so it must be unique in the scope of the parent)
      */
     public Part(PARENT parent, String name) {
-        this.parent = parent;
-        this.name = name;
-        taskManager = new Group(name, parent.getTaskManager());
-        eventManager = new EventManager(name, parent.getEventManager());
-        construct();
+        this(parent, name, parent.getTaskManager());
     }
 
     /**
-     * A constructor for Parts that create an event managers attached to the parents and a task managers attached to the custom task manager then calls {@link #construct()}
+     * A constructor that creates an event managers attached to the parents and a task managers attached to the custom task manager then initializes the events, tasks, and beans
      * @param parent the parent of this part (CAN NOT BE NULL)
      * @param name the name of this part (used to register an event manager and task manager so it must be unique in the scope of the parent)
      * @param taskManager the custom task manager that is the parent for this parts task manager
@@ -78,13 +74,7 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
         this.name = name;
         this.taskManager = new Group(name, taskManager);
         eventManager = new EventManager(name, parent.getEventManager());
-        construct();
-    }
 
-    /**
-     * Configures the part by attaching the on action methods to the events and adding itself as a bean to the bean manager
-     */
-    private void construct(){
         //-----event manager-----//
         //make/attach events
         eventManager.attachToEvent(Robot.Names.Events.INIT, "onInit", this::onInit);

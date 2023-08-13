@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -242,61 +243,88 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
     }
 
     /**
-     *
+     * A map of all the control environments in this part. The key is the name of the environment and the value is the environment itself. This is used to switch between environments.
      */
     private final HashMap<String, ControlEnvironment> controlEnvironments = new HashMap<>();
+    /**
+     * The current control environment that is used by the main control loop task ({@link Names.Tasks#MAIN_CONTROL_LOOP})
+     */
     private ControlEnvironment currentControlEnvironment;
 
     /**
-     * base constructor
+     * A constructor that calls {@link #ControllablePart(PartParent, String, Group, Supplier, Map[])} with the Group as the parent task manager (from {@link PartParent#getTaskManager()})
      * @param parent the parent of this part
      * @param name the name of the part(used to register an event manager and task manager so it must be unique)
-     * @param baseController the default(starting) controller. this can be changed later using {@link ControllablePart#setBaseController(Supplier, boolean)}
+     * @param baseController the base controller for the default environment. this can be changed later using {@link ControlEnvironment#setBaseController(Supplier)} on the default environment
+     * @param controllers maps of names to controllers for any controllers to add to the default environment. The controllers are added in the order they are specified in the maps.
      */
-    public ControllablePart(PARENT parent, String name, Supplier<CONTROL> baseController) {
-        this(parent, name, parent.getTaskManager(), baseController);
+    public ControllablePart(PARENT parent, String name, Supplier<CONTROL> baseController, Map<String, Consumer<CONTROL>>... controllers) {
+        this(parent, name, parent.getTaskManager(), baseController, controllers);
     }
 
     /**
-     * base constructor with a custom task manager
+     * A constructor calls {@link Part#Part(PartParent, String, Group)} to initialize the base part then adds the default control environment and main control loop task with events.
      * @param parent the parent of this part
      * @param name the name of the part(used to register an event manager and task manager so it must be unique)
-     * @param taskManager the cut
-     * @param baseController the default(starting) controller. this can be changed later using {@link ControllablePart#setBaseController(Supplier, boolean)}
+     * @param taskManager the custom task manager that is the parent for this parts task manager
+     * @param baseController the base controller for the default environment. this can be changed later using {@link ControlEnvironment#setBaseController(Supplier)} on the default environment
+     * @param controllers maps of names to controllers for any controllers to add to the default environment. The controllers are added in the order they are specified in the maps.
      */
-    public ControllablePart(PARENT parent, String name, Group taskManager, Supplier<CONTROL> baseController) {
+    public ControllablePart(PARENT parent, String name, Group taskManager, Supplier<CONTROL> baseController, Map<String, Consumer<CONTROL>>... controllers) {
         super(parent, name, taskManager);
 
-        addControlEnvironment(Names.ControlEnvironment.DEFAULT, new ControlEnvironment(baseController), true);
+        addControlEnvironment(Names.ControlEnvironments.DEFAULT, new ControlEnvironment(baseController, controllers), true);
 
-        Task controlLoop = new Task(Names.Tasks.MAIN_CONTROL_LOOP, getTaskManager());
-        controlLoop.autoStart = false; // ensure it doesn't run right away
+        Task controlLoop = new Task(Names.Tasks.MAIN_CONTROL_LOOP, this.taskManager);
         controlLoop.setRunnable(() -> {
             onRun(currentControlEnvironment.getControl());
         });//basically just runs the controllers
         //add events to stop and start controllers
-        getEventManager().attachToEvent(Names.Events.START_CONTROLLERS, "start control loop", () -> controlLoop.runCommand(Group.Command.START));
-        getEventManager().attachToEvent(Names.Events.STOP_CONTROLLERS, "stop control loop", () -> controlLoop.runCommand(Group.Command.PAUSE));
+        getEventManager().attachToEvent(Names.Events.START_CONTROLLERS, "start control loop", () -> this.taskManager.runKeyedCommand(Names.Tasks.MAIN_CONTROL_LOOP, Group.Command.START));
+        getEventManager().attachToEvent(Names.Events.STOP_CONTROLLERS, "stop control loop", () -> this.taskManager.runKeyedCommand(Names.Tasks.MAIN_CONTROL_LOOP, Group.Command.PAUSE));
     }
 
+    /**
+     * Returns the map of all the control environments in this part. The key is the name of the environment and the value is the environment itself.
+     * @return all control environments ({@link #controlEnvironments})
+     */
     public HashMap<String, ControlEnvironment> getControlEnvironments() {
         return controlEnvironments;
     }
 
+    /**
+     * Returns the current active control environment that is used by the main control loop task ({@link Names.Tasks#MAIN_CONTROL_LOOP}). Editing this environment will affect the control loop.
+     * @return the current control environment ({@link #currentControlEnvironment})
+     */
     public ControlEnvironment getCurrentControlEnvironment() {
         return currentControlEnvironment;
     }
 
+    /**
+     * Sets the current active control environment that is used by the main control loop task ({@link Names.Tasks#MAIN_CONTROL_LOOP}).
+     * @param name the name of the control environment to set as the current environment
+     * @return true if the environment was set successfully, false if the name is not used
+     */
     public boolean setCurrentControlEnvironment(String name) {
         if(!controlEnvironments.containsKey(name)) return false;
         currentControlEnvironment = controlEnvironments.get(name);
         return true;
     }
 
+    /**
+     * Sets the current active control environment to the default one created in the constructor. It just calls {@link #setCurrentControlEnvironment(String)} with {@link Names.ControlEnvironments#DEFAULT}
+     */
     public void setControlEnvironmentToDefault(){
-        setCurrentControlEnvironment(Names.ControlEnvironment.DEFAULT);
+        setCurrentControlEnvironment(Names.ControlEnvironments.DEFAULT);
     }
 
+    /**
+     * Adds a control environment to the map of control environments.
+     * @param name the name of the control environment. This is used to reference the environment in the {@link #controlEnvironments} and when switching/removing it.
+     * @param controlEnvironment the control environment to add
+     * @param setCurrent if true, the environment will be set as the current environment
+     * @return true if the environment was added successfully, false if the name is already used
+     */
     public boolean addControlEnvironment(String name, ControlEnvironment controlEnvironment, boolean setCurrent) {
         if(controlEnvironments.containsKey(name)) return false;
         controlEnvironments.put(name, controlEnvironment);
@@ -304,17 +332,36 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
         return true;
     }
 
-    public ControlEnvironment getControlEnvironment(String name) {
-        return controlEnvironments.get(name);
+    /**
+     * Tries to get the control environment mapped to the specified name.
+     * @param name the name of the control environment to get
+     * @return An optional containing the control environment if the name is used, otherwise an empty optional
+     */
+    public Optional<ControlEnvironment> getControlEnvironment(String name) {
+        return Optional.ofNullable(controlEnvironments.get(name));
     }
 
+    /**
+     * Removes the control environment mapped to the specified name assuming it is not the current control environment.
+     * @param name the name of the control environment to remove
+     * @return true if the control environment was removed successfully, false if the name is not mapped or the control environment is the current environment
+     */
     public boolean removeControlEnvironment(String name) {
+        if(currentControlEnvironment == controlEnvironments.get(name)) return false;
         return controlEnvironments.remove(name) != null;
     }
 
+    /**
+     * Checks if the main control loop task ({@link Names.Tasks#MAIN_CONTROL_LOOP}) is running.
+     * @return true if the task is running, false if it is not
+     */
     public boolean isControlActive() {
         return getTaskManager().isChildRunning(Names.Tasks.MAIN_CONTROL_LOOP);
     }
 
+    /**
+     * Method that gets called with the final control object every loop of the main control loop task ({@link Names.Tasks#MAIN_CONTROL_LOOP}).
+     * @param control the final control object
+     */
     public abstract void onRun(CONTROL control);
 }

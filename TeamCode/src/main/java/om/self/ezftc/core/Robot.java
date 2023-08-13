@@ -21,7 +21,7 @@ public class Robot implements PartParent{
      * <br>
      * Check out {@link Events} for all the names of events used by the robot.
      * <br>
-     * Check out {@link Group} for all the names of groups used by the robot.
+     * Check out {@link Groups} for all the names of groups used by the robot.
      */
     public static final class Names{
         /**
@@ -57,7 +57,7 @@ public class Robot implements PartParent{
          * Note: These groups should be reachable from the group returned by getTaskManager(). If they are multiple levels down, the path to the group should be specified in the JavaDoc. <br>
          * Note 2: Robot is a little bit of an exception because {@link #getTaskManager()} returns the regular task manager which is a child of the main task manager.
          */
-        public static final class Group {
+        public static final class Groups {
             /**
              * This is the group that runs early tasks (check out {@link Robot#startTaskManager})
              */
@@ -84,21 +84,21 @@ public class Robot implements PartParent{
 
     /**
      * This is the top level task manager group that handles all tasks (runnables) and other groups. <br>
-     * Note: This is not intended to be used directly, use the groups defined in {@link Names.Group}
+     * Note: This is not intended to be used directly, use the groups defined in {@link Names.Groups}
      */
     public final Group taskManager = new OrderedGroup("main");
     /**
      * This group is for tasks that need to be run before regular tasks are run. (Ex: running code to find robot position)
      */
-    public final Group startTaskManager = new Group(Names.Group.START, taskManager);
+    public final Group startTaskManager = new Group(Names.Groups.START, taskManager);
     /**
      * This is the main group where most tasks and groups will go to be run normally.
      */
-    public final Group regularTaskManager = new Group(Names.Group.REGULAR, taskManager);
+    public final Group regularTaskManager = new Group(Names.Groups.REGULAR, taskManager);
     /**
      * This group is for tasks that need to be run after all other tasks. (Ex: sending out telemetry)
      */
-    public final Group endTaskManager = new Group(Names.Group.END, taskManager);
+    public final Group endTaskManager = new Group(Names.Groups.END, taskManager);
     /**
      * Handles all beans (which include but are not limited to this and all parts) and dependency injection
      */
@@ -128,8 +128,8 @@ public class Robot implements PartParent{
         });
 
         //these should be useless because there is no parent task manager but if something breaks try uncommenting them
-        //eventManager.attachToEvent(Events.START, "start taskManager",() -> taskManager.runCommand(Group.Command.START));
-        //eventManager.attachToEvent(Events.STOP, "stop taskManager", () -> taskManager.runCommand(Group.Command.PAUSE));
+        //eventManager.attachToEvent(Events.START, "start taskManager",() -> taskManager.runCommand(Groups.Command.START));
+        //eventManager.attachToEvent(Events.STOP, "stop taskManager", () -> taskManager.runCommand(Groups.Command.PAUSE));
 
         //add different task stages
         startTaskManager.autoStopPolicy = om.self.task.core.Group.AutoManagePolicy.DISABLED; //ensure it never turns off so order is maintained
