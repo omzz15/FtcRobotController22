@@ -2,6 +2,11 @@ package om.self.ezftc.utils;
 
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
+/**
+ * A simple PID controller
+ * @deprecated Use {@link com.acmerobotics.roadrunner.control.PIDFController} instead
+ */
+@Deprecated
 public class PID
 {
 	public PIDCoefficients PIDs;
