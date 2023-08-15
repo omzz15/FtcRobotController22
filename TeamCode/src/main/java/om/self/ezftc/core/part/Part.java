@@ -4,6 +4,7 @@ import om.self.beans.core.BeanManager;
 import om.self.ezftc.core.Robot;
 import om.self.task.core.Group;
 import om.self.task.event.EventManager;
+import om.self.task.other.Utils;
 
 /**
  * Provides a simple configuration of events, beans, and tasks that allow you to make extensions(ex: robot parts or telemetry) to {@link Robot} or anything that implements {@link PartParent}. <br>
@@ -212,6 +213,25 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
      */
     public boolean isRunning() {
         return running;
+    }
+
+    /**
+     * Gets the info of this part including its task and event manager.
+     * @param start the string to start each line with
+     * @param tab the string to use as a tab for indentation
+     * @return the info of this part
+     */
+    public String getInfo(String start, String tab){
+        return  start + name + " (" + getDir() + "):\n" + //Name and directory
+                start + tab + "Task Manager:\n" + //Task manager title
+                taskManager.getInfo(start + Utils.repeat(tab, 2), tab) + "\n" + //all task manager info
+                start + tab + "Event Manager:\n" + //Event manager title
+                eventManager.getInfo(start + Utils.repeat(tab, 2), tab) + "\n";//all event manager info
+    }
+
+    @Override
+    public String toString(){
+        return getInfo("", "│\t");
     }
 
     /**

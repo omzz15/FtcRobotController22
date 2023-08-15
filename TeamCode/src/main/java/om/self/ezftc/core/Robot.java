@@ -39,7 +39,7 @@ public class Robot implements PartParent{
              */
             public static final String ALL_BEAN_LOADED = "ALL_BEAN_LOADED";
             /**
-             * This is the event that is triggered when the robot is first started
+             * This is the event that is triggered when the robot is first started. This will run before the {@link #START} event
              */
             public static final String INITIAL_START = "INITIAL_START";
             /**

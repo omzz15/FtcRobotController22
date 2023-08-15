@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 import om.self.task.core.Group;
 import om.self.task.core.Task;
+import om.self.task.other.Utils;
 
 //TODO figure out how to reserve certain positions for specific parts to maintain an order
 public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARDWARE, CONTROL> extends Part<PARENT, SETTINGS, HARDWARE> {
@@ -275,10 +276,8 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
 
         addControlEnvironment(Names.ControlEnvironments.DEFAULT, new ControlEnvironment(baseController, controllers), true);
 
-        Task controlLoop = new Task(Names.Tasks.MAIN_CONTROL_LOOP, this.taskManager);
-        controlLoop.setRunnable(() -> {
-            onRun(currentControlEnvironment.getControl());
-        });//basically just runs the controllers
+        new Task(Names.Tasks.MAIN_CONTROL_LOOP, this.taskManager)
+                .setRunnable(() -> onRun(currentControlEnvironment.getControl()));//basically just runs the controllers
         //add events to stop and start controllers
         getEventManager().attachToEvent(Names.Events.START_CONTROLLERS, "start control loop", () -> this.taskManager.runKeyedCommand(Names.Tasks.MAIN_CONTROL_LOOP, Group.Command.START));
         getEventManager().attachToEvent(Names.Events.STOP_CONTROLLERS, "stop control loop", () -> this.taskManager.runKeyedCommand(Names.Tasks.MAIN_CONTROL_LOOP, Group.Command.PAUSE));
@@ -357,6 +356,32 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
      */
     public boolean isControlActive() {
         return getTaskManager().isChildRunning(Names.Tasks.MAIN_CONTROL_LOOP);
+    }
+
+    /**
+     * Gets the info of this part including its tasks, events, and control environments.
+     *
+     * @param start the string to start each line with
+     * @param tab   the string to use as a tab for indentation
+     * @return the info of this part
+     */
+    @Override
+    public String getInfo(String start, String tab) {
+        StringBuilder builder = new StringBuilder(getInfo(start, tab)); //all the part info
+        builder.append("\n");//new line for formatting
+        builder.append(start).append(tab)
+                .append("Control Environments:\n");
+        controlEnvironments.forEach((k,v) -> {
+            builder.append(start).append(Utils.repeat(tab, 2))
+                    .append(k).append(currentControlEnvironment.equals(v) ? " (Current)" : "").append(":\n"); //name of environment
+
+            v.controllerNameMapping.forEach((name, val) -> {
+                builder.append(start).append(Utils.repeat(tab, 3))
+                        .append(name).append(": ").append(val).append(" (").append(v.controllers.indexOf(val)).append(")\n"); //each controller and index
+            });
+        });
+
+        return builder.toString();
     }
 
     /**
