@@ -1,28 +1,20 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.parts.drive.Drive;
-import org.firstinspires.ftc.teamcode.parts.drive.DriveTeleop;
-import org.firstinspires.ftc.teamcode.parts.drive.headerkeeper.HeaderKeeper;
-import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
-import org.firstinspires.ftc.teamcode.parts.positionsolver.XRelativeSolver;
-import org.firstinspires.ftc.teamcode.parts.positionsolver.settings.PositionSolverSettings;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.odometry.Odometry;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
+import om.self.ezftc.prebuilt.drive.base.Drive;
+import om.self.ezftc.prebuilt.drive.teleop.DriveTeleop;
+
+import om.self.ezftc.prebuilt.positionsolver.XRelativeSolver;
+import om.self.ezftc.prebuilt.positiontracker.PositionTracker;
+import om.self.ezftc.prebuilt.positiontracker.odometry.Odometry;
 
 import java.util.function.Supplier;
 
 import om.self.ezftc.core.Robot;
-import om.self.ezftc.utils.Vector3;
 import om.self.ezftc.utils.VectorMath;
 import om.self.supplier.suppliers.EdgeSupplier;
-import om.self.task.core.Task;
-import om.self.task.core.TaskEx;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".

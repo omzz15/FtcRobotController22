@@ -4,6 +4,11 @@ package om.self.ezftc.utils;
  * An immutable 2D vector class
  */
 public class Vector2{
+    /**
+     * A single instance of a zero vector for easy access
+     */
+    public static Vector2 V2_ZERO = new Vector2(0,0);
+
     public final double X,Y;
 
     /**

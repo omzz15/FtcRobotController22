@@ -4,6 +4,11 @@ package om.self.ezftc.utils;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 public class Vector3 extends Vector2 {
+	/**
+	 * A single instance of a zero vector for easy access
+	 */
+	public static Vector3 V3_ZERO = new Vector3(0,0,0);
+
 	public final double Z;
 
 	/**

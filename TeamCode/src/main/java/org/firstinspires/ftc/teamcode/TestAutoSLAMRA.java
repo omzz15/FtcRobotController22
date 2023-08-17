@@ -6,15 +6,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.teamcode.parts.apriltags.Tag;
-import org.firstinspires.ftc.teamcode.parts.drive.Drive;
+import om.self.ezftc.prebuilt.drive.base.Drive;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
 import org.firstinspires.ftc.teamcode.parts.lifter.LifterControl;
-import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.hardware.PositionTrackerHardware;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.settings.PositionTrackerSettings;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.slamra.Slamra;
+import om.self.ezftc.prebuilt.positionsolver.PositionSolver;
+import om.self.ezftc.prebuilt.positiontracker.PositionTracker;
+import om.self.ezftc.prebuilt.positiontracker.encodertracking.EncoderTracker;
+import om.self.ezftc.prebuilt.positiontracker.hardware.PositionTrackerHardware;
+import om.self.ezftc.prebuilt.positiontracker.settings.PositionTrackerSettings;
+import om.self.ezftc.prebuilt.positiontracker.slamra.Slamra;
 
 import java.text.DecimalFormat;
 import java.util.function.Function;

@@ -11,11 +11,20 @@ import om.self.task.other.Utils;
  * IMPORTANT: PLEASE make new documentation when creating a part. Any names used (Ex: event, group, and task names) should be stored in a public static Names class (or a public instance of a Names object if it is instance specific). Check {@link Robot.Names} for an example.
  * <br>
  * <br>
- * This class uses events from {@link Robot.Names.Events} and {@link}
+ * Note: This class uses names(Ex: events) from {@link Robot.Names.Events} and {@link Names}
  */
 public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implements PartParent {
 
+    /**
+     * This class contains all the names used by {@link Part}.
+     * <br>
+     * <br>
+     * Check out {@link Events} for all events.
+     */
     public final class Names{
+        /**
+         * Stores all the events for {@link Part}
+         */
         public final class Events{
             /**
              * This is the event that is triggered when the bean manager finishes loading this part (when {@link #onBeanLoad()} is finished)
@@ -226,7 +235,7 @@ public abstract class Part<PARENT extends PartParent, SETTINGS, HARDWARE> implem
                 start + tab + "Task Manager:\n" + //Task manager title
                 taskManager.getInfo(start + Utils.repeat(tab, 2), tab) + "\n" + //all task manager info
                 start + tab + "Event Manager:\n" + //Event manager title
-                eventManager.getInfo(start + Utils.repeat(tab, 2), tab) + "\n";//all event manager info
+                eventManager.getInfo(start + Utils.repeat(tab, 2), tab) + "\n"; //all event manager info
     }
 
     @Override

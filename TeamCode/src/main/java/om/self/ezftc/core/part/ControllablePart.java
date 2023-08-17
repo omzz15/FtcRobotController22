@@ -10,11 +10,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import om.self.ezftc.core.Robot;
+import om.self.ezftc.prebuilt.drive.base.DriveControl;
 import om.self.task.core.Group;
 import om.self.task.core.Task;
 import om.self.task.other.Utils;
 
-//TODO figure out how to reserve certain positions for specific parts to maintain an order
+/**
+ * An extension of {@link Part} that uses a control object, which is an object that stores data about what action the part should take, to control the part. These objects are created within a {@link ControlEnvironment ControlEnvironment} by a base controller then modified by other controllers. You are able to create multiple control environments and switch between them. This is useful for creating different control schemes for the same part.
+ * <br>
+ * <br>
+ * Note: This class uses names(Ex: events) from {@link Robot.Names.Events}, {@link Part.Names}, and {@link Names}
+ * @param <PARENT> the parent of this part
+ * @param <SETTINGS> the type of the settings object
+ * @param <HARDWARE> the type of the hardware object
+ * @param <CONTROL> the type of the control object
+ */
 public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARDWARE, CONTROL> extends Part<PARENT, SETTINGS, HARDWARE> {
     /**
      * This class is used to store the names of all the events, tasks, and control environments used by {@link ControllablePart}.
@@ -35,7 +46,7 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
              */
             public static final String START_CONTROLLERS = "START_CONTROLLERS";
             /**
-             * This event stops the main control loop that runs all the controllers and feeds the control to the {@link ControllablePart#onRun(Object)} method
+             * This event stops the main control loop that runs all the controllers and feeds the control to the {@link ControllablePart#onRun(Object)} method. This will disable the control system and allow for manual control of the part.
              */
             public static final String STOP_CONTROLLERS = "STOP_CONTROLLERS";
         }
@@ -385,7 +396,7 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
     }
 
     /**
-     * Method that gets called with the final control object every loop of the main control loop task ({@link Names.Tasks#MAIN_CONTROL_LOOP}).
+     * Method that gets called with the final control object every loop of the main control loop task ({@link Names.Tasks#MAIN_CONTROL_LOOP}). This is where you should put code to take the values inside the control object and convert them to actual actions. (See {@link om.self.ezftc.prebuilt.drive.base.Drive#onRun(DriveControl) onRun(DriveControl)} as an example)
      * @param control the final control object
      */
     public abstract void onRun(CONTROL control);

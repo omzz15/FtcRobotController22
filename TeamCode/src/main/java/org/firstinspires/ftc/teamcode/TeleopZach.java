@@ -4,20 +4,19 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.parts.bulkread.BulkRead;
-import org.firstinspires.ftc.teamcode.parts.drive.Drive;
-import org.firstinspires.ftc.teamcode.parts.drive.DriveTeleop;
+import om.self.ezftc.prebuilt.BulkRead;
+import om.self.ezftc.prebuilt.drive.base.Drive;
+import om.self.ezftc.prebuilt.drive.teleop.DriveTeleop;
 //import org.firstinspires.ftc.teamcode.parts.led.Led;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
 import org.firstinspires.ftc.teamcode.parts.lifter.LifterTeleop;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
+import om.self.ezftc.prebuilt.positiontracker.PositionTracker;
+import om.self.ezftc.prebuilt.positiontracker.encodertracking.EncoderTracker;
 
 import java.text.DecimalFormat;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.utils.Vector3;
-import om.self.task.other.TimedTask;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".

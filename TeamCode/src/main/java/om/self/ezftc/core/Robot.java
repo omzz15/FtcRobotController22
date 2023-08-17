@@ -7,6 +7,7 @@ import om.self.ezftc.core.part.PartParent;
 import om.self.task.core.Group;
 import om.self.task.core.OrderedGroup;
 import om.self.task.event.EventManager;
+import om.self.task.other.Utils;
 
 /**
  * Sets up the framework by configuring base events, adding all the core beans(ex: OpMode), and generating other beans such as the task manager.
@@ -16,7 +17,7 @@ import om.self.task.event.EventManager;
  */
 public class Robot implements PartParent{
     /**
-     * This stores all the names used by the robot
+     * This stores all the names (ex: Events, Groups, and Tasks) used by {@link Robot}
      * <br>
      * <br>
      * Check out {@link Events} for all the names of events used by the robot.
@@ -31,7 +32,7 @@ public class Robot implements PartParent{
          */
         public static final class Events {
             /**
-             * This is the event that is triggered when the robot is initialized
+             * This is the event that is triggered when the robot is initialized. This is called from {@link Robot#init()}
              */
             public static final String INIT = "INIT";
             /**
@@ -43,11 +44,11 @@ public class Robot implements PartParent{
              */
             public static final String INITIAL_START = "INITIAL_START";
             /**
-             * This is the event that is triggered everytime the robot is started
+             * This is the event that is triggered everytime the robot is started. This is called from {@link Robot#start()}
              */
             public static final String START = "START";
             /**
-             * This is the event that is triggered everytime the robot is stopped
+             * This is the event that is triggered everytime the robot is stopped. This is called from {@link Robot#stop()}
              */
             public static final String STOP = "STOP";
         }
@@ -219,5 +220,24 @@ public class Robot implements PartParent{
      */
     public void stop(){
         eventManager.triggerEventRecursively(Names.Events.STOP);
+    }
+
+    /**
+     * Gets the info of the robot including its task and event manager.
+     * @param start the string to start each line with
+     * @param tab the string to use as a tab for indentation
+     * @return the info of this part
+     */
+    public String getInfo(String start, String tab){
+        return  start + "robot (robot):\n" + //Name and directory
+                start + tab + "Task Manager:\n" + //Task manager title
+                taskManager.getInfo(start + Utils.repeat(tab, 2), tab) + "\n" + //all task manager info
+                start + tab + "Event Manager:\n" + //Event manager title
+                eventManager.getInfo(start + Utils.repeat(tab, 2), tab) + "\n"; //all event manager info
+    }
+
+    @Override
+    public String toString(){
+        return getInfo("", "│\t");
     }
 }

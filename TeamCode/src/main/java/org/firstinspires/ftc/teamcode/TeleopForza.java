@@ -5,17 +5,17 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.parts.bulkread.BulkRead;
-import org.firstinspires.ftc.teamcode.parts.drive.Drive;
-import org.firstinspires.ftc.teamcode.parts.drive.DriveTeleop;
-import org.firstinspires.ftc.teamcode.parts.drive.settings.DriveTeleopSettings;
+import om.self.ezftc.prebuilt.BulkRead;
+import om.self.ezftc.prebuilt.drive.base.Drive;
+import om.self.ezftc.prebuilt.drive.teleop.DriveTeleop;
+import om.self.ezftc.prebuilt.drive.teleop.DriveTeleopSettings;
 import org.firstinspires.ftc.teamcode.parts.lifter.Lifter;
 import org.firstinspires.ftc.teamcode.parts.lifter.LifterTeleop;
-import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
-import org.firstinspires.ftc.teamcode.parts.positionsolver.settings.PositionSolverSettings;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.encodertracking.EncoderTracker;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.odometry.Odometry;
+import om.self.ezftc.prebuilt.positionsolver.PositionSolver;
+import om.self.ezftc.prebuilt.positionsolver.settings.PositionSolverSettings;
+import om.self.ezftc.prebuilt.positiontracker.PositionTracker;
+import om.self.ezftc.prebuilt.positiontracker.encodertracking.EncoderTracker;
+import om.self.ezftc.prebuilt.positiontracker.odometry.Odometry;
 
 import java.text.DecimalFormat;
 

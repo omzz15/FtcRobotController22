@@ -3,12 +3,12 @@ package org.firstinspires.ftc.teamcode.parts.lifter;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.parts.drive.Drive;
-import org.firstinspires.ftc.teamcode.parts.drive.DriveControl;
+import om.self.ezftc.prebuilt.drive.base.Drive;
+import om.self.ezftc.prebuilt.drive.base.DriveControl;
 import org.firstinspires.ftc.teamcode.parts.lifter.hardware.LifterHardware;
 import org.firstinspires.ftc.teamcode.parts.lifter.settings.LifterSettings;
-import org.firstinspires.ftc.teamcode.parts.positionsolver.PositionSolver;
-import org.firstinspires.ftc.teamcode.parts.positiontracker.PositionTracker;
+import om.self.ezftc.prebuilt.positionsolver.PositionSolver;
+import om.self.ezftc.prebuilt.positiontracker.PositionTracker;
 
 import om.self.ezftc.core.Robot;
 import om.self.ezftc.core.part.ControllablePart;
