@@ -69,7 +69,7 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
     /**
      * This class allows all the controllers to be stored and managed in one object to make it easy to create multiple control environments and switch between them.
      */
-    class ControlEnvironment implements Cloneable{
+    public class ControlEnvironment implements Cloneable{
         /**
          * The base that supplies the control object to the {@link #controllers} so they can use/modify it.
          * <br>
@@ -349,6 +349,14 @@ public abstract class ControllablePart<PARENT extends PartParent, SETTINGS, HARD
      */
     public Optional<ControlEnvironment> getControlEnvironment(String name) {
         return Optional.ofNullable(controlEnvironments.get(name));
+    }
+
+    /**
+     * Gets the default control environment that is created in the constructor.
+     * @return the default control environment ({@link #controlEnvironments} with key {@link Names.ControlEnvironments#DEFAULT})
+     */
+    public ControlEnvironment getDefualtControlEnvironment() {
+        return controlEnvironments.get(Names.ControlEnvironments.DEFAULT);
     }
 
     /**

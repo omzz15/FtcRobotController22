@@ -4,10 +4,10 @@ import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 /**
  * A simple PID controller
- * @deprecated Use {@link PIDF} instead
+ * <br>
+ * Note: Check out {@link PIDF} for a PID controller with feedforward support.
  */
-@Deprecated
-public class PIDOld
+public class PID
 {
     public PIDCoefficients PIDs;
     public double maxClamp;
@@ -19,13 +19,13 @@ public class PIDOld
     private double lastError = 0;
     private long lastTime = System.nanoTime();
 
-    public PIDOld(){
+    public PID(){
         this.PIDs = new PIDCoefficients(0,0,0);
         this.minClamp = -1;
         this.maxClamp = 1;
     }
 
-    public PIDOld(PIDCoefficients PIDs, double minClamp, double maxClamp)
+    public PID(PIDCoefficients PIDs, double minClamp, double maxClamp)
     {
         this.PIDs = PIDs;
         this.minClamp = minClamp;
@@ -61,6 +61,10 @@ public class PIDOld
         totalError = 0;
         lastError = 0;
         lastTime = System.nanoTime();
+    }
+
+    public void resetValue(){
+        value = 0;
     }
 
     public double updatePIDAndReturnValue(double error)
