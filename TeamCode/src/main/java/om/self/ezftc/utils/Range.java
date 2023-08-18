@@ -10,9 +10,59 @@ public class Range<T extends Comparable<T>>{
 	T min;
 	T max;
 
+	/**
+	 * creates a new range with the given min and max values (inclusive)
+	 * @param min the minimum value of the range
+	 * @param max the maximum value of the range
+	 */
 	public Range(T min, T max){
+		setRange(min, max);
+	}
+
+	/**
+	 * returns the minimum value of the range
+	 * @return the minimum value of the range
+	 */
+	public T getMin() {
+		return min;
+	}
+
+	/**
+	 * sets the minimum value of the range
+	 * @param min the minimum value of the range (inclusive)
+	 */
+	public void setMin(T min) {
+		if (min == null)
+			throw new IllegalArgumentException("The argument min can not be null!");
 		this.min = min;
+	}
+
+	/**
+	 * returns the maximum value of the range
+	 * @return the maximum value of the range
+	 */
+	public T getMax() {
+		return max;
+	}
+
+	/**
+	 * sets the maximum value of the range
+	 * @param max the maximum value of the range (inclusive)
+	 */
+	public void setMax(T max) {
+		if (max == null)
+			throw new IllegalArgumentException("The argument max can not be null!");
 		this.max = max;
+	}
+
+	/**
+	 * sets the range of the range
+	 * @param min the minimum value of the range (inclusive)
+	 * @param max the maximum value of the range (inclusive)
+	 */
+	public void setRange(T min, T max){
+		setMin(min);
+		setMax(max);
 	}
 
 	/**

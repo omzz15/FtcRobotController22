@@ -17,13 +17,20 @@ public class Constants{
      */
     public static final double tileSide = 23.5;
 
+    public static final double millisecondsPerSecond = 1e3;
+    public static final double secondsPerMillisecond = 1 / millisecondsPerSecond;
+
+    public static final double nanoSecondsPerSecond = 1e9;
+    public static final double secondsPerNanoSecond = 1 / nanoSecondsPerSecond;
+
+
     /**
      * Converts a vector3 that has coordinates in tiles to a vector3 that has coordinates in inches. It will convert the first 2 values (X,Y) and leave the third value (Z) alone.
      * @param p the vector to convert
      * @return the converted vector
      */
     public static Vector3 tileToInch(Vector3 p){
-        return VectorMath.multiplyAsVector2(p, tileSide);
+        return VectorMath.scaleAsVector2(p, tileSide);
     }
 
     /**

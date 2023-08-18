@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 /**
  * A simple PID controller
- * @deprecated Use {@link PID} or {@link com.acmerobotics.roadrunner.control.PIDFController} instead
+ * @deprecated Use {@link PIDF} instead
  */
 @Deprecated
 public class PIDOld
@@ -19,13 +19,13 @@ public class PIDOld
     private double lastError = 0;
     private long lastTime = System.nanoTime();
 
-    public PID(){
+    public PIDOld(){
         this.PIDs = new PIDCoefficients(0,0,0);
         this.minClamp = -1;
         this.maxClamp = 1;
     }
 
-    public PID(PIDCoefficients PIDs, double minClamp, double maxClamp)
+    public PIDOld(PIDCoefficients PIDs, double minClamp, double maxClamp)
     {
         this.PIDs = PIDs;
         this.minClamp = minClamp;
