@@ -209,7 +209,7 @@ public class Robot implements PartParent{
 
     /**
      * This runs the main task manager ({@link #taskManager}) which will run everything in the robot. (This is referred to as a loop in some parts of the library)<br>
-     * Note: Even if the robot is stopped, calling this will still run the task manager which could run code so this SHOULD NOT be called if you have stopped the robot.
+     * Note: Even if the robot is stopped, calling this will still run the task manager which could run code so this SHOULD NOT be called if you have stopped the robot. Although, you can run it during init and start if needed.
      */
     public void run(){
         taskManager.run();

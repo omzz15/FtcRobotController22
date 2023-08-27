@@ -1,13 +1,12 @@
 package om.self.ezftc.prebuilt.positiontracker;
 
 
+import org.apache.commons.lang3.ObjectUtils;
+import org.firstinspires.ftc.robotcore.external.Supplier;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import om.self.ezftc.prebuilt.positiontracker.encodertracking.EncoderTracker;
-import om.self.ezftc.prebuilt.positiontracker.hardware.PositionTrackerHardware;
-import om.self.ezftc.prebuilt.positiontracker.odometry.Odometry;
-import om.self.ezftc.prebuilt.positiontracker.settings.PositionTrackerSettings;
-import om.self.ezftc.prebuilt.positiontracker.slamra.Slamra;
+
+import om.self.ezftc.core.part.Part;
 
 import java.util.Hashtable;
 
@@ -18,39 +17,40 @@ import om.self.ezftc.utils.Vector3;
 import om.self.ezftc.utils.VectorMath;
 
 
-public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettings, PositionTrackerHardware> {
-    private Vector3 currentPosition = new Vector3();
-    private Vector2 relativePosition = new Vector2();
-    private double offset;
-    private long lastUpdateTime = System.currentTimeMillis();
-    public Class positionSourceId; //TODO make better
-    private Hashtable<Class, PositionTicket> tickets = new Hashtable();
-    private double imuAngle = 0;
+public class PositionTracker extends Part<Robot, PositionTrackerSettings, ObjectUtils.Null> {
+    private Vector3 position;
+    private Vector3 confidence;
+    private Vector3 accuracy;
+    private Vector2 relativePosition;
+    private Vector2 relativeConfidence;
+
+    private Hashtable<String, PositionTicket> currentTickets = new Hashtable<>();
+    private Hashtable<String, Supplier<PositionTicket>> ticketSuppliers = new Hashtable<>();
+    private long lastUpdateTime = 0;
 
     public PositionTracker(Robot robot) {
         super(robot, "position tracker", robot.startTaskManager);
-        setConfig(PositionTrackerSettings.makeDefault(), PositionTrackerHardware.makeDefault(robot));
+        setConfig(PositionTrackerSettings.makeDefault(), null);
     }
 
-    public PositionTracker(Robot robot, PositionTrackerSettings positionTrackerSettings, PositionTrackerHardware positionTrackerHardware) {
+    public PositionTracker(Robot robot, PositionTrackerSettings positionTrackerSettings) {
         super(robot, "position tracker", robot.startTaskManager);
-        setConfig(positionTrackerSettings, positionTrackerHardware);
-    }
-
-    public void setAngle(double angle){
-        updateAngle();
-        offset += currentPosition.Z - angle;
-        imuAngle = angle;
-        currentPosition = currentPosition.withZ(angle);
+        setConfig(positionTrackerSettings, null);
     }
 
     public Vector3 getCurrentPosition() {
-        return currentPosition;
+        return position;
+    }
+
+    public void setCurrentPosition(Vector3 currentPosition, Vector3 confidence, Vector3 accuracy) {
+        this.currentPosition = currentPosition;
+        lastUpdateTime = System.currentTimeMillis();
     }
 
     /**
+     * Sets the current position of the robot
      * @param currentPosition the current position
-     * @deprecated you should add a position ticket so it integrates!!
+     * @deprecated you should add a position ticket so it integrates with other position sources!!
      */
     @Deprecated
     public void setCurrentPosition(Vector3 currentPosition) {
@@ -62,44 +62,30 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
         return relativePosition;
     }
 
-    public void addPositionTicket(Class id, PositionTicket pt){
-        tickets.put(id, pt);
+    public void setRelativePosition(Vector2 relativePosition) {
+        this.relativePosition = relativePosition;
+    }
+
+    public boolean addPositionTicket(String key, PositionTicket pt){
+        if(ticketSuppliers.containsKey(key))
+            return false;
+        return currentTickets.putIfAbsent(key, pt) == null;
     }
 
     public boolean isPositionStale(){
         return System.currentTimeMillis() - lastUpdateTime > getSettings().stalePosTime;
     }
 
-    public double getImuAngle(){
-        return imuAngle;
-    }
-
-    private void updateAngle() {
-        if(getHardware() != null) {
-            double angle = getHardware().imu.getAngularOrientation(AxesReference.EXTRINSIC, getSettings().axesOrder, AngleUnit.DEGREES).thirdAngle;
-            if (getSettings().flipAngle)
-                angle *= -1;
-            angle -= offset;
-            imuAngle = AngleMath.scaleAngle(angle);
-            setCurrentPosition(currentPosition.withZ(imuAngle));
-        }
-    }
-
-
     @Override
     public void onBeanLoad() {
-        if(getBeanManager().getBestMatch(Slamra.class, true, true) != null)
-            positionSourceId = Slamra.class;
-        else if(getBeanManager().getBestMatch(EncoderTracker.class, true, true) != null)
-            positionSourceId = EncoderTracker.class;
-        else if(getBeanManager().getBestMatch(Odometry.class, true, true) != null)
-            positionSourceId = Odometry.class;
-
-        //TODO something better
     }
 
     @Override
     public void onInit() {
+    }
+
+    @Override
+    public void onInitialStart() {
     }
 
     @Override
@@ -115,7 +101,6 @@ public class PositionTracker extends LoopedPartImpl<Robot, PositionTrackerSettin
 
     @Override
     public void onHardwareUpdate(PositionTrackerHardware hardware) {
-        hardware.imu.initialize(hardware.parameters);
 
         while (!hardware.imu.isGyroCalibrated())
         {

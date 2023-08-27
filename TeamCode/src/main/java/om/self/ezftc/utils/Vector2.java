@@ -39,6 +39,15 @@ public class Vector2{
     }
 
     /**
+     * Creates a vector with the given value
+     * @param val the value to set the x and y values to
+     */
+    public Vector2(double val){
+        X = val;
+        Y = val;
+    }
+
+    /**
      * Converts the vector to an array
      * @return an array with the values of the vector {x,y}
      */
