@@ -186,9 +186,9 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
 
     private void park(TaskEx autoTask){
         //Parking locations
-        Vector3 locOne = isRight ? new Vector3(-0.5, .5, 180) : new Vector3(-2.5, .5, 180);
-        Vector3 locTwo = new Vector3(-1.5, .5, 180);
-        Vector3 locThree = isRight ? new Vector3(-2.5, .5, 180) : new Vector3(-0.5, .5, 180);
+        Vector3 locOne = isRight ? new Vector3(-0.42, .58, 180) : new Vector3(-2.5, .5, 180);
+        Vector3 locTwo = new Vector3(-1.42, .58, 180);
+        Vector3 locThree = isRight ? new Vector3(-2.42, .58, 180) : new Vector3(-0.5, .5, 180);
         int parkId = aprilTag.parkID;
         //Parking task
         positionSolver.setSettings(PositionSolverSettings.loseSettings);
@@ -234,7 +234,7 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
         positionSolver.setSettings(PositionSolverSettings.loseSettings);
 
         //autoTask.addDelay(1000);
-        autoTask.addTimedStep(() -> {}, l::isPoleInRange, 1500);
+        autoTask.addTimedStep(() -> {}, l::isPoleInRange, 2000);
         //autoTask.addDelay(100);
         l.addAutoDropToTask(autoTask);
         autoTask.addDelay(100); // was 1000
@@ -425,10 +425,10 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
 
 
     private void moveSideDangerous(TimedTask autoTask){
-        Vector3 rightLoadedPrep = new Vector3(-1.5,.5,135);
-        Vector3 rightTallPrep = new Vector3(-1.5,.5,180);
-        Vector3 preloadTall = new Vector3(-1.5,0.5,135);
-        Vector3 poleT = new Vector3(-1.25, .27, 135);
+        Vector3 rightLoadedPrep = new Vector3(-1.5,.58,135);
+        Vector3 rightTallPrep = new Vector3(-1.5,.58,180);
+        Vector3 preloadTall = new Vector3(-1.5,0.58,135);
+        Vector3 poleT = new Vector3(-1.25, .31, 135);
 
 
 
@@ -476,11 +476,12 @@ public class AutoRightDangerousAndAll extends LinearOpMode{
     private void setupSideDangerous(TimedTask autoTask){
         // alliance side mid pole
         //start
-        Vector3 rightTallPrep = new Vector3(-1.5,.5,180);
+        Vector3 rightTallPrep = new Vector3(-1.5,.58,180);
 //        Vector3 rightStack = new Vector3(-2.57,.58,180);
-        Vector3 rightLoadedPrep = new Vector3(-1.5,.5,135);
+        Vector3 rightLoadedPrep = new Vector3(-1.5,.58,135);
 //        Vector3 poleM = new Vector3(-1.275, .7475, 225);
-        Vector3 poleT = new Vector3(-1.25, .27, 135);
+        Vector3 poleT = new Vector3(-1.25, .31, 135);
+        Vector3 rightStack = new Vector3(-2.57,.58,180);
 
         l.addAutoPreDropToTask(autoTask, 3, false);
         positionSolver.addMoveToTaskEx(tileToInchAuto(rightTallPrep), autoTask);
